@@ -4,7 +4,8 @@ const Schema = mongoose.Schema
 const Message = new Schema({
     message: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     }
 })
 
