@@ -2,6 +2,7 @@
   <dictionary name="boss">
     <words>
       <w>minlength</w>
+      <w>splited</w>
     </words>
   </dictionary>
 </component>
