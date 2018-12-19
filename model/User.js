@@ -69,15 +69,13 @@ User.methods.generateAuthToken = async function() {
     const token = jwt.sign({_id, access}, SALT)
 
     this.tokens = this.tokens.concat([{access, token}])
-    return this.save().then(() => {
-        return token
-    })
+    return this.save().then(() => token)
 }
 
 User.statics.findByEmailPassword = function(email, password) {
     const hash = SHA256(password)
 
-    return this.findOne({ email, password: hash })
+    return this.findOne({email, password: hash})
 }
 
 User.statics.findByAuthToken = function(authToken) {
