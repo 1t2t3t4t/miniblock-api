@@ -1,6 +1,6 @@
 const User = require('../model/User')
 
-const authentication = (req, res, next) => {
+const authenticate = (req, res, next) => {
     const token = req.headers.authorization
     User.findByAuthToken(token).then((user) => {
         if (!user) {
@@ -15,4 +15,4 @@ const authentication = (req, res, next) => {
     })
 }
 
-module.exports = authentication
+module.exports = authenticate

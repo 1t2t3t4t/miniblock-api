@@ -55,7 +55,7 @@ const User = new Schema({
 })
 
 User.pre('save', function (next) {
-    if (this.isNew) {
+    if (this.isModified('password')) {
         const password = this.password
         this.password = SHA256(password)
     }
@@ -72,13 +72,14 @@ User.methods.generateAuthToken = async function() {
     return this.save().then(() => token)
 }
 
-User.statics.findByEmailPassword = function(email, password) {
+User.statics.findByEmailPassword = async function(email, password) {
+    if (!password || !email) { throw new Error('Invalid email or password.') }
     const hash = SHA256(password)
 
     return this.findOne({email, password: hash})
 }
 
-User.statics.findByAuthToken = function(authToken) {
+User.statics.findByAuthToken = async function(authToken) {
     const splitedAuthToken = authToken.split(' ')
 
     if (splitedAuthToken[0] !== 'Bearer' || !splitedAuthToken[1]) { throw new Error('Invalid Auth Header.') }

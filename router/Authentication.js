@@ -8,10 +8,10 @@ route.post('/login', (req, res) => {
     const password = req.body.password
 
     User.findByEmailPassword(email, password).then((user) => {
-        if (!user) { return res.status(400).send('User not found.') }
+        if (!user) { throw new Error('Invalid email or password.') }
         return user.generateAuthToken()
     }).then((token) => {
-        res.header({ 'Authorization' : `Bearer ${token}` }).send('Successfully login')
+        return res.json({'token': token})
     }).catch((e) => {
         res.status(400).send(e)
     })
@@ -27,7 +27,7 @@ route.post('/register', (req, res) => {
     user.save().then(() => {
         return user.generateAuthToken()
     }).then((token) => {
-        res.header({ 'Authorization' : `Bearer ${token}` }).send(user)
+        res.send({'token': token})
     }).catch((e) => {
         res.status(400).send(e)
     })
