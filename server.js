@@ -1,10 +1,9 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const mongoose = require('./db/mongoose')
+const mongoose = require('./src/db/mongoose')
 
-const Authentication = require('./router/Authentication')
-const authenticate = require('./middleware/authenticate')
-const User = require('./model/User')
+const Authentication = require('./src/router/Authentication')
+const authenticate = require('./src/middleware/authenticate')
 
 const port = process.env.PORT || 3000
 
