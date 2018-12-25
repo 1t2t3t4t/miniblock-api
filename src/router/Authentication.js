@@ -11,7 +11,7 @@ route.post('/login', (req, res) => {
         if (!user) { throw new Error('Invalid email or password.') }
         return user.generateAuthToken()
     }).then((token) => {
-        return res.json({'token': token})
+        return res.send({'token': token})
     }).catch((e) => {
         res.status(400).send(e)
     })
