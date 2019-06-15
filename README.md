@@ -1,10 +1,9 @@
-##How to
+# How to
 
 Firstly, start mongodb server
 
-#eg.
+### eg.
 `mongod --dbpath /usr/local/var/mongodb/`
 
-#test
-
+### test
 `npm test`
