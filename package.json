@@ -4,7 +4,15 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "nyc --reporter=text mocha --recursive --exit"
+    "test": "nyc --reporter=text mocha --recursive --exit",
+    "postinstall": "link-module-alias"
+  },
+  "_moduleAliases": {
+    "@model": "src/model",
+    "@router": "src/router",
+    "@middleware": "src/middleware",
+    "@utils": "src/utils",
+    "@db": "src/db"
   },
   "author": "Nathakorn Throngtrairat",
   "license": "ISC",
@@ -17,6 +25,7 @@
     "validator": "^10.9.0"
   },
   "devDependencies": {
+    "link-module-alias": "^1.1.5",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0"
   }
