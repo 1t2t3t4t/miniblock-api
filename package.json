@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "start": "node server",
     "test": "nyc --reporter=text mocha --recursive --exit",
     "postinstall": "link-module-alias"
   },
