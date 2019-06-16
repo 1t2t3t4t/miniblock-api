@@ -1,6 +1,5 @@
 const assert = require('assert')
 const request = require('supertest')
-const mocha = require('mocha')
 const app = require('../server')
 
 const User = require('@model/User')
@@ -9,7 +8,8 @@ beforeEach((next) => {
     User.deleteMany({}).then(() => {
         next()
     }).catch((err) => {
-
+        console.log('something wrong')
+        console.log(err)
     })
 })
 
@@ -18,6 +18,10 @@ describe('POST /auth/login', () => {
         request(app)
             .post('/auth/login')
             .expect(400)
+            .expect((res) => {
+                assert(res.body.status == 'error')
+                assert(res.body.body.message == 'Invalid email or password.')
+            })
             .end(done)
     })
 
@@ -29,6 +33,10 @@ describe('POST /auth/login', () => {
                 'password': 'randompassword'
             })
             .expect(400)
+            .expect((res) => {
+                assert(res.body.status == 'error')
+                assert(res.body.body.message == 'Invalid email or password.')
+            })
             .end(done)
     })
 })

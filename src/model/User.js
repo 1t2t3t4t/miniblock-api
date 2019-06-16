@@ -73,16 +73,17 @@ User.methods.generateAuthToken = async function() {
 }
 
 User.statics.findByEmailPassword = async function(email, password) {
-    if (!password || !email) { throw new Error('Invalid email or password.') }
+    if (!password || !email) { throw Error('Invalid email or password.') }
     const hash = SHA256(password)
 
     return this.findOne({email, password: hash})
 }
 
 User.statics.findByAuthToken = async function(authToken) {
+    if (!authToken) throw Error('Require Auth Token.')
     const splitedAuthToken = authToken.split(' ')
 
-    if (splitedAuthToken[0] !== 'Bearer' || !splitedAuthToken[1]) { throw new Error('Invalid Auth Header.') }
+    if (splitedAuthToken[0] !== 'Bearer' || !splitedAuthToken[1]) { throw Error('Invalid Auth Header.') }
 
     const token = splitedAuthToken[1]
     const user = jwt.verify(token, SALT)

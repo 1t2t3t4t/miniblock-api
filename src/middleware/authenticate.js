@@ -1,4 +1,5 @@
 const User = require('../model/User')
+const { ErrorResponse } = require('../model/HTTPResponse')
 
 const authenticate = (req, res, next) => {
     const token = req.headers.authorization
@@ -11,7 +12,8 @@ const authenticate = (req, res, next) => {
         req.token = token
         next()
     }).catch((e) => {
-        res.status(401).send(e)
+        res.status(401)
+        next(e)
     })
 }
 

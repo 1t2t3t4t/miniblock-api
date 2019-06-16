@@ -5,6 +5,8 @@ const mongoose = require('./src/db/mongoose')
 const Authentication = require('./src/router/Authentication')
 const authenticate = require('./src/middleware/authenticate')
 
+const { ErrorResponse } = require('@model/HTTPResponse') 
+
 const port = process.env.PORT || 3000
 
 let app = express()
@@ -16,6 +18,13 @@ app.get('/', authenticate, (req, res) => {
 });
 
 app.use('/auth', Authentication)
+
+app.use(function (err, req, res, next) {
+	console.log('---ERROR---')
+	console.log(err)
+  	const error = new ErrorResponse(err.message)
+  	res.send(error)
+})
 
 module.exports = app.listen(port, () => {
     console.log('Server started on port', port)

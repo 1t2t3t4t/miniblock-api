@@ -1,5 +1,6 @@
 const express = require('express')
-const User = require('../model/User')
+const User = require('@model/User')
+const { ErrorResponse, Response } = require('@model/HTTPResponse')
 
 const route = express.Router()
 
@@ -11,9 +12,9 @@ route.post('/login', (req, res) => {
         if (!user) { throw new Error('Invalid email or password.') }
         return user.generateAuthToken()
     }).then((token) => {
-        return res.send({'token': token})
+        return res.send(new Response({'token': token}))
     }).catch((e) => {
-        res.status(400).send(e)
+        res.status(400).send(new ErrorResponse(e.message))
     })
 })
 
@@ -27,9 +28,9 @@ route.post('/register', (req, res) => {
     user.save().then(() => {
         return user.generateAuthToken()
     }).then((token) => {
-        res.send({'token': token})
+        res.send(new Response({'token': token}))
     }).catch((e) => {
-        res.status(400).send(e)
+        res.status(400).send(new ErrorResponse(e.message))
     })
 })
 
