@@ -5,6 +5,11 @@ const Message = new Schema({
     message: {
         type: String,
         required: true
+    },
+    ownerID: {
+    	type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    	required: true	
     }
 })
 

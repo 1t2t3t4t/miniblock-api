@@ -2,8 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('./src/db/mongoose')
 
-const Authentication = require('./src/router/Authentication')
-const authenticate = require('./src/middleware/authenticate')
+const Authentication = require('@router/Authentication')
+const Member = require('@router/Member')
+const authenticate = require('@middleware/authenticate')
 
 const { ErrorResponse } = require('@model/HTTPResponse') 
 
@@ -18,6 +19,7 @@ app.get('/', authenticate, (req, res) => {
 });
 
 app.use('/auth', Authentication)
+app.use('/member', Member)
 
 app.use(function (err, req, res, next) {
 	console.log('---ERROR---')

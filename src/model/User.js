@@ -39,9 +39,9 @@ const User = new Schema({
         },
         minlength: 1
     },
-    messages: {
-        type: [Message.schema]
-    },
+    messageList: [
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Message' }
+    ],
     tokens: [{
         access: {
             type: String,
@@ -70,6 +70,14 @@ User.methods.generateAuthToken = async function() {
 
     this.tokens = this.tokens.concat([{access, token}])
     return this.save().then(() => token)
+}
+
+User.methods.toSafeJSON = function() {
+    const user = this.toObject()
+    delete user.password
+    delete user.tokens
+    delete user.__v
+    return user
 }
 
 User.statics.findByEmailPassword = async function(email, password) {
