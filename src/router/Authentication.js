@@ -18,7 +18,7 @@ route.post('/login', (req, res) => {
     })
 })
 
-route.post('/register', (req, res) => {
+route.post('/register', async (req, res) => {
     const email = req.body.email
     const username = req.body.username
     const password = req.body.password
@@ -27,7 +27,7 @@ route.post('/register', (req, res) => {
 
     user.save().then(() => {
         return user.generateAuthToken()
-    }).then((token) => {
+    }).then(async (token) => {
         res.send(new Response({'token': token}))
     }).catch((e) => {
         res.status(400).send(new ErrorResponse(e.message))
