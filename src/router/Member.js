@@ -37,6 +37,9 @@ route.post('/getMessageList', authenticate, async (req, res, next) => {
 	.populate('messageList')
 	.then((messageList) => {
 		res.status(200).send(new Response(messageList))
+	}).catch((e) => {
+		res.status(500)
+		next(e)
 	})
 })
 
