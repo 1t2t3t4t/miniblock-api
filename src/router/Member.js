@@ -30,4 +30,14 @@ route.post('/saveMessage', authenticate, async (req, res, next) => {
 	})
 })
 
+route.post('/getMessageList', authenticate, async (req, res, next) => {
+	const user = req.user
+	User.findOne({ _id: user._id })
+	.select('messageList')
+	.populate('messageList')
+	.then((messageList) => {
+		res.status(200).send(new Response(messageList))
+	})
+})
+
 module.exports = route
