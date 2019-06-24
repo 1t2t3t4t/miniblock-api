@@ -2,13 +2,13 @@
   "name": "lope",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "lib/server.js",
   "scripts": {
-    "start": "node server",
-    "test": "nyc --reporter=text mocha --recursive --exit",
+    "start": "node lib/server",
+    "test": "nyc --reporter=text mocha lib/test/*.test.js --recursive --exit",
     "postinstall": "link-module-alias",
     "flow": "flow",
-    "build": "flow-remove-types ./src/ -d ./lib/ --all --pretty"
+    "build": "rm -rf ./lib && flow-remove-types ./src/ -d ./lib/src/ --all --pretty && flow-remove-types ./test/ -d ./lib/test/ --all --pretty"
   },
   "_moduleAliases": {
     "@model": "src/model",
