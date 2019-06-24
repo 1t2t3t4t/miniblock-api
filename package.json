@@ -2,11 +2,13 @@
   "name": "lope",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node server",
     "test": "nyc --reporter=text mocha --recursive --exit",
-    "postinstall": "link-module-alias"
+    "postinstall": "link-module-alias",
+    "flow": "flow",
+    "build": "flow-remove-types ./src/ -d ./lib/ --all --pretty"
   },
   "_moduleAliases": {
     "@model": "src/model",
@@ -26,6 +28,8 @@
     "validator": "^10.9.0"
   },
   "devDependencies": {
+    "flow-bin": "^0.101.1",
+    "flow-remove-types": "^2.101.0",
     "link-module-alias": "^1.1.5",
     "mocha": "^5.2.0",
     "mongodb-memory-server": "^5.1.4",
