@@ -7,9 +7,9 @@ const Message = new Schema({
         required: true
     },
     ownerID: {
-    	type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-    	required: true	
+        required: true
     }
 })
 
