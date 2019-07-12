@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const mongoose = require('./db/mongoose')
+const mongoose = require('./src/db/mongoose')
 
 const Authentication = require('@router/Authentication')
 const Member = require('@router/Member')
