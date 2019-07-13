@@ -69,6 +69,32 @@ describe('The middleware ensures that request has a valid token before perform a
         authenticate(req, res, next)
     })
 
+    it('should now add user if invalid token', (done) => {
+        const req = {
+            headers: {
+                authorization: 'Bearer ' + 'superinvalidtoken'
+            }
+        }
+        const res = {
+            status: (code) => {
+                assert.deepEqual(code, 401)
+            }
+        }
+
+        const next = (error) => {
+            if (error) {
+                assert.deepEqual(req.user, undefined)
+                assert.deepEqual(req.token, undefined)
+                assert.deepEqual(error.message, 'Whatever error returned from actual firebase-admin')
+                done()
+                return
+            }
+
+            throw Error('expect error')
+        }
+        authenticate(req, res, next)
+    })
+
     it('should check correct token format', (done) => {
         const req = {
             headers: {
@@ -77,7 +103,7 @@ describe('The middleware ensures that request has a valid token before perform a
         }
         const res = {
             status: (code) => {
-                console.log(code)
+                assert.deepEqual(code, 401)
             }
         }
 
@@ -100,7 +126,7 @@ describe('The middleware ensures that request has a valid token before perform a
         }
         const res = {
             status: (code) => {
-                console.log(code)
+                assert.deepEqual(code, 401)
             }
         }
 
