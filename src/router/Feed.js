@@ -4,6 +4,13 @@ const { Response } = require('@model/HTTPResponse')
 
 const router = express.Router()
 
+/**
+ * @api {GET} /feed/all GetAllFeed
+ * @apiDescription Fetch all posts
+ * @apiGroup Feed
+ *
+ * @apiSuccess {[Post]} posts Array of post
+ * */
 router.get('/all', (req, res, next) => {
     Post.find({}).then((posts) => {
         res.status(200).send(new Response({ posts }))

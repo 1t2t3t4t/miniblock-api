@@ -6,8 +6,7 @@ const route = express.Router()
 
 /**
  * @api {POST} /auth/login Login
- * @apiDeprecated Dont really know if we need this or not so keep it just in case.
- * @apiName Register
+ * @apiDeprecated Dont really know if we need this or not so keep it just in case
  * @apiGroup Authentication
  *
  * @apiParam {String} uid           Users unique ID.
@@ -36,7 +35,6 @@ route.post('/login', (req, res) => {
 /**
  * @api {POST} /auth/register Register
  * @apiDescription Register user from Firebase to the database **Must be called**
- * @apiName Register
  * @apiGroup Authentication
  *
  * @apiParam {String} uid           Users unique ID.
