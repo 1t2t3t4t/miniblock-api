@@ -7,7 +7,7 @@
     "start": "node server",
     "test": "nyc --reporter=text mocha --recursive --exit",
     "postinstall": "link-module-alias",
-    "gen-doc": "apidoc -i src/router -o docs/ && open docs/index.html"
+    "gen-doc": "apidoc -i src/ -o docs/ && open docs/index.html"
   },
   "_moduleAliases": {
     "@model": "src/model",
