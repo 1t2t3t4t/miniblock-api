@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
 const config = require('../../config')
 
-mongoose.connect(config.mongouri, {
+const mongouri = config.MONGO_URI
+
+mongoose.connect(mongouri, {
     useCreateIndex: true,
     useNewUrlParser: true
 }).then(() => {
