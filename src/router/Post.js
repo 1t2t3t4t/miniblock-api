@@ -5,6 +5,19 @@ const { Response } = require('@model/HTTPResponse')
 
 const router = express.Router()
 
+/**
+ * @api {POST} /post/create Create Post
+ * @apiDescription Create post. Dont know what to more than this.
+ * @apiGroup Post
+ * @apiPermission loggedIn
+ *
+ * @apiHeader {String} Authorization Token string from Firebase
+ *
+ * @apiParam {String} content Content of the post
+ *
+ * @apiSuccess {Post} post Post model
+ *
+ * */
 router.post('/create', authenticate, (req, res, next) => {
     const user = req.user
     const content = req.body.content

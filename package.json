@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server",
     "test": "nyc --reporter=text mocha --recursive --exit",
-    "postinstall": "link-module-alias"
+    "postinstall": "link-module-alias",
+    "gen-doc": "apidoc -i src/ -o docs/ && open docs/index.html"
   },
   "_moduleAliases": {
     "@model": "src/model",
@@ -27,6 +28,7 @@
     "validator": "^10.9.0"
   },
   "devDependencies": {
+    "apidoc": "^0.17.7",
     "link-module-alias": "^1.1.5",
     "mocha": "^5.2.0",
     "mongodb-memory-server": "^5.1.4",
