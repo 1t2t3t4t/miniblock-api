@@ -5,7 +5,7 @@ const { Response } = require('@model/HTTPResponse')
 const router = express.Router()
 
 /**
- * @api {GET} /feed/all GetAllFeed
+ * @api {GET} /feed/all Get All Feed
  * @apiDescription Fetch all posts
  * @apiGroup Feed
  *
