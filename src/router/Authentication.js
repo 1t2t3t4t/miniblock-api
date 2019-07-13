@@ -19,9 +19,9 @@ route.post('/login', (req, res) => {
 })
 
 route.post('/register', async (req, res) => {
-    const { email, username, password, uid } = req.body
+    const { email, username, uid } = req.body
 
-    let user = new User({ email, username, password, uid })
+    let user = new User({ email, username, uid })
 
     user.save().then(async (token) => {
         res.send(new Response({'message': 'Register successfully', user}))
