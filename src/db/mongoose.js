@@ -1,9 +1,27 @@
 const mongoose = require('mongoose')
 const config = require('../../config')
 
-const mongouri = config.MONGO_URI
+const env = process.env.ENV || "development"
 
-mongoose.connect(mongouri, {
+let mongoURI
+
+switch (env) {
+    case 'production':
+        mongoURI = config.MONGO_URI
+        break;
+    case 'staging':
+        mongoURI = config.MONGO_URI
+        break;
+    case 'development':
+        mongoURI = config.MONGO_LOCAL_URI
+        break;
+    default:
+        mongoURI = config.MONGO_LOCAL_URI
+        break;
+}
+
+
+mongoose.connect(mongoURI, {
     useCreateIndex: true,
     useNewUrlParser: true
 }).then(() => {
