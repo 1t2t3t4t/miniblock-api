@@ -15,6 +15,7 @@ class DBManager {
             useCreateIndex: true,
             useNewUrlParser: true
         })
+        mongoose.connection.db.dropDatabase();
     }
 
     stop() {
