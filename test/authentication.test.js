@@ -12,7 +12,8 @@ before((next) => {
         const stubUser = new User({
             email: 'test@email.com',
             password: 'password',
-            username: 'username'
+            username: 'username',
+            uid: "1"
         })
         stubUser.save().then(() => {
             return User.ensureIndexes()
@@ -26,34 +27,6 @@ after(() => {
     dbManager.stop()
 })
 
-describe('POST /auth/login', () => {
-    it('should return 400 if email or password is undefined', (done) => {
-        request(app)
-            .post('/auth/login')
-            .expect(400)
-            .expect((res) => {
-                assert(res.body.status == 'error')
-                assert(res.body.body.message == 'Invalid email or password.')
-            })
-            .end(done)
-    })
-
-    it('should return 400 if email or password is invalid', (done) => {
-        request(app)
-            .post('/auth/login')
-            .send({
-                'email': 'notexisted@email.com',
-                'password': 'randompassword'
-            })
-            .expect(400)
-            .expect((res) => {
-                assert(res.body.status == 'error')
-                assert(res.body.body.message == 'Invalid email or password.')
-            })
-            .end(done)
-    })
-})
-
 describe('POST /auth/register', () => {
     it('should return 200 and token if register successfully', (done) => {
         request(app)
@@ -61,11 +34,12 @@ describe('POST /auth/register', () => {
             .send({
                 'email': 'test@test.com',
                 'username': 'tester',
-                'password': '123456'
+                'password': '123456',
+                'uid': '2'
             })
             .expect(200)
             .expect((res) => {
-                assert(res.body.body.token !== undefined)
+                assert(res.body.body !== undefined)
             })
             .end(done)
     })
@@ -76,7 +50,8 @@ describe('POST /auth/register', () => {
             .send({
                 'email': 'test@email.com',
                 'username': 'tester',
-                'password': '123456'
+                'password': '123456',
+                'uid': '3'
             })
             .expect(400)
             .expect((res) => {

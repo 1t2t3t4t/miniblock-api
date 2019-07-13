@@ -6,11 +6,12 @@ const Message = require('./Message')
 const validator = require('validator')
 const jwt = require('jsonwebtoken')
 
-const SHA256 = require('../utils/SHA256')
-
-const SALT = 'BossLopeSalt'
-
 const User = new Schema({
+    uid: {
+        type: String,
+        required: true,
+        unique: true
+    },
     email: {
         type: String,
         required: true,
@@ -19,11 +20,6 @@ const User = new Schema({
             validator: validator.isEmail,
             message: '{VALUE is not a valid email.}'
         }
-    },
-    password: {
-        type: String,
-        required: true,
-        minlength: 6
     },
     displayName: {
         type: String,
@@ -41,28 +37,13 @@ const User = new Schema({
     },
     messageList: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Message' }
-    ],
-    tokens: [{
-        access: {
-            type: String,
-            required: true
-        },
-        token: {
-            type:String,
-            required: true
-        }
-    }]
+    ]
 })
 
-User.pre('save', function (next) {
-    if (this.isModified('password')) {
-        const password = this.password
-        this.password = SHA256(password)
-    }
 
-    next()
-})
-
+/*
+* Actually unused but just want to keep it
+* */
 User.methods.generateAuthToken = async function() {
     const {_id} = this
     const access = 'auth'
@@ -72,31 +53,10 @@ User.methods.generateAuthToken = async function() {
     return this.save().then(() => token)
 }
 
-User.methods.toSafeJSON = function() {
-    const user = this.toObject()
-    delete user.password
-    delete user.tokens
-    delete user.__v
-    return user
-}
+User.statics.findByUID = async function(uid) {
+    if (!uid) throw Error('uid is missing')
 
-User.statics.findByEmailPassword = async function(email, password) {
-    if (!password || !email) { throw Error('Invalid email or password.') }
-    const hash = SHA256(password)
-
-    return this.findOne({email, password: hash})
-}
-
-User.statics.findByAuthToken = async function(authToken) {
-    if (!authToken) throw Error('Require Auth Token.')
-    const splitedAuthToken = authToken.split(' ')
-
-    if (splitedAuthToken[0] !== 'Bearer' || !splitedAuthToken[1]) { throw Error('Invalid Auth Header.') }
-
-    const token = splitedAuthToken[1]
-    const user = jwt.verify(token, SALT)
-
-    return this.findOne({ _id: user._id })
+    return this.findOne({ uid })
 }
 
 module.exports = mongoose.model('User', User)

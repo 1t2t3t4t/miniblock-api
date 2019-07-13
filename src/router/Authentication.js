@@ -19,16 +19,12 @@ route.post('/login', (req, res) => {
 })
 
 route.post('/register', async (req, res) => {
-    const email = req.body.email
-    const username = req.body.username
-    const password = req.body.password
+    const { email, username, password, uid } = req.body
 
-    let user = new User({ email, username, password })
+    let user = new User({ email, username, password, uid })
 
-    user.save().then(() => {
-        return user.generateAuthToken()
-    }).then(async (token) => {
-        res.send(new Response({'token': token}))
+    user.save().then(async (token) => {
+        res.send(new Response({'message': 'Register successfully', user}))
     }).catch((e) => {
         res.status(400).send(new ErrorResponse(e.message))
     })
