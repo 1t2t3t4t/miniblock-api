@@ -11,7 +11,6 @@ before((next) => {
         User = require('@model/User')
         const stubUser = new User({
             email: 'test@email.com',
-            password: 'password',
             username: 'username',
             uid: "1"
         })
