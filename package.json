@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-    "test": "nyc --reporter=text mocha --recursive --exit",
+    "test": "nyc --reporter=text mocha --compilers ts:ts-node/register --recursive --exit",
     "postinstall": "link-module-alias",
     "gen-doc": "apidoc -i src/ -o docs/ && open docs/index.html",
     "tsc": "tsc"
@@ -31,11 +31,15 @@
     "validator": "^10.9.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/mocha": "^5.2.7",
+    "@types/mongoose": "^5.5.8",
     "apidoc": "^0.17.7",
     "link-module-alias": "^1.1.5",
     "mocha": "^5.2.0",
     "mongodb-memory-server": "^5.1.4",
     "nyc": "^14.1.1",
-    "sinon": "^7.3.2"
+    "sinon": "^7.3.2",
+    "ts-node": "^8.3.0"
   }
 }
