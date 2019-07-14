@@ -29,10 +29,10 @@
     "jsonwebtoken": "^8.4.0",
     "mongoose": "^5.3.14",
     "supertest": "^3.3.0",
-    "validator": "^10.9.0"
+    "validator": "^10.9.0",
+    "typescript": "^3.5.3"
   },
   "devDependencies": {
-    "typescript": "^3.5.3",
     "@types/express": "^4.17.0",
     "@types/mocha": "^5.2.7",
     "@types/mongoose": "^5.5.8",
