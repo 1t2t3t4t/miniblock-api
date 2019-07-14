@@ -7,9 +7,11 @@
     "start": "node server",
     "test": "nyc --reporter=text mocha --recursive --exit",
     "postinstall": "link-module-alias",
-    "gen-doc": "apidoc -i src/ -o docs/ && open docs/index.html"
+    "gen-doc": "apidoc -i src/ -o docs/ && open docs/index.html",
+    "tsc": "tsc"
   },
   "_moduleAliases": {
+    "@root": "src/",
     "@model": "src/model",
     "@router": "src/router",
     "@middleware": "src/middleware",
@@ -25,6 +27,7 @@
     "jsonwebtoken": "^8.4.0",
     "mongoose": "^5.3.14",
     "supertest": "^3.3.0",
+    "typescript": "^3.5.3",
     "validator": "^10.9.0"
   },
   "devDependencies": {
