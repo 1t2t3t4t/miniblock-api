@@ -26,10 +26,10 @@ after(() => {
     dbManager.stop()
 })
 
-describe('POST /auth/register', () => {
+describe('POST v1/auth/register', () => {
     it('should return 200 and token if register successfully', (done) => {
         request(app)
-            .post('/auth/register')
+            .post('/v1/auth/register')
             .send({
                 'email': 'test@test.com',
                 'username': 'tester',
@@ -45,7 +45,7 @@ describe('POST /auth/register', () => {
 
     it('should return 400 if user already exist', (done) => {
         request(app)
-            .post('/auth/register')
+            .post('/v1/auth/register')
             .send({
                 'email': 'test@email.com',
                 'username': 'tester',

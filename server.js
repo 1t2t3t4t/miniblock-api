@@ -3,10 +3,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('./src/db/mongoose')
 const admin = require('firebase-admin')
 
-const Authentication = require('@router/Authentication')
-const Member = require('@router/Member')
-const Post = require('@router/Post')
-const Feed = require('@router/Feed')
+const v1 = require('@v1')
 
 const authenticate = require('@middleware/authenticate')
 
@@ -29,10 +26,7 @@ app.get('/', authenticate, (req, res) => {
 	res.send(`Hello World ${req.user.username}`)
 });
 
-app.use('/auth', Authentication)
-app.use('/member', Member)
-app.use('/post', Post)
-app.use('/feed', Feed)
+app.use('/v1', v1)
 
 app.use(function (err, req, res, next) {
 	console.log('---ERROR---')
@@ -40,6 +34,10 @@ app.use(function (err, req, res, next) {
   	const error = new ErrorResponse(err.message)
   	res.send(error)
 })
+
+process.on('uncaughtException', function (err) {
+	console.log(err);
+});
 
 module.exports = app.listen(port, () => {
     console.log('Server started on port', port)

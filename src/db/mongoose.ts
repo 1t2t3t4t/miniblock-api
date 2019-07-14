@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const url = require('./MongoURL')
 
 const env = process.env.ENV || "development"
 
-let mongoURI: String
+let mongoURI: string
 
 switch (env) {
     case 'production':

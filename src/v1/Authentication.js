@@ -1,6 +1,6 @@
 const express = require('express')
 const User = require('@model/User')
-const { ErrorResponse, Response } = require('@model/HTTPResponse')
+const { Response } = require('@model/HTTPResponse')
 
 const route = express.Router()
 
@@ -18,7 +18,7 @@ const route = express.Router()
  *
  * @apiError {Error} InternalError error with message
  */
-route.post('/login', (req, res) => {
+route.post('/login', (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
 
@@ -28,7 +28,8 @@ route.post('/login', (req, res) => {
     }).then((token) => {
         return res.send(new Response({'token': token}))
     }).catch((e) => {
-        res.status(400).send(new ErrorResponse(e.message))
+        res.status(400)
+        next(e)
     })
 })
 
@@ -46,7 +47,7 @@ route.post('/login', (req, res) => {
  *
  * @apiError {Error} InternalError error with message
  */
-route.post('/register', async (req, res) => {
+route.post('/register', async (req, res, next) => {
     const { email, username, uid } = req.body
 
     let user = new User({ email, username, uid })
@@ -54,7 +55,8 @@ route.post('/register', async (req, res) => {
     user.save().then(async (token) => {
         res.send(new Response({'message': 'Register successfully', user}))
     }).catch((e) => {
-        res.status(400).send(new ErrorResponse(e.message))
+        res.status(400)
+        next(e)
     })
 })
 

@@ -13,12 +13,12 @@
     "tsc": "tsc"
   },
   "_moduleAliases": {
-    "@root": "src/",
-    "@model": "src/model",
-    "@router": "src/router",
-    "@middleware": "src/middleware",
-    "@utils": "src/utils",
-    "@db": "src/db"
+    "@root": "build/",
+    "@model": "build/src/model",
+    "@v1": "build/src/v1",
+    "@middleware": "build/src/middleware",
+    "@utils": "build/src/utils",
+    "@db": "build/src/db"
   },
   "author": "Nathakorn Throngtrairat",
   "license": "ISC",
