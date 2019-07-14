@@ -1,4 +1,4 @@
-const mongoose = require('@db/mongoose');
+const mongoose = require('@db/mongoose.ts');
 const {
     MongoMemoryServer
 } = require('mongodb-memory-server');

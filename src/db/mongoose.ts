@@ -1,22 +1,22 @@
 const mongoose = require('mongoose')
-const config = require('../../config')
+const url = require('./MongoURL')
 
 const env = process.env.ENV || "development"
 
-let mongoURI
+let mongoURI: String
 
 switch (env) {
     case 'production':
-        mongoURI = config.MONGO_URI
+        mongoURI = url.MONGO_URI
         break;
     case 'staging':
-        mongoURI = config.MONGO_URI
+        mongoURI = url.MONGO_URI
         break;
     case 'development':
-        mongoURI = config.MONGO_LOCAL_URI
+        mongoURI = url.MONGO_LOCAL_URI
         break;
     default:
-        mongoURI = config.MONGO_LOCAL_URI
+        mongoURI = url.MONGO_LOCAL_URI
         break;
 }
 
