@@ -27,9 +27,10 @@ after(() => {
 })
 
 describe('POST v1/auth/register', () => {
+    const path = '/v1/account/register'
     it('should return 200 and token if register successfully', (done) => {
         request(app)
-            .post('/v1/auth/register')
+            .post(path)
             .send({
                 'email': 'test@test.com',
                 'username': 'tester',
@@ -45,7 +46,7 @@ describe('POST v1/auth/register', () => {
 
     it('should return 400 if user already exist', (done) => {
         request(app)
-            .post('/v1/auth/register')
+            .post(path)
             .send({
                 'email': 'test@email.com',
                 'username': 'tester',

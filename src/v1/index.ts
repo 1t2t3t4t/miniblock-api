@@ -1,8 +1,10 @@
 import express from 'express'
+import AccountRouteController from './Account'
 const router = express.Router()
 
-router.use('/auth', require('@v1/Authentication'))
-router.use('/member', require('@v1/Member'))
+const accountRouteController = new AccountRouteController()
+
+router.use('/account', accountRouteController.router)
 router.use('/post', require('@v1/Post'))
 router.use('/feed', require('@v1/Feed'))
 

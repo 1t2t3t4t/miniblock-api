@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('./src/db/mongoose')
 const admin = require('firebase-admin')
 
-const v1 = require('@v1')
+const v1 = require('./src/v1')
 
 const authenticate = require('@middleware/authenticate')
 
