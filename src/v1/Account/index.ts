@@ -2,8 +2,8 @@ import express from 'express'
 
 import AuthenticationFacade from './AuthenticationFacade'
 
-const HTTPResponse = require('@model/HTTPResponse')
-const authenticate = require('@middleware/authenticate')
+const HTTPResponse = require('../../model/HTTPResponse')
+const authenticate = require('../../middleware/authenticate')
 
 interface AuthenticatedRequest extends express.Request {
     user?: object
@@ -22,7 +22,7 @@ class AccountRouterController {
     private registerRoute() {
         this.router.post('/login', this.login.bind(this))
         this.router.post('/register', this.register.bind(this))
-        this.router.get('/profile', authenticate, this.profile.bind(this))
+        this.router.get('/profile', authenticate.authenticate, this.profile.bind(this))
     }
 
     /**

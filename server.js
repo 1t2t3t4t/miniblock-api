@@ -5,9 +5,7 @@ const admin = require('firebase-admin')
 
 const v1 = require('./src/v1')
 
-const authenticate = require('@middleware/authenticate')
-
-const { ErrorResponse } = require('@model/HTTPResponse')
+const { ErrorResponse } = require('./src/model/HTTPResponse')
 
 const port = process.env.PORT || 3000
 
@@ -21,10 +19,6 @@ admin.initializeApp({
 });
 
 app.use(bodyParser.json())
-
-app.get('/', authenticate, (req, res) => {
-	res.send(`Hello World ${req.user.username}`)
-});
 
 app.use('/v1', v1)
 

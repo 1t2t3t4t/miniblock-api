@@ -1,7 +1,7 @@
 const assert = require('assert')
 const request = require('supertest')
-const authenticate = require('@middleware/authenticate')
-const utils = require('@utils/VerifyIdToken')
+const authenticate = require('../../src/middleware/authenticate').authenticate
+const utils = require('../../src/utils/VerifyIdToken')
 
 let User = null
 
@@ -9,7 +9,7 @@ const dbManager = require('../DBManager')
 
 before((next) => {
     dbManager.start().then(() => {
-        User = require('@model/User')
+        User = require('../../src/model/User')
         const stubUser = new User({
             email: 'test@email.com',
             username: 'username',
@@ -31,7 +31,7 @@ const CORRECT_TOKEN = 'validtoken'
 
 
 /**
- * Stub verifyIdToke
+ * Stub verifyIdToken
  */
 utils.verifyIdToken = async (token) => {
     if (token === CORRECT_TOKEN) {

@@ -4,11 +4,13 @@ const app = require('../server')
 
 let User = null
 
+let mockUser = undefined
+
 const dbManager = require('./DBManager')
 
 before((next) => {
     dbManager.start().then(() => {
-        User = require('@model/User')
+        User = require('../src/model/User')
         const stubUser = new User({
             email: 'test@email.com',
             username: 'username',
@@ -26,7 +28,7 @@ after(() => {
     dbManager.stop()
 })
 
-describe('POST v1/auth/register', () => {
+describe('POST v1/account/register', () => {
     const path = '/v1/account/register'
     it('should return 200 and token if register successfully', (done) => {
         request(app)

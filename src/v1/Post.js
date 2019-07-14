@@ -1,7 +1,7 @@
 const express = require('express')
-const authenticate = require('@middleware/authenticate')
-const Post = require('@model/Post')
-const { Response } = require('@model/HTTPResponse')
+const authenticate = require('../middleware/authenticate')
+const Post = require('../model/Post')
+const { Response } = require('../model/HTTPResponse')
 
 const router = express.Router()
 
@@ -18,7 +18,7 @@ const router = express.Router()
  * @apiSuccess {Post} post Post model
  *
  * */
-router.post('/create', authenticate, (req, res, next) => {
+router.post('/create', authenticate.authenticate, (req, res, next) => {
     const user = req.user
     const content = req.body.content
 
