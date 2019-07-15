@@ -23,6 +23,7 @@ app.use((req, res, next) => {
 	console.log('path', req.url, req.method)
 	console.log('body', req.body)
 	console.log('headers', req.headers)
+	next()
 })
 
 app.use('/v1', v1)

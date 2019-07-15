@@ -1,6 +1,7 @@
 import express from 'express'
 import AuthenticationFacade from './AuthenticationFacade'
-import {UserModel} from "../../model/User";
+import {UserModel} from "../../model/User"
+import {MongoError} from "mongodb";
 
 const HTTPResponse = require('../../model/HTTPResponse')
 const authenticate = require('../../middleware/authenticate')
@@ -62,7 +63,11 @@ class AccountRouterController {
 
         this.facade.register(email, displayName, uid).then(async (user: object) => {
             res.send(new HTTPResponse.Response({'message': 'Register successfully', user}))
-        }).catch((error: Error) => {
+        }).catch((error: MongoError) => {
+            if (error.code == 11000) {
+                res.send(new HTTPResponse.Response({'message': 'Already registered.'}))
+                return
+            }
             res.status(400)
             next(error)
         })
