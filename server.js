@@ -35,8 +35,6 @@ app.use(function (err, req, res, next) {
   	res.send(error)
 })
 
-app.use('/pg', require('./playground/Firebase'))
-
 module.exports = app.listen(port, () => {
     console.log('Server started on port', port)
 })
