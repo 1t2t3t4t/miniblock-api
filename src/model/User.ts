@@ -20,16 +20,7 @@ const User = new Schema({
     },
     displayName: {
         type: String,
-        minlength: 1
-    },
-    username: {
-        type: String,
         required: true,
-        unique: true,
-        validate: {
-            validator: validator.isAlphanumeric,
-            msg: '{VALUE} should not contain special character'
-        },
         minlength: 1
     }
 })
@@ -48,7 +39,6 @@ export interface UserModel extends mongoose.Document {
     uid: string
     email: string
     displayName?: string
-    username: string
 }
 
 export default mongoose.model<UserModel, UserModelHelper>('User', User)

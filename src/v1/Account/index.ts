@@ -58,9 +58,9 @@ class AccountRouterController {
      * @apiError {Error} InternalError error with message
      */
     register(req: express.Request, res: express.Response, next: express.NextFunction) {
-        const { email, username, uid } = req.body
+        const { email, displayName, uid } = req.body
 
-        this.facade.register(email, username, uid).then(async (user: object) => {
+        this.facade.register(email, displayName, uid).then(async (user: object) => {
             res.send(new HTTPResponse.Response({'message': 'Register successfully', user}))
         }).catch((error: Error) => {
             res.status(400)
