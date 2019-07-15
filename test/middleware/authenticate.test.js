@@ -1,18 +1,16 @@
+import User from '../../src/model/User'
 const assert = require('assert')
 const request = require('supertest')
 const authenticate = require('../../src/middleware/authenticate').authenticate
 const utils = require('../../src/utils/VerifyIdToken')
 
-let User = null
-
 const dbManager = require('../DBManager')
 
 before((next) => {
     dbManager.start().then(() => {
-        User = require('../../src/model/User')
         const stubUser = new User({
             email: 'test@email.com',
-            username: 'username',
+            displayName: 'username',
             uid: "1"
         })
         stubUser.save().then(() => {
