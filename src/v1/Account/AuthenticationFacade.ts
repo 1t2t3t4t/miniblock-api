@@ -1,4 +1,4 @@
-const User = require('../../model/User')
+import User from "../../model/User"
 
 class AccountFacade {
 

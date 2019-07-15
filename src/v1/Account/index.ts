@@ -1,12 +1,12 @@
 import express from 'express'
-
 import AuthenticationFacade from './AuthenticationFacade'
+import {UserModel} from "../../model/User";
 
 const HTTPResponse = require('../../model/HTTPResponse')
 const authenticate = require('../../middleware/authenticate')
 
 interface AuthenticatedRequest extends express.Request {
-    user?: object
+    user?: UserModel
 }
 
 class AccountRouterController {
@@ -23,6 +23,7 @@ class AccountRouterController {
         this.router.post('/login', this.login.bind(this))
         this.router.post('/register', this.register.bind(this))
         this.router.get('/profile', authenticate.authenticate, this.profile.bind(this))
+        this.router.post('/profile', authenticate.authenticate, this.saveProfile.bind(this))
     }
 
     /**
@@ -35,7 +36,7 @@ class AccountRouterController {
      * @apiParam {String} username      Username.
      *
      */
-    protected login(req: express.Request, res: express.Response, next: express.NextFunction) {
+    login(req: express.Request, res: express.Response, next: express.NextFunction) {
         const email = req.body.email
         const password = req.body.password
         res.send(new HTTPResponse.Response({ message: 'Did not do anything yet' }))
@@ -56,7 +57,7 @@ class AccountRouterController {
      *
      * @apiError {Error} InternalError error with message
      */
-    protected register(req: express.Request, res: express.Response, next: express.NextFunction) {
+    register(req: express.Request, res: express.Response, next: express.NextFunction) {
         const { email, username, uid } = req.body
 
         this.facade.register(email, username, uid).then(async (user: object) => {
@@ -79,8 +80,36 @@ class AccountRouterController {
      * @apiSuccess {User} User model
      *
      * */
-    protected profile(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
+    profile(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
         res.status(200).send(new HTTPResponse.Response(req.user))
+    }
+
+    /**
+     * @api {POST} /account/profile Update User Profile
+     * @apiDescription Update user's profile from parameters
+     * @apiGroup Account
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccess {User} User model
+     *
+     * */
+    saveProfile(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
+        if (!req.user) {
+            next(Error('Unregistered'))
+            return
+        }
+
+        const { displayName } = req.body
+        req.user.update({
+            displayName
+        }).then((newUser) => {
+            res.status(200).send(new HTTPResponse.Response(newUser))
+        }).catch((error: Error) => {
+            res.status(400)
+            next(error)
+        })
     }
 }
 
