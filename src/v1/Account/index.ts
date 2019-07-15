@@ -1,6 +1,6 @@
 import express from 'express'
 import AuthenticationFacade from './AuthenticationFacade'
-import {UserModel} from "../../model/User"
+import User, {UserModel} from "../../model/User"
 import {MongoError} from "mongodb";
 
 const HTTPResponse = require('../../model/HTTPResponse')
@@ -61,7 +61,7 @@ class AccountRouterController {
     register(req: express.Request, res: express.Response, next: express.NextFunction) {
         const { email, displayName, uid } = req.body
 
-        this.facade.register(email, displayName, uid).then(async (user: object) => {
+        this.facade.register(email, displayName, uid).then(async (user: UserModel) => {
             res.send(new HTTPResponse.Response({'message': 'Register successfully', user}))
         }).catch((error: MongoError) => {
             if (error.code == 11000) {

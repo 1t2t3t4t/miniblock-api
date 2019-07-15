@@ -1,9 +1,9 @@
-import User from "../../model/User"
+import User, {UserModel} from "../../model/User"
+import {MongoError} from "mongodb";
 
 class AccountFacade {
 
-    //TODO: - Change object tobe User interface when implemented
-    async register(email: string, displayName: string, uid: string): Promise<object>  {
+    async register(email: string, displayName: string, uid: string): Promise<UserModel>  {
         let user = new User({ email, displayName, uid })
         return user.save()
     }
