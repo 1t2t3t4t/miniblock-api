@@ -19,6 +19,11 @@ admin.initializeApp({
 });
 
 app.use(bodyParser.json())
+app.use((req, res, next) => {
+	console.log('path', req.url, req.method)
+	console.log('body', req.body)
+	console.log('headers', req.headers)
+})
 
 app.use('/v1', v1)
 
@@ -29,9 +34,7 @@ app.use(function (err, req, res, next) {
   	res.send(error)
 })
 
-process.on('uncaughtException', function (err) {
-	console.log(err);
-});
+app.use('/pg', require('./playground/Firebase'))
 
 module.exports = app.listen(port, () => {
     console.log('Server started on port', port)
