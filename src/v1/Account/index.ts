@@ -92,6 +92,8 @@ class AccountRouterController {
      *
      * @apiHeader {String} Authorization Token string from Firebase
      *
+     * @apiParam {String} displayName Display name to be saved
+     *
      * @apiSuccess {User} User model
      *
      * */
