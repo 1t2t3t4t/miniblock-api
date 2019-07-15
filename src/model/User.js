@@ -1,8 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const Message = require('./Message')
-
 const validator = require('validator')
 
 const User = new Schema({
@@ -33,10 +31,7 @@ const User = new Schema({
             message: '{VALUE} should not contain special character'
         },
         minlength: 1
-    },
-    messageList: [
-        { type: mongoose.Schema.Types.ObjectId, ref: 'Message' }
-    ]
+    }
 })
 
 User.statics.findByUID = async function(uid) {

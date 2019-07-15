@@ -1,6 +1,6 @@
 const User = require('../model/User')
 const admin = require('firebase-admin')
-const utils = require('@utils/VerifyIdToken')
+const utils = require('../utils/VerifyIdToken')
 const {ErrorResponse} = require('../model/HTTPResponse')
 
 /**
@@ -51,4 +51,6 @@ const authenticate = (req, res, next) => {
         })
 }
 
-module.exports = authenticate
+module.exports = {
+    authenticate
+}

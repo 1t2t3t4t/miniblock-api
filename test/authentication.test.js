@@ -4,11 +4,13 @@ const app = require('../server')
 
 let User = null
 
+let mockUser = undefined
+
 const dbManager = require('./DBManager')
 
 before((next) => {
     dbManager.start().then(() => {
-        User = require('@model/User')
+        User = require('../src/model/User')
         const stubUser = new User({
             email: 'test@email.com',
             username: 'username',
@@ -26,10 +28,11 @@ after(() => {
     dbManager.stop()
 })
 
-describe('POST /auth/register', () => {
+describe('POST v1/account/register', () => {
+    const path = '/v1/account/register'
     it('should return 200 and token if register successfully', (done) => {
         request(app)
-            .post('/auth/register')
+            .post(path)
             .send({
                 'email': 'test@test.com',
                 'username': 'tester',
@@ -45,7 +48,7 @@ describe('POST /auth/register', () => {
 
     it('should return 400 if user already exist', (done) => {
         request(app)
-            .post('/auth/register')
+            .post(path)
             .send({
                 'email': 'test@email.com',
                 'username': 'tester',
