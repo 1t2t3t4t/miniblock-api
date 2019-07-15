@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, {Model} from 'mongoose'
 const Schema = mongoose.Schema
 
 const validator = require('validator')
@@ -34,10 +34,14 @@ const User = new Schema({
     }
 })
 
-User.statics.findByUID = async function(uid: string) {
+User.statics.findByUID = async function(uid: string): Promise<UserModel> {
     if (!uid) throw Error('uid is missing')
 
     return this.findOne({ uid })
+}
+
+interface UserModelHelper extends Model<UserModel> {
+    findByUID(uid: string): UserModel
 }
 
 export interface UserModel extends mongoose.Document {
@@ -47,4 +51,4 @@ export interface UserModel extends mongoose.Document {
     username: string
 }
 
-export default mongoose.model<UserModel>('User', User)
+export default mongoose.model<UserModel, UserModelHelper>('User', User)

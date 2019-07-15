@@ -1,4 +1,4 @@
-const User = require('../model/User')
+import User from '../model/User'
 const admin = require('firebase-admin')
 const utils = require('../utils/VerifyIdToken')
 const {ErrorResponse} = require('../model/HTTPResponse')
