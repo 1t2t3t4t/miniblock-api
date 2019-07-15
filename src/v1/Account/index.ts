@@ -104,9 +104,8 @@ class AccountRouterController {
         }
 
         const { displayName } = req.body
-        req.user.update({
-            displayName
-        }).then((newUser) => {
+        req.user.displayName = displayName
+        req.user.save().then((newUser) => {
             res.status(200).send(new HTTPResponse.Response(newUser))
         }).catch((error: Error) => {
             res.status(400)
