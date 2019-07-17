@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "tsc && node build/server",
+    "start": "rm -rf build && tsc && node build/server",
     "local": "ts-node server",
     "staging": "ENV=staging ts-node server",
     "test": "nyc --reporter=text mocha --compilers ts:ts-node/register --recursive --exit",
