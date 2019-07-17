@@ -1,12 +1,18 @@
 import express, {Router} from 'express'
 import {UserModel} from '../../model/User'
-import Post from '../../model/Post'
+import Post, {PostType} from '../../model/Post'
 
 const HTTPResponse = require('../../model/HTTPResponse');
 const auth = require('../../middleware/authenticate')
 
-interface AuthenticatedRequest extends express.Request {
+interface PostRequest extends express.Request {
     user?: UserModel
+    body: {
+        content: string,
+        title: string,
+        categoryId: number,
+        type: PostType
+    }
 }
 
 export default class PostRouterController {
@@ -19,7 +25,7 @@ export default class PostRouterController {
     }
 
     private registerRoute() {
-        this.router.post('/post', auth.authenticate, this.post.bind(this))
+        this.router.post('/', auth.authenticate, this.post.bind(this))
     }
 
     /**
@@ -35,13 +41,16 @@ export default class PostRouterController {
      * @apiSuccess {Post} post Post model
      *
      * */
-    post(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
-        const user = req.user
-        const content = req.body.content
+    post(req: PostRequest, res: express.Response, next: express.NextFunction) {
+        const creator = req.user
+        const { content, title, type, categoryId } = req.body
 
         const post = new Post({
-            creator: user,
-            content: content
+            creator,
+            content,
+            type,
+            title,
+            categoryId
         })
 
         post.save().then(() => {

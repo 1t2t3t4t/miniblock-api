@@ -3,7 +3,7 @@ import PostRouterController from './PostRoute'
 
 const router = express.Router()
 
-const controller = new PostRouterController(router)
+const controller = new PostRouterController(express.Router())
 
 router.use('/', controller.router)
 
