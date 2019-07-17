@@ -1,5 +1,14 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import {UserRef} from './User'
+
 const Schema = mongoose.Schema
+
+export interface PostModel extends mongoose.Document {
+    content: string,
+    creator: UserRef,
+    like?: [UserRef],
+    dislike?: [UserRef]
+}
 
 const Post = new Schema({
     content: {
@@ -27,4 +36,4 @@ const Post = new Schema({
     timestamps: true
 })
 
-module.exports = mongoose.model('Post', Post)
+export default mongoose.model<PostModel>('Post', Post)
