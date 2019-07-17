@@ -13,7 +13,7 @@ export default class PostRouterController {
     }
 
     private registerRoute() {
-        this.router.post('/', this.categories.bind(this))
+        this.router.get('/', this.categories.bind(this))
     }
 
     /**
@@ -22,8 +22,7 @@ export default class PostRouterController {
      * @apiGroup Categories
      *
      *
-     *
-     * @apiSuccess {[Category]} list of categories contains name, id, and iconURL
+     * @apiSuccess {[Category]} categories list of category contains name, id, and iconURL
      *
      * */
     categories(req: express.Request, res: express.Response, next: express.NextFunction) {
