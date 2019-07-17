@@ -29,7 +29,7 @@ export default class PostRouterController {
     }
 
     /**
-     * @api {POST} /post/create Create Post
+     * @api {POST} /post Create Post
      * @apiDescription Create post. Dont know what to more than this.
      * @apiGroup Post
      * @apiPermission loggedIn

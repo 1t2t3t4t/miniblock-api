@@ -1,5 +1,5 @@
 import express from 'express'
-import PostRouterController from './PostRoute'
+import PostRouterController from './PostRouterController'
 
 const router = express.Router()
 

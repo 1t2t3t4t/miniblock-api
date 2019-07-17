@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import {UserRef} from './User'
+import categories from './Categories'
 
 const Schema = mongoose.Schema
 
@@ -7,6 +8,10 @@ export type PostType = 'text' | 'url'
 
 const postTypeValidator = (str: string) => {
     return str === 'text' || str === 'url'
+}
+
+const categoryValidator = (id: number): boolean => {
+    return categories.find((cat) => cat.id == id) != undefined
 }
 
 export interface PostModel extends mongoose.Document {
@@ -26,7 +31,11 @@ const Post = new Schema({
     },
     categoryId: {
         type: Number,
-        required: true
+        required: true,
+        validate: {
+            validator: categoryValidator,
+            msg: 'we dont have categoryId {VALUE}.'
+        }
     },
     type: {
         type: String,

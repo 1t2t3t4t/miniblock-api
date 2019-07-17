@@ -22,7 +22,7 @@ app.use(bodyParser.json())
 app.use((req, res, next) => {
 	console.log('path', req.url, req.method)
 	console.log('body', req.body)
-	console.log('headers', req.headers)
+	console.log('headers', req.headers.authorization)
 	next()
 })
 
