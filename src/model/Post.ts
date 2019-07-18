@@ -1,27 +1,50 @@
 import mongoose from 'mongoose'
 import {UserRef} from './User'
 import categories from './Categories'
+import {isNullOrUndefined} from "util";
 
 const Schema = mongoose.Schema
 
-export type PostType = 'text' | 'url'
+export enum PostType {
+    TEXT = 'text',
+    LINK = 'link',
+    IMAGE = 'image'
+}
+
+export type PostContentInfo = {
+    link?: string,
+    text?: string,
+    image?: string
+}
 
 const postTypeValidator = (str: string) => {
-    return str === 'text' || str === 'url'
+    return str === PostType.LINK || str === PostType.TEXT || str === PostType.IMAGE
 }
 
 const categoryValidator = (id: number): boolean => {
     return categories.find((cat) => cat.id == id) != undefined
 }
 
+const contentValidator = function (this: PostModel, content: PostContentInfo): boolean {
+    switch (this.type) {
+        case PostType.IMAGE:
+            return !isNullOrUndefined(content.image)
+        case PostType.TEXT:
+            return !isNullOrUndefined(content.text)
+        case PostType.LINK:
+            return !isNullOrUndefined(content.link)
+    }
+    return false
+}
+
 export interface PostModel extends mongoose.Document {
-    title: string,
-    categoryId: number,
-    type: PostType,
-    content: string,
-    creator: UserRef,
-    like?: [UserRef],
-    dislike?: [UserRef],
+    title: string
+    categoryId: number
+    type: PostType
+    content: PostContentInfo
+    creator: UserRef
+    like?: [UserRef]
+    dislike?: [UserRef]
 }
 
 const Post = new Schema({
@@ -42,12 +65,26 @@ const Post = new Schema({
         required: true,
         validate: {
             validator: postTypeValidator,
-            msg: 'type can only be "text" or "url" but got {VALUE}.'
+            msg: 'we have no type {VALUE}.'
         }
     },
     content: {
-        type: String,
-        required: true
+        type: {
+            text: {
+                type: String
+            },
+            link: {
+                type: String
+            },
+            image: {
+                type: String
+            }
+        },
+        required: true,
+        validate: {
+            validator: contentValidator,
+            msg: 'content does not conform to type'
+        }
     },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
