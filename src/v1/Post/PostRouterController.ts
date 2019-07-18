@@ -1,6 +1,6 @@
 import express, {Router} from 'express'
 import {UserModel} from '../../model/User'
-import Post, {PostType} from '../../model/Post'
+import Post, {PostContentInfo, PostType} from '../../model/Post'
 
 const HTTPResponse = require('../../model/HTTPResponse');
 const auth = require('../../middleware/authenticate')
@@ -8,7 +8,7 @@ const auth = require('../../middleware/authenticate')
 interface PostRequest extends express.Request {
     user?: UserModel
     body: {
-        content: string,
+        content: PostContentInfo,
         title: string,
         categoryId: number,
         type: PostType
@@ -30,13 +30,21 @@ export default class PostRouterController {
 
     /**
      * @api {POST} /post Create Post
-     * @apiDescription Create post. Dont know what to more than this.
+     * @apiDescription Create post. client has to send content that relates to type
      * @apiGroup Post
      * @apiPermission loggedIn
      *
      * @apiHeader {String} Authorization Token string from Firebase
      *
-     * @apiParam {String} content Content of the post
+     * @apiParamExample
+     * body: {
+     *     content: {
+     *          link | text | image: string
+     *     },
+     *     title: string,
+     *     type: string ("link" | "text" | "image")
+     *     categoryId: int
+     * }
      *
      * @apiSuccess {Post} post Post model
      *
