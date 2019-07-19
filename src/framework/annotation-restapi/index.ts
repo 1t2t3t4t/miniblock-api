@@ -20,6 +20,7 @@ export function RouterController(path: string): ClassDecorator {
             path
         }
         Reflect.defineMetadata(MetaDataKey.Router, info, target)
+        return target
     }
 }
 
@@ -36,6 +37,7 @@ export function SubRouterController(parent: Object, path: string): ClassDecorato
             path, target: target.constructor
         }
         Reflect.defineMetadata(MetaDataKey.SubRouter, info, parent.constructor)
+        return target
     }
 }
 
@@ -51,7 +53,7 @@ type EndpointInfo = {
 
 //------------------ENDPOINT--------------------
 
-const defineMetadata = (target: Object,
+const defineMethodMetadata = (target: Object,
                        propertyKey: string | symbol,
                        descriptor: TypedPropertyDescriptor<EndpointFunction>,
                        path: string,
@@ -72,13 +74,14 @@ const defineMetadata = (target: Object,
     }
     endpoints.push(info)
     Reflect.defineMetadata(MetaDataKey.Endpoint, endpoints, target.constructor)
+    return descriptor
 }
 
 export function GET(path: string) {
     return function(target: Object,
                     propertyKey: string | symbol,
                     descriptor: TypedPropertyDescriptor<EndpointFunction>) {
-        defineMetadata(target, propertyKey, descriptor, path, "get")
+        return defineMethodMetadata(target, propertyKey, descriptor, path, "get")
     }
 }
 
@@ -86,7 +89,7 @@ export function POST(path: string) {
     return function(target: Object,
                     propertyKey: string | symbol,
                     descriptor: TypedPropertyDescriptor<EndpointFunction>) {
-        defineMetadata(target, propertyKey, descriptor, path, "post")
+        return defineMethodMetadata(target, propertyKey, descriptor, path, "post")
     }
 }
 
@@ -108,17 +111,21 @@ export function register(app: express.Application, target: Class) {
 
     const endpointInfos: Array<EndpointInfo> = Reflect.getMetadata(MetaDataKey.Endpoint, target)
 
-    console.log(controller)
     endpointInfos.forEach((info) => {
         switch (info.method) {
             case "get":
-                router.get(info.path, controller[info.name]).bind(controller)
+                router.get(info.path, (res, req, next) => {
+                    controller[info.name](res, req, next)
+                })
                 break
             case "post":
-                router.post(info.path, info.func).bind(controller)
+                router.post(info.path, (res, req, next) => {
+                    controller[info.name](res, req, next)
+                })
                 break
         }
     })
 
     app.use(routerInfo.path, router)
+    return controller
 }
