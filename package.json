@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "rm -rf build && tsc && node build/server",
-    "local": "ts-node server",
+    "local": "ENV=development ts-node server",
     "staging": "ENV=staging ts-node server",
     "test": "nyc --reporter=text mocha --compilers ts:ts-node/register --recursive --exit",
     "postinstall": "link-module-alias",
