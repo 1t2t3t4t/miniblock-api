@@ -26,6 +26,16 @@ app.use((req, res, next) => {
 	next()
 })
 
+if (process.env.ENV == 'development') {
+	app.get('/clean', (req, res) => {
+		mongoose.connection.db.dropDatabase().then(() => {
+			res.status(200).send("done")
+		}).catch(() => {
+			res.status(500).send("error")
+		})
+	})
+}
+
 app.use('/v1', v1)
 
 app.use(function (err, req, res, next) {

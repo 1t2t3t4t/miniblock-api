@@ -1,7 +1,7 @@
 const admin = require('firebase-admin')
 
 const verifyIdToken = (token) => {
-    if (process.env.ENV == 'staging' && token === 'admin') {
+    if (process.env.ENV != 'production' && token === 'admin') {
         return Promise.resolve({
             uid: '1'
         })
