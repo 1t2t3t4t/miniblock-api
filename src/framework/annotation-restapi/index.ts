@@ -114,14 +114,10 @@ export function register(app: express.Application, target: Class) {
     endpointInfos.forEach((info) => {
         switch (info.method) {
             case "get":
-                router.get(info.path, (res, req, next) => {
-                    controller[info.name](res, req, next)
-                })
+                router.get(info.path, info.func.bind(controller))
                 break
             case "post":
-                router.post(info.path, (res, req, next) => {
-                    controller[info.name](res, req, next)
-                })
+                router.post(info.path, info.func.bind(controller))
                 break
         }
     })
