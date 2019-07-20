@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "rm -rf build && tsc && node build/server",
-    "local": "ts-node server",
+    "local": "ENV=development ts-node server",
     "staging": "ENV=staging ts-node server",
     "test": "nyc --reporter=text mocha --compilers ts:ts-node/register --recursive --exit",
     "postinstall": "link-module-alias",
@@ -28,9 +28,10 @@
     "firebase-admin": "^8.2.0",
     "jsonwebtoken": "^8.4.0",
     "mongoose": "^5.3.14",
+    "reflect-metadata": "^0.1.13",
     "supertest": "^3.3.0",
-    "validator": "^10.9.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "validator": "^10.9.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.0",
