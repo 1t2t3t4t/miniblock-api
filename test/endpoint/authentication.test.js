@@ -1,9 +1,9 @@
-import User from '../src/model/User'
+import User from '../../src/model/User'
 const assert = require('assert')
 const request = require('supertest')
-const app = require('../server')
+const app = require('../../server')
 
-const dbManager = require('./DBManager')
+const dbManager = require('../DBManager')
 
 before((next) => {
     dbManager.start().then(() => {

@@ -36,6 +36,14 @@ if (process.env.ENV == 'development') {
 	})
 }
 
+import {register} from './src/framework/annotation-restapi'
+import TestRouterController from './src/framework/annotation-restapi/test-endpoint'
+
+if (process.env.ENV == 'test') {
+	console.log('REGISTER TEST ROUTE')
+	register(app, TestRouterController)
+}
+
 app.use('/v1', v1)
 
 app.use(function (err, req, res, next) {
