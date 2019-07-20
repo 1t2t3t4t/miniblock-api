@@ -121,7 +121,7 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
     })
 }
 
-function registerSubRouter(router: express.Router, parent: Class) {
+function registerSubRouters(router: express.Router, parent: Class) {
     const subRouterInfos: Array<SubRouterInfo> = Reflect.getMetadata(MetaDataKey.SubRouter, parent)
     if (!subRouterInfos) { return }
     subRouterInfos.forEach((subRouterInfo) => {
@@ -133,6 +133,7 @@ function registerSubRouter(router: express.Router, parent: Class) {
         router.use(subRouterInfo.path, subRouter)
 
         registerEndpoint(subTarget, subRouter, controller)
+        registerSubRouters(subRouter, subTarget)
     })
 }
 
@@ -143,7 +144,7 @@ export function register(app: express.Application, target: Class) {
     const router = express.Router()
 
     registerEndpoint(target, router, controller)
-    registerSubRouter(router, target)
+    registerSubRouters(router, target)
 
     app.use(routerInfo.path, router)
     return controller
