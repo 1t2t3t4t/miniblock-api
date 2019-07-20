@@ -16,7 +16,7 @@ export default class FeedRouterController {
      * */
     @GET('/all')
     all(req: express.Request, res: express.Response, next: express.NextFunction) {
-        Post.find({}).then((posts) => {
+        Post.find({}).populate('creator').then((posts) => {
             res.status(200).send(new HTTPResponse.Response({ posts }))
         }).catch((e) => {
             res.status(500)
