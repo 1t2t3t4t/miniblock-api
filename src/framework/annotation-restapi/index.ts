@@ -5,7 +5,8 @@ import construct = Reflect.construct;
 enum MetaDataKey {
     Router = 'route',
     SubRouter = 'subRouter',
-    Endpoint = 'endpoint'
+    Endpoint = 'endpoint',
+    Middleware = 'middleware'
 }
 
 //------------------Router--------------------
@@ -52,19 +53,46 @@ type EndpointFunction = (req: express.Request, res: express.Response, next: expr
 
 type HTTPMethod = 'get' | 'post'
 type EndpointInfo = {
-    name: string,
+    name: PropertyKey,
     path: string,
     method: HTTPMethod,
     func: EndpointFunction
 }
 
+//------------------MIDDLEWARE--------------------
+
+type MiddlewareInfo = {
+    middleware: EndpointFunction
+}
+
+export function Middleware(middleware: EndpointFunction) {
+    return function(target: Object,
+                    propertyKey: string | symbol,
+                    descriptor: TypedPropertyDescriptor<EndpointFunction>) {
+        if (!descriptor.value) {
+            throw Error(`${target} ${String(propertyKey)} is invalid`)
+        }
+        if (!Reflect.hasMetadata(MetaDataKey.Middleware, target.constructor)) {
+            Reflect.defineMetadata(MetaDataKey.Middleware, [], target.constructor)
+        }
+
+        let middlewareInfos: Array<MiddlewareInfo> = Reflect.getMetadata(MetaDataKey.Middleware, target.constructor)
+        const info: MiddlewareInfo = {
+            middleware
+        }
+        middlewareInfos.push(info)
+        Reflect.defineMetadata(MetaDataKey.Middleware, middlewareInfos, target.constructor)
+        return descriptor
+    }
+}
+
 //------------------ENDPOINT--------------------
 
 const defineMethodMetadata = (target: Object,
-                       propertyKey: string | symbol,
-                       descriptor: TypedPropertyDescriptor<EndpointFunction>,
-                       path: string,
-                       method: HTTPMethod) => {
+                              propertyKey: string | symbol,
+                              descriptor: TypedPropertyDescriptor<EndpointFunction>,
+                              path: string,
+                              method: HTTPMethod) => {
     if (!descriptor.value) {
         throw Error(`${target} ${String(propertyKey)} is invalid`)
     }
@@ -74,7 +102,7 @@ const defineMethodMetadata = (target: Object,
 
     let endpoints: Array<EndpointInfo> = Reflect.getMetadata(MetaDataKey.Endpoint, target.constructor)
     const info: EndpointInfo = {
-        name: String(propertyKey),
+        name: propertyKey,
         path,
         method: method,
         func: descriptor.value!
@@ -110,12 +138,14 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
     const endpointInfos: Array<EndpointInfo> = Reflect.getMetadata(MetaDataKey.Endpoint, target)
 
     endpointInfos.forEach((info) => {
+        const middlewareInfos: Array<MiddlewareInfo> = Reflect.getMetadata(MetaDataKey.Middleware, target) || []
+        const middlewares: Array<EndpointFunction> = middlewareInfos.map((info) => info.middleware)
         switch (info.method) {
             case "get":
-                router.get(info.path, info.func.bind(controller))
+                router.get(info.path, ...middlewares, info.func.bind(controller))
                 break
             case "post":
-                router.post(info.path, info.func.bind(controller))
+                router.post(info.path, ...middlewares, info.func.bind(controller))
                 break
         }
     })
