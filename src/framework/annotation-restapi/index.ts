@@ -167,7 +167,7 @@ function registerSubRouters(router: express.Router, parent: Class) {
     })
 }
 
-export function register(app: express.Application, target: Class) {
+export function register(app: express.Application | express.Router, target: Class) {
     const controller = new target()
     const routerInfo: RouterInfo = Reflect.getMetadata(MetaDataKey.Router, target)
 
@@ -175,7 +175,7 @@ export function register(app: express.Application, target: Class) {
 
     registerEndpoint(target, router, controller)
     registerSubRouters(router, target)
-
+    
     app.use(routerInfo.path, router)
     return controller
 }
