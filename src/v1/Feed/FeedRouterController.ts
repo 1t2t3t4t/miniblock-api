@@ -8,11 +8,31 @@ const HTTPResponse = require('../../model/HTTPResponse');
 export default class FeedRouterController {
 
     /**
-     * @api {GET} /feed/all Get All Feed
+     * @api {GET} v1/feed/all Get All Feed
      * @apiDescription Fetch all posts
      * @apiGroup Feed
      *
-     * @apiSuccess {[Post]} posts Array of post
+     * @apiSuccess {[Post]} posts Array of
+     * @apiSuccessExample example
+     * posts: [
+     *     {
+     *         like: [User]
+     *         dislike: [User]
+     *         creator: {
+     *             email: String
+     *             displayName: String
+     *             uid: String
+     *         }
+     *         content: {
+     *             text | link | image: String
+     *         }
+     *         type: String
+     *         title: String
+     *         categoryId: Int
+     *         createdAt: Date
+     *         updatedAt: Date
+     *     }
+     * ]
      * */
     @GET('/all')
     all(req: express.Request, res: express.Response, next: express.NextFunction) {
