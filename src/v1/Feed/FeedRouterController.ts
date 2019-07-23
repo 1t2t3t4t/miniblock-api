@@ -19,7 +19,10 @@ export default class FeedRouterController {
      * @apiDescription Fetch all posts
      * @apiGroup Feed
      *
-     * @apiSuccess {[Post]} posts Array of
+     * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
+     * @apiParam {int} [limit] Set limit of fetching ** default value is 10
+     *
+     * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example
      * posts: [
      *     {
