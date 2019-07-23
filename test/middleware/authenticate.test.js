@@ -28,14 +28,7 @@ describe('The middleware ensures that request has a valid token before perform a
             }
         }
         dbManager.start().then(() => {
-            const stubUser = new User({
-                email: 'test@email.com',
-                displayName: 'username',
-                uid: "1"
-            })
-            stubUser.save().then(() => {
-                next()
-            })
+            next()
         })
     })
 

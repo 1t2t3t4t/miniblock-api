@@ -9,16 +9,9 @@ const manager = new AppTestManager()
 describe('get user profile', () => {
     before((next) => {
         dbManager.start().then(() => {
-            const stubUser = new User({
-                email: 'test@email.com',
-                displayName: 'username',
-                uid: "1"
-            })
-            stubUser.save().then(() => {
-                next()
-            }).catch((e) => {
-                console.log(e)
-            })
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
         })
     })
 

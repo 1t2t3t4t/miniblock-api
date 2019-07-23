@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import mongodb from 'mongodb'
 const mongooseDB = require('../src/db/mongoose.ts');
 import {MongoMemoryServer} from 'mongodb-memory-server'
+import User from "../src/model/User";
 
 class DBManager {
     db!: mongodb.Db
@@ -21,7 +22,17 @@ class DBManager {
         })
         this.db = mongoose.connection.db
         this.dropDB()
+        await this.stubUser()
         console.log('reconnect db to', this.uri)
+    }
+
+    async stubUser() {
+        const stubUser = new User({
+            email: 'test@email.com',
+            displayName: 'username',
+            uid: "1"
+        })
+        return stubUser.save()
     }
 
     dropDB() {

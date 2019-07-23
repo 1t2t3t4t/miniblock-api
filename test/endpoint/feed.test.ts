@@ -1,5 +1,5 @@
 import Post, {PostModel, PostType} from '../../src/model/Post'
-import User from '../../src/model/User'
+import User, {UserModel} from '../../src/model/User'
 import {Category} from "../../src/model/Categories";
 import {Response} from 'superagent'
 
@@ -34,21 +34,17 @@ describe('Fetch all from feed', () => {
             }
         }
 
+
         dbManager.start().then(() => {
-            const stubUser = new User({
-                email: 'test@email.com',
-                displayName: 'username',
-                uid: "1"
+            return User.findByUID("1")
+        }).then((user: UserModel) => {
+            return stubPost(user._id)
+        }).then(() => {
+            Post.find({}).then((posts) => {
+                next()
             })
-            stubUser.save().then(() => {
-                return stubPost(stubUser._id)
-            }).then(() => {
-                Post.find({}).then((posts) => {
-                    next()
-                })
-            }).catch((e) => {
-                console.log(e)
-            })
+        }).catch((e: Error) => {
+            console.log(e)
         })
     })
 
