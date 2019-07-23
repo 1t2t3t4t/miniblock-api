@@ -3,7 +3,9 @@ const assert = require('assert')
 const request = require('supertest')
 const app = require('../../server')
 
-const dbManager = require('../DBManager')
+const DBManager = require('../DBManager')
+
+const dbManager = new DBManager()
 
 before((next) => {
     dbManager.start().then(() => {

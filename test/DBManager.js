@@ -23,4 +23,4 @@ class DBManager {
     }
 }
 
-module.exports = new DBManager()
+module.exports = DBManager

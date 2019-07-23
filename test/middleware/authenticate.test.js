@@ -4,7 +4,9 @@ const request = require('supertest')
 const authenticate = require('../../src/middleware/authenticate').authenticate
 const utils = require('../../src/utils/VerifyIdToken')
 
-const dbManager = require('../DBManager')
+const DBManager = require('../DBManager')
+
+const dbManager = new DBManager()
 
 before((next) => {
     dbManager.start().then(() => {
