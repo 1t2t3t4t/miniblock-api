@@ -1,6 +1,8 @@
 import {GET, RouterController} from "../../framework/annotation-restapi"
 import express from "express"
-import Post from '../../model/Post'
+import Post, {PostModel} from '../../model/Post'
+import * as mongoose from "mongoose";
+import {DocumentQuery} from "mongoose";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -46,24 +48,24 @@ export default class FeedRouterController {
      * */
     @GET('/all')
     all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
-        const limit = req.query.limit || 10
+        const limit = req.query.limit
         const afterId = req.query.afterId
+        const query: any = {}
 
         if (afterId) {
-            console.log(afterId)
-            Post.find({ _id: { $gt: afterId } }).limit(limit).populate('creator').then((posts) => {
-                res.status(200).send(new HTTPResponse.Response({ posts }))
-            }).catch((e) => {
-                res.status(500)
-                next(e)
-            })
-        } else {
-            Post.find({}).populate('creator').then((posts) => {
-                res.status(200).send(new HTTPResponse.Response({ posts }))
-            }).catch((e) => {
-                res.status(500)
-                next(e)
-            })
+            query._id = { $gt: afterId }
         }
+
+        const documentQuery = Post.find(query)
+        if (limit) {
+            documentQuery.limit(Number(limit))
+        }
+
+        documentQuery.populate('creator').then((posts) => {
+            res.status(200).send(new HTTPResponse.Response({ posts }))
+        }).catch((e) => {
+            res.status(500)
+            next(e)
+        })
     }
 }
