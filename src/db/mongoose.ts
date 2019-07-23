@@ -26,6 +26,8 @@ mongoose.connect(mongoURI, {
     useNewUrlParser: true
 }).then(() => {
     console.log('Connected to db.')
+}).catch((e: Error) => {
+    console.log(e.name)
 })
 
 module.exports = mongoose
