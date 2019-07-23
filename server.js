@@ -5,6 +5,8 @@ const admin = require('firebase-admin')
 
 const v1 = require('./src/v1')
 
+const env = process.env.ENV
+
 const { ErrorResponse } = require('./src/model/HTTPResponse')
 
 const port = process.env.PORT || 3000
@@ -20,13 +22,15 @@ admin.initializeApp({
 
 app.use(bodyParser.json())
 app.use((req, res, next) => {
-	console.log('path', req.url, req.method)
-	console.log('body', req.body)
-	console.log('headers', req.headers.authorization)
+	if (env != "test") {
+		console.log('path', req.url, req.method)
+		console.log('body', req.body)
+		console.log('headers', req.headers.authorization)
+	}
 	next()
 })
 
-if (process.env.ENV == 'development') {
+if (env == 'development') {
 	app.get('/clean', (req, res) => {
 		mongoose.connection.db.dropDatabase().then(() => {
 			res.status(200).send("done")
@@ -39,7 +43,7 @@ if (process.env.ENV == 'development') {
 import {register} from './src/framework/annotation-restapi'
 import TestRouterController from './src/framework/annotation-restapi/test-endpoint'
 
-if (process.env.ENV == 'test') {
+if (env == 'test') {
 	console.log('REGISTER TEST ROUTE')
 	register(app, TestRouterController)
 }
@@ -47,9 +51,11 @@ if (process.env.ENV == 'test') {
 app.use('/v1', v1)
 
 app.use(function (err, req, res, next) {
-	console.log('---ERROR---')
-	console.log(err)
-  	const error = new ErrorResponse(err.message)
+	if (env != 'test') {
+		console.log('---ERROR---')
+		console.log(err)
+	}
+	const error = new ErrorResponse(err.message)
   	res.send(error)
 })
 
