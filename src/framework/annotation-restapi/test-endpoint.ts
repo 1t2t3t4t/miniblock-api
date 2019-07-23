@@ -13,6 +13,22 @@ export default class TestRouterController {
         })
     }
 
+    @GET('/query')
+    query(req: express.Request, res: express.Response, next: express.NextFunction) {
+        res.send({
+            name: this.name,
+            query: req.query
+        })
+    }
+
+    @GET('/params/:something/yo')
+    params(req: express.Request, res: express.Response, next: express.NextFunction) {
+        res.send({
+            name: this.name,
+            params: req.params
+        })
+    }
+
     @POST('/endpoint')
     testPost(req: express.Request, res: express.Response, next: express.NextFunction) {
         res.send({

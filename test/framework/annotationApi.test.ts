@@ -12,6 +12,26 @@ describe('test RouterController', () => {
             }).end(done)
     })
 
+    it('should get successful to RouterControlle with query', (done) => {
+        request(server)
+            .get('/test/query?id=69&name=sucker')
+            .expect(200)
+            .expect((res) => {
+                assert.deepEqual('TestRouterController', res.body.name)
+                assert.deepEqual({ id: '69', name: 'sucker' }, res.body.query)
+            }).end(done)
+    })
+
+    it('should get successful to RouterControlle with params', (done) => {
+        request(server)
+            .get('/test/params/yoboi/yo')
+            .expect(200)
+            .expect((res) => {
+                assert.deepEqual('TestRouterController', res.body.name)
+                assert.deepEqual({ something: 'yoboi' }, res.body.params)
+            }).end(done)
+    })
+
     it('should post successful to RouterController', (done) => {
         const body = {
             name: 'body',
