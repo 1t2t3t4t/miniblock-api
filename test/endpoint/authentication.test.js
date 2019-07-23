@@ -17,8 +17,6 @@ describe('POST v1/account/register', () => {
                 uid: "1"
             })
             stubUser.save().then(() => {
-                return User.ensureIndexes()
-            }).then(() => {
                 next()
             }).catch((e) => {
                 console.log(e)

@@ -10,23 +10,23 @@ const dbManager = new DBManager()
 
 const CORRECT_TOKEN = 'validtoken'
 
-
-/**
- * Stub verifyIdToken
- */
-utils.verifyIdToken = async (token) => {
-    if (token === CORRECT_TOKEN) {
-        return {
-            uid: '1'
-        }
-    } else {
-        throw Error('Whatever error returned from actual firebase-admin')
-    }
-}
+const oriVerifyIdToken = utils.verifyIdToken
 
 describe('The middleware ensures that request has a valid token before perform action', () => {
     
     before((next) => {
+        /**
+         * Stub verifyIdToken
+         */
+        utils.verifyIdToken = async (token) => {
+            if (token === CORRECT_TOKEN) {
+                return {
+                    uid: '1'
+                }
+            } else {
+                throw Error('Whatever error returned from actual firebase-admin')
+            }
+        }
         dbManager.start().then(() => {
             const stubUser = new User({
                 email: 'test@email.com',
@@ -34,8 +34,6 @@ describe('The middleware ensures that request has a valid token before perform a
                 uid: "1"
             })
             stubUser.save().then(() => {
-                return User.ensureIndexes()
-            }).then(() => {
                 next()
             })
         })
@@ -43,6 +41,7 @@ describe('The middleware ensures that request has a valid token before perform a
 
     after(() => {
         dbManager.stop()
+        utils.verifyIdToken = oriVerifyIdToken
     })
 
     it('should add user to request if success', (done) => {

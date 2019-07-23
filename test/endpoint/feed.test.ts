@@ -1,8 +1,6 @@
 import Post, {PostModel, PostType} from '../../src/model/Post'
 import User from '../../src/model/User'
 import {Category} from "../../src/model/Categories";
-import mongoose from 'mongoose'
-import express = require('express');
 import {Response} from 'superagent'
 
 const assert = require('assert')

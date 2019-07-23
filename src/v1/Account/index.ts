@@ -86,7 +86,7 @@ class AccountRouterController {
      *
      * */
     profile(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
-        res.status(200).send(new HTTPResponse.Response(req.user))
+        res.status(200).send(new HTTPResponse.Response({ user: req.user }))
     }
 
     /**
@@ -111,7 +111,7 @@ class AccountRouterController {
         const { displayName } = req.body
         req.user.displayName = displayName
         req.user.save().then((newUser) => {
-            res.status(200).send(new HTTPResponse.Response(newUser))
+            res.status(200).send(new HTTPResponse.Response({ user: newUser }))
         }).catch((error: Error) => {
             res.status(400)
             next(error)
