@@ -7,28 +7,29 @@ const DBManager = require('../DBManager')
 
 const dbManager = new DBManager()
 
-before((next) => {
-    dbManager.start().then(() => {
-        const stubUser = new User({
-            email: 'test@email.com',
-            displayName: 'username',
-            uid: "1"
-        })
-        stubUser.save().then(() => {
-            return User.ensureIndexes()
-        }).then(() => {
-            next()
-        }).catch((e) => {
-            console.log(e)
+describe('POST v1/account/register', () => {
+
+    before((next) => {
+        dbManager.start().then(() => {
+            const stubUser = new User({
+                email: 'test@email.com',
+                displayName: 'username',
+                uid: "1"
+            })
+            stubUser.save().then(() => {
+                return User.ensureIndexes()
+            }).then(() => {
+                next()
+            }).catch((e) => {
+                console.log(e)
+            })
         })
     })
-})
 
-after(() => {
-    dbManager.stop()
-})
-
-describe('POST v1/account/register', () => {
+    after(() => {
+        dbManager.stop()
+    })
+    
     const path = '/v1/account/register'
     it('should return 200 and token if register successfully', (done) => {
         request(app)

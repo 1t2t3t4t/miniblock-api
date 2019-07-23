@@ -15,49 +15,49 @@ const dbManager = new DBManager()
 
 let posts: Array<PostModel> = []
 
-before((next) => {
+describe('Fetch all from feed', () => {
+    before((next) => {
 
-    const stubPost = async (creator: string) => {
-        for(let i=1;i<=25;i++) {
-            let model = {
-                type: PostType.TEXT,
-                categoryId: Category.Loneliness,
-                content: {
-                    text: `text number ${i}`
-                },
-                creator: creator,
-                title: `${i}`
-            } as PostModel
-            const post = new Post(model)
-            await post.save().then((post) => {
-                posts.push(post)
-            })
+        const stubPost = async (creator: string) => {
+            for(let i=1;i<=25;i++) {
+                let model = {
+                    type: PostType.TEXT,
+                    categoryId: Category.Loneliness,
+                    content: {
+                        text: `text number ${i}`
+                    },
+                    creator: creator,
+                    title: `${i}`
+                } as PostModel
+                const post = new Post(model)
+                await post.save().then((post) => {
+                    posts.push(post)
+                })
+            }
         }
-    }
 
-    dbManager.start().then(() => {
-        const stubUser = new User({
-            email: 'test@email.com',
-            displayName: 'username',
-            uid: "1"
-        })
-        stubUser.save().then(() => {
-            return stubPost(stubUser._id)
-        }).then(() => {
-            Post.find({}).then((posts) => {
-                next()
+        dbManager.start().then(() => {
+            const stubUser = new User({
+                email: 'test@email.com',
+                displayName: 'username',
+                uid: "1"
             })
-        }).catch((e) => {
-            console.log(e)
+            stubUser.save().then(() => {
+                return stubPost(stubUser._id)
+            }).then(() => {
+                Post.find({}).then((posts) => {
+                    next()
+                })
+            }).catch((e) => {
+                console.log(e)
+            })
         })
     })
-})
 
-after(() => {
-    dbManager.stop()
-})
+    after(() => {
+        dbManager.stop()
+    })
 
-describe('Fetch all from feed', () => {
     const path = '/v1/feed/all'
     it('should get all feed', (done) => {
         request(app)

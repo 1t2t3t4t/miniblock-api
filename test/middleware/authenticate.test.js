@@ -8,25 +8,6 @@ const DBManager = require('../DBManager')
 
 const dbManager = new DBManager()
 
-before((next) => {
-    dbManager.start().then(() => {
-        const stubUser = new User({
-            email: 'test@email.com',
-            displayName: 'username',
-            uid: "1"
-        })
-        stubUser.save().then(() => {
-            return User.ensureIndexes()
-        }).then(() => {
-            next()
-        })
-    })
-})
-
-after(() => {
-    dbManager.stop()
-})
-
 const CORRECT_TOKEN = 'validtoken'
 
 
@@ -44,6 +25,26 @@ utils.verifyIdToken = async (token) => {
 }
 
 describe('The middleware ensures that request has a valid token before perform action', () => {
+    
+    before((next) => {
+        dbManager.start().then(() => {
+            const stubUser = new User({
+                email: 'test@email.com',
+                displayName: 'username',
+                uid: "1"
+            })
+            stubUser.save().then(() => {
+                return User.ensureIndexes()
+            }).then(() => {
+                next()
+            })
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
     it('should add user to request if success', (done) => {
         const req = {
             headers: {
