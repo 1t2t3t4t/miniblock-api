@@ -4,6 +4,13 @@ import Post from '../../model/Post'
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
+export interface FeedQueryRequest extends express.Request {
+    query: {
+        limit?: number,
+        afterId?: string
+    }
+}
+
 @RouterController('/')
 export default class FeedRouterController {
 
@@ -35,12 +42,25 @@ export default class FeedRouterController {
      * ]
      * */
     @GET('/all')
-    all(req: express.Request, res: express.Response, next: express.NextFunction) {
-        Post.find({}).populate('creator').then((posts) => {
-            res.status(200).send(new HTTPResponse.Response({ posts }))
-        }).catch((e) => {
-            res.status(500)
-            next(e)
-        })
+    all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
+        const limit = req.query.limit || 10
+        const afterId = req.query.afterId
+
+        if (afterId) {
+            console.log(afterId)
+            Post.find({ _id: { $gt: afterId } }).limit(limit).populate('creator').then((posts) => {
+                res.status(200).send(new HTTPResponse.Response({ posts }))
+            }).catch((e) => {
+                res.status(500)
+                next(e)
+            })
+        } else {
+            Post.find({}).populate('creator').then((posts) => {
+                res.status(200).send(new HTTPResponse.Response({ posts }))
+            }).catch((e) => {
+                res.status(500)
+                next(e)
+            })
+        }
     }
 }
