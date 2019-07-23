@@ -11,6 +11,7 @@ class DBManager {
 
     async start() {
         const url = await this.server.getConnectionString()
+        console.log('reconnect db to', url)
         this.connection = await mongoose.connect(url, {
             useCreateIndex: true,
             useNewUrlParser: true
@@ -19,6 +20,7 @@ class DBManager {
     }
 
     stop() {
+        console.log(this.server.instanceInfoSync.uri, 'stopped')
         return this.server.stop()
     }
 }
