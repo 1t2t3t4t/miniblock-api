@@ -27,8 +27,7 @@ describe('Fetch all from feed', () => {
                     creator: creator,
                     title: `${i}`
                 } as PostModel
-                const post = new Post(model)
-                await post.save().then((post) => {
+                await dbManager.stubPost(model).then((post: PostModel) => {
                     posts.push(post)
                 })
             }

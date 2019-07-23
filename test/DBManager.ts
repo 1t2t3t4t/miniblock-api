@@ -2,16 +2,24 @@ import mongoose from 'mongoose'
 import mongodb from 'mongodb'
 const mongooseDB = require('../src/db/mongoose.ts');
 import {MongoMemoryServer} from 'mongodb-memory-server'
-import User from "../src/model/User";
+import User, {UserModel} from "../src/model/User";
+import Post, {PostModel} from "../src/model/Post";
 
 class DBManager {
+
     db!: mongodb.Db
     server: MongoMemoryServer
     connection!: mongoose.Connection
     uri! : string
+    defaultUser: UserModel
 
     constructor() {
         this.server = new MongoMemoryServer()
+        this.defaultUser = {
+            email: 'test@email.com',
+            displayName: 'username',
+            uid: "1"
+        } as UserModel
     }
 
     async start() {
@@ -22,17 +30,18 @@ class DBManager {
         })
         this.db = mongoose.connection.db
         this.dropDB()
-        await this.stubUser()
+        await this.stubUser(this.defaultUser)
         console.log('reconnect db to', this.uri)
     }
 
-    async stubUser() {
-        const stubUser = new User({
-            email: 'test@email.com',
-            displayName: 'username',
-            uid: "1"
-        })
+    async stubUser(user: UserModel) {
+        const stubUser = new User(user)
         return stubUser.save()
+    }
+
+    async stubPost(post: PostModel) {
+        const stubPost = new Post(post)
+        return stubPost.save()
     }
 
     dropDB() {

@@ -54,7 +54,7 @@ class AccountRouterController {
      * @apiParam {String} username      Username.
      *
      * @apiSuccess {String} message     Successfully message.
-     * @apiSuccess {User}   User        User model.
+     * @apiSuccess {User}   user        User model.
      *
      * @apiError {Error} InternalError error with message
      */
@@ -99,7 +99,7 @@ class AccountRouterController {
      *
      * @apiParam {String} displayName Display name to be saved
      *
-     * @apiSuccess {User} User model
+     * @apiSuccess {User} user User model
      *
      * */
     saveProfile(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
