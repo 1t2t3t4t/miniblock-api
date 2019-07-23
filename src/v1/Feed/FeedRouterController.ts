@@ -1,8 +1,17 @@
 import {GET, RouterController} from "../../framework/annotation-restapi"
 import express from "express"
-import Post from '../../model/Post'
+import Post, {PostModel} from '../../model/Post'
+import * as mongoose from "mongoose";
+import {DocumentQuery} from "mongoose";
 
 const HTTPResponse = require('../../model/HTTPResponse');
+
+export interface FeedQueryRequest extends express.Request {
+    query: {
+        limit?: number,
+        afterId?: string
+    }
+}
 
 @RouterController('/')
 export default class FeedRouterController {
@@ -12,7 +21,10 @@ export default class FeedRouterController {
      * @apiDescription Fetch all posts
      * @apiGroup Feed
      *
-     * @apiSuccess {[Post]} posts Array of
+     * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
+     * @apiParam {int} [limit] Set limit of fetching ** default value is 10
+     *
+     * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example
      * posts: [
      *     {
@@ -35,8 +47,21 @@ export default class FeedRouterController {
      * ]
      * */
     @GET('/all')
-    all(req: express.Request, res: express.Response, next: express.NextFunction) {
-        Post.find({}).populate('creator').then((posts) => {
+    all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
+        const limit = req.query.limit
+        const afterId = req.query.afterId
+        const query: any = {}
+
+        if (afterId) {
+            query._id = { $gt: afterId }
+        }
+
+        const documentQuery = Post.find(query)
+        if (limit) {
+            documentQuery.limit(Number(limit))
+        }
+
+        documentQuery.populate('creator').then((posts) => {
             res.status(200).send(new HTTPResponse.Response({ posts }))
         }).catch((e) => {
             res.status(500)
