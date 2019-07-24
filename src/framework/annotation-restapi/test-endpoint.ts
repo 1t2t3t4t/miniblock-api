@@ -98,4 +98,12 @@ class TestSubOfSubRouterController {
             md: req.something
         })
     }
+
+    @GET('/endpointNoMD')
+    noMd(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
+        res.send({
+            name: this.subSubName,
+            md: req.something
+        })
+    }
 }
