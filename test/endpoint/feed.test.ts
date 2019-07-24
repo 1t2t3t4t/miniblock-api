@@ -1,8 +1,6 @@
 import Post, {PostModel, PostType} from '../../src/model/Post'
-import User from '../../src/model/User'
+import User, {UserModel} from '../../src/model/User'
 import {Category} from "../../src/model/Categories";
-import mongoose from 'mongoose'
-import express = require('express');
 import {Response} from 'superagent'
 
 const assert = require('assert')
@@ -29,28 +27,23 @@ describe('Fetch all from feed', () => {
                     creator: creator,
                     title: `${i}`
                 } as PostModel
-                const post = new Post(model)
-                await post.save().then((post) => {
+                await dbManager.stubPost(model).then((post: PostModel) => {
                     posts.push(post)
                 })
             }
         }
 
+
         dbManager.start().then(() => {
-            const stubUser = new User({
-                email: 'test@email.com',
-                displayName: 'username',
-                uid: "1"
+            return User.findByUID("1")
+        }).then((user: UserModel) => {
+            return stubPost(user._id)
+        }).then(() => {
+            Post.find({}).then((posts) => {
+                next()
             })
-            stubUser.save().then(() => {
-                return stubPost(stubUser._id)
-            }).then(() => {
-                Post.find({}).then((posts) => {
-                    next()
-                })
-            }).catch((e) => {
-                console.log(e)
-            })
+        }).catch((e: Error) => {
+            console.log(e)
         })
     })
 

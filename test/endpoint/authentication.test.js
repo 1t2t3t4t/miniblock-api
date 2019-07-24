@@ -11,18 +11,9 @@ describe('POST v1/account/register', () => {
 
     before((next) => {
         dbManager.start().then(() => {
-            const stubUser = new User({
-                email: 'test@email.com',
-                displayName: 'username',
-                uid: "1"
-            })
-            stubUser.save().then(() => {
-                return User.ensureIndexes()
-            }).then(() => {
                 next()
-            }).catch((e) => {
-                console.log(e)
-            })
+        }).catch((e) => {
+            console.log(e)
         })
     })
 
