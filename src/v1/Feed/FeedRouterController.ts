@@ -59,7 +59,7 @@ export default class FeedRouterController {
         if (afterId) {
             query._id = { $gt: afterId }
         }
-        
+
         const documentQuery = Post.find(query)
         if (limit) {
             documentQuery.limit(Number(limit))
