@@ -12,6 +12,15 @@
     "gen-doc": "apidoc -i src/ -o docs/ && open docs/index.html",
     "tsc": "tsc"
   },
+  "nyc": {
+    "extension": [
+      ".js",
+      ".ts"
+    ],
+    "exclude": [
+      "src/db/*"
+    ]
+  },
   "_moduleAliases": {
     "@root": "build/",
     "@model": "build/src/model",
