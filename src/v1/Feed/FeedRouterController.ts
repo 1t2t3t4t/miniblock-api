@@ -79,6 +79,37 @@ export default class FeedRouterController {
         })
     }
 
+    /**
+     * @api {GET} v1/feed/search Search posts with title
+     * @apiDescription Get posts that its title contains the keyword.
+     * @apiGroup Search
+     *
+     * @apiParam {string} keyword Keyword used for searching the posts
+     * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
+     * @apiParam {int} [limit] Set limit of fetching ** default value is 10
+     *
+     * @apiSuccess {[Post]} posts Array of post
+     * @apiSuccessExample example
+     * posts: [
+     *     {
+     *         like: [User]
+     *         dislike: [User]
+     *         creator: {
+     *             email: String
+     *             displayName: String
+     *             uid: String
+     *         }
+     *         content: {
+     *             text | link | image: String
+     *         }
+     *         type: String
+     *         title: String
+     *         categoryId: Int
+     *         createdAt: Date
+     *         updatedAt: Date
+     *     }
+     * ]
+     * */
     @GET('/search')
     search(req: FeedSearchQueryRequest, res: express.Response, next: express.NextFunction) {
         const { limit, afterId, keyword } = req.query
