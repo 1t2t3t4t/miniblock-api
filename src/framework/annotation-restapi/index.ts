@@ -62,7 +62,8 @@ type EndpointInfo = {
 //------------------MIDDLEWARE--------------------
 
 type MiddlewareInfo = {
-    middleware: EndpointFunction
+    middleware: EndpointFunction,
+    name: PropertyKey
 }
 
 export function Middleware(middleware: EndpointFunction) {
@@ -78,7 +79,8 @@ export function Middleware(middleware: EndpointFunction) {
 
         let middlewareInfos: Array<MiddlewareInfo> = Reflect.getMetadata(MetaDataKey.Middleware, target.constructor)
         const info: MiddlewareInfo = {
-            middleware
+            middleware,
+            name: propertyKey
         }
         middlewareInfos.push(info)
         Reflect.defineMetadata(MetaDataKey.Middleware, middlewareInfos, target.constructor)
@@ -139,7 +141,9 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
 
     endpointInfos.forEach((info) => {
         const middlewareInfos: Array<MiddlewareInfo> = Reflect.getMetadata(MetaDataKey.Middleware, target) || []
-        const middlewares: Array<EndpointFunction> = middlewareInfos.map((info) => info.middleware)
+        const middlewares: Array<EndpointFunction> = middlewareInfos
+            .filter((endpointInfo) => endpointInfo.name === info.name)
+            .map((info) => info.middleware)
         switch (info.method) {
             case "get":
                 router.get(info.path, ...middlewares, info.func.bind(controller))

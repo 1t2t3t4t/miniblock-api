@@ -98,6 +98,16 @@ describe('test SubOfSubRouterController', () => {
             }).end(done)
     })
 
+    it('should get successful endpoint with no effect from middleware', (done) => {
+        request(server)
+            .get('/test/1stsubroute/2ndsubroute/endpointNoMD')
+            .expect(200)
+            .expect((res) => {
+                assert.deepEqual('TestSubOfSubRouterController', res.body.name)
+                assert.deepEqual(undefined, res.body.md)
+            }).end(done)
+    })
+
     it('should post successful to SubOfSubRouterController', (done) => {
         const body = {
             name: 'body',
