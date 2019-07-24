@@ -78,7 +78,7 @@ describe('Fetch all from feed with 1 category', () => {
     })
 
     it('should get 10 posts after 10th post', (done) => {
-        const tenId = posts.find((post, index) => index == 9)!._id
+        const tenId = posts.find((post, index) => index == 15)!._id
         request(app)
             .get(path + `?limit=10&afterId=${tenId}`)
             .expect(200)
@@ -86,13 +86,13 @@ describe('Fetch all from feed with 1 category', () => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 10)
-                assert.deepEqual(resPosts[0].title, posts[10].title)
-                assert.deepEqual(resPosts[9].title, posts[19].title)
+                assert.deepEqual(resPosts[0].title, posts[14].title)
+                assert.deepEqual(resPosts[9].title, posts[5].title)
             }).end(done)
     })
 
     it('should get 5 posts after 20th post', (done) => {
-        const twenId = posts.find((post, index) => index == 19)!._id
+        const twenId = posts.find((post, index) => index == 5)!._id
         request(app)
             .get(path + `?limit=10&afterId=${twenId}`)
             .expect(200)
@@ -100,8 +100,8 @@ describe('Fetch all from feed with 1 category', () => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 5)
-                assert.deepEqual(resPosts[0].title, posts[20].title)
-                assert.deepEqual(resPosts[4].title, posts[24].title)
+                assert.deepEqual(resPosts[0].title, posts[4].title)
+                assert.deepEqual(resPosts[4].title, posts[0].title)
             }).end(done)
     })
 })
@@ -185,7 +185,7 @@ describe('Fetch all from feed with mixed category', () => {
         const categoryId = Category.Depression
         const afterId = posts
             .filter((post) => post.categoryId == categoryId)
-            .find((post, idx) => idx == 9)!._id
+            .find((post, idx) => idx == 15)!._id
         request(app)
             .get(path + '?limit=10&categoryId=' + categoryId + '&afterId=' + afterId)
             .expect(200)
@@ -195,7 +195,7 @@ describe('Fetch all from feed with mixed category', () => {
                 assert.deepEqual(resPosts.length, 10)
                 const expectId = posts
                     .filter((post) => post.categoryId == categoryId)
-                    .find((post, idx) => idx == 10)!._id.toString()
+                    .find((post, idx) => idx == 14)!._id.toString()
                 assert.deepEqual(expectId, resPosts[0]._id)
                 resPosts.forEach((post) => {
                     assert.deepEqual(post.categoryId, categoryId)
@@ -301,7 +301,7 @@ describe('Seach post', () => {
                 const resPosts: Array<PostModel> = res.body.body.posts
                 const expectId = posts
                     .filter((post) => post.title.includes(keyword))
-                    .find((post, idx) => idx == 3)!._id.toString()
+                    .find((post, idx) => idx == 1)!._id.toString()
                 assert.deepEqual(resPosts[0]._id, expectId)
                 assert.deepEqual(2, resPosts.length)
                 resPosts.forEach((post) => {

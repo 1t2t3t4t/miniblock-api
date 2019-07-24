@@ -129,13 +129,14 @@ export default class FeedRouterController {
 
     queryPaginate(query: PostModel, afterId?: string, limit?: number): DocumentQuery<PostModel[], PostModel> {
         if (afterId) {
-            query._id = { $gt: afterId }
+            query._id = { $lt: afterId }
         }
 
         const documentQuery = Post.find(query)
         if (limit) {
             documentQuery.limit(Number(limit))
         }
+        documentQuery.sort({ createdAt: 'desc' })
 
         return documentQuery
     }
