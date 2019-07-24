@@ -9,7 +9,8 @@ const HTTPResponse = require('../../model/HTTPResponse');
 export interface FeedQueryRequest extends express.Request {
     query: {
         limit?: number,
-        afterId?: string
+        afterId?: string,
+        categoryId?: string
     }
 }
 
@@ -48,14 +49,17 @@ export default class FeedRouterController {
      * */
     @GET('/all')
     all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
-        const limit = req.query.limit
-        const afterId = req.query.afterId
-        const query: any = {}
+        const { limit, afterId, categoryId } = req.query
+        const query = {} as PostModel
+
+        if (categoryId) {
+            query.categoryId = Number(categoryId)
+        }
 
         if (afterId) {
             query._id = { $gt: afterId }
         }
-
+        
         const documentQuery = Post.find(query)
         if (limit) {
             documentQuery.limit(Number(limit))
