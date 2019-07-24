@@ -14,6 +14,18 @@ export interface FeedQueryRequest extends express.Request {
     }
 }
 
+export interface FeedSearchQueryRequest extends express.Request {
+    query: {
+        limit?: number,
+        afterId?: string,
+        keyword: string
+    }
+}
+
+interface PostSearchModel extends PostModel {
+    title: any
+}
+
 @RouterController('/')
 export default class FeedRouterController {
 
@@ -24,6 +36,7 @@ export default class FeedRouterController {
      *
      * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
      * @apiParam {int} [limit] Set limit of fetching ** default value is 10
+     * @apiParam {int} [categoryId] Set to filter for specific categoryId
      *
      * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example
@@ -56,6 +69,34 @@ export default class FeedRouterController {
             query.categoryId = Number(categoryId)
         }
 
+        const documentQuery = this.queryPaginate(query, afterId, limit)
+
+        documentQuery.populate('creator').then((posts) => {
+            res.status(200).send(new HTTPResponse.Response({ posts }))
+        }).catch((e) => {
+            res.status(500)
+            next(e)
+        })
+    }
+
+    @GET('/search')
+    search(req: FeedSearchQueryRequest, res: express.Response, next: express.NextFunction) {
+        const { limit, afterId, keyword } = req.query
+        const query = {} as PostSearchModel
+
+        query.title = new RegExp(`.*${keyword}.*`,'i')
+
+        const documentQuery = this.queryPaginate(query, afterId, limit)
+
+        documentQuery.populate('creator').then((posts) => {
+            res.status(200).send(new HTTPResponse.Response({ posts }))
+        }).catch((e) => {
+            res.status(500)
+            next(e)
+        })
+    }
+
+    queryPaginate(query: PostModel, afterId?: string, limit?: number): DocumentQuery<PostModel[], PostModel> {
         if (afterId) {
             query._id = { $gt: afterId }
         }
@@ -65,11 +106,6 @@ export default class FeedRouterController {
             documentQuery.limit(Number(limit))
         }
 
-        documentQuery.populate('creator').then((posts) => {
-            res.status(200).send(new HTTPResponse.Response({ posts }))
-        }).catch((e) => {
-            res.status(500)
-            next(e)
-        })
+        return documentQuery
     }
 }
