@@ -58,7 +58,8 @@ const Post = new Schema({
         validate: {
             validator: categoryValidator,
             msg: 'we dont have categoryId {VALUE}.'
-        }
+        },
+        index: true
     },
     type: {
         type: String,
@@ -89,7 +90,8 @@ const Post = new Schema({
     creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
+        index: true
     },
     like: [
         {
@@ -106,5 +108,7 @@ const Post = new Schema({
 }, {
     timestamps: true
 })
+
+Post.index({ createdAt: -1, _id: -1 })
 
 export default mongoose.model<PostModel>('Post', Post)
