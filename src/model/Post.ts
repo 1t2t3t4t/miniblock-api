@@ -109,6 +109,8 @@ const Post = new Schema({
     timestamps: true
 })
 
-Post.index({ createdAt: -1, _id: -1 })
+Post.index({  createdAt: -1, _id: -1 })
+Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
+Post.index({ title: 1, createdAt: -1, _id: -1 })
 
 export default mongoose.model<PostModel>('Post', Post)

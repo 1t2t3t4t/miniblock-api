@@ -136,7 +136,9 @@ export default class FeedRouterController {
         if (limit) {
             documentQuery.limit(Number(limit))
         }
-        documentQuery.sort({ createdAt: 'desc' })
+        documentQuery
+            .sort({ createdAt: 'desc' })
+            .lean()
 
         return documentQuery
     }
