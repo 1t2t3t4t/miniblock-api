@@ -1,7 +1,7 @@
 import Post, {PostModel} from "../model/Post";
 import {DocumentQuery, Model} from "mongoose";
 import {Category} from "../model/Categories";
-import {UserModel} from "../model/User";
+import User, {UserModel} from "../model/User";
 
 interface PostSearchModel extends PostModel {
     title: any
@@ -9,10 +9,10 @@ interface PostSearchModel extends PostModel {
 
 export default class FeedManager {
 
-    post: Model<PostModel>
+    Post: Model<PostModel>
 
-    constructor(post: Model<PostModel>) {
-        this.post = post
+    constructor(Post: Model<PostModel>) {
+        this.Post = Post
     }
 
     async getAll(limit?: number,
@@ -26,8 +26,16 @@ export default class FeedManager {
         }
 
         const documentQuery = this.queryPaginate(query, afterId, limit)
+        const posts = await documentQuery.populate('creator')
 
-        return documentQuery.populate('creator').exec()
+        const user = await User.findByUID('1')
+
+        if (interactor) {
+            posts.forEach(post => {
+                post.setInteractor(interactor)
+            })
+        }
+        return posts
     }
 
     async search(keyword: string,
@@ -43,7 +51,7 @@ export default class FeedManager {
         return documentQuery.populate('creator').exec()
     }
 
-    protected queryPaginate(query: PostModel,
+    protected queryPaginate(query: any | PostModel,
                             afterId?: string,
                             limit?: number): DocumentQuery<PostModel[], PostModel> {
         if (afterId) {

@@ -1,5 +1,5 @@
 import Post, {PostModel, PostType} from '../../src/model/Post'
-import User, {UserModel} from '../../src/model/User'
+import User, {UserModel, UserRef} from '../../src/model/User'
 import {Category} from "../../src/model/Categories";
 import {Response} from 'superagent'
 
@@ -13,7 +13,7 @@ describe('Fetch all from feed with 1 category', () => {
     const dbManager = new DBManager()
     let posts: Array<PostModel> = []
     before((next) => {
-        const stubPost = async (creator: string) => {
+        const stubPost = async (creator: UserRef) => {
             for(let i=1;i<=25;i++) {
                 let modelLoneliness = {
                     type: PostType.TEXT,
@@ -110,7 +110,7 @@ describe('Fetch all from feed with mixed category', () => {
     const dbManager = new DBManager()
     let posts: Array<PostModel> = []
     before((next) => {
-        const stubPost = async (creator: string) => {
+        const stubPost = async (creator: UserRef) => {
             for(let i=1;i<=25;i++) {
                 let modelLoneliness = {
                     type: PostType.TEXT,
@@ -213,7 +213,7 @@ describe('Seach post', () => {
     const keyword = 'keyword'
     before((next) => {
 
-        const makePost = (title: string, creator: string): PostModel => {
+        const makePost = (title: string, creator: UserRef): PostModel => {
             return {
                 type: PostType.TEXT,
                 categoryId: Category.Loneliness,
@@ -225,7 +225,7 @@ describe('Seach post', () => {
             } as PostModel
         }
 
-        const stubPost = async (creator: string) => {
+        const stubPost = async (creator: UserRef) => {
             let postList: PostModel[] = []
             postList.push(makePost(keyword, creator))
             postList.push(makePost('random post', creator))

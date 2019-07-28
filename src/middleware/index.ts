@@ -8,8 +8,18 @@ const utils = require('../utils/VerifyIdToken')
  * Every logged in user has to send auth token
  * */
 
-export interface AuthenticatedRequest extends express.Request {
-    user: Model<UserModel>
+/**
+ * Middleware interface for request that could be authenticated
+ * */
+export interface AuthRequest extends express.Request {
+    user?: UserModel
+}
+
+/**
+ * Middleware interface for request that needed to be sure that it has valid authentication
+ * */
+export interface EnsureAuthRequest extends express.Request {
+    user: UserModel
 }
 
 /**
@@ -40,7 +50,7 @@ export async function ensureAuthenticate(req: express.Request, res: express.Resp
 
     try {
         const user = await userFromToken(token)
-        const authenticatedRequest = req as AuthenticatedRequest
+        const authenticatedRequest = req as EnsureAuthRequest
         if (!user) {
             throw Error('User is null or not found.')
         }
@@ -55,6 +65,37 @@ export async function ensureAuthenticate(req: express.Request, res: express.Resp
 
 }
 
-const userFromToken = (token: string): Promise<Model<UserModel>> => {
+export async function authenticate(req: express.Request, res: express.Response, next: express.NextFunction) {
+    const authToken = req.headers.authorization
+
+    if (!authToken) {
+        next()
+        return
+    }
+
+    const slicedAuthToken = authToken!.split(' ')
+    if (slicedAuthToken[0] !== 'Bearer' || !slicedAuthToken[1]) {
+        next(Error('Invalid Auth Header.'))
+    }
+    const token = slicedAuthToken[1]
+
+    try {
+        const user = await userFromToken(token)
+        const authenticatedRequest = req as AuthRequest
+        if (!user) {
+            throw Error('User is null or not found.')
+        }
+
+        authenticatedRequest.user = user
+        next()
+    } catch(e) {
+        console.log(e)
+        res.status(401)
+        next(e)
+    }
+
+}
+
+const userFromToken = (token: string): Promise<UserModel> => {
     return utils.verifyIdToken(token).then((decodedToken: any) => User.findByUID(decodedToken.uid))
 }

@@ -1,14 +1,15 @@
-import {GET, RouterController} from "../../framework/annotation-restapi"
+import {GET, Middleware, RouterController} from "../../framework/annotation-restapi"
 import express from "express"
 import Post, {PostModel, PostType} from '../../model/Post'
 import {DocumentQuery} from "mongoose";
 import User from "../../model/User";
 import {Category} from "../../model/Categories";
 import FeedManager from "../../common/FeedManager";
+import {authenticate, AuthRequest} from "../../middleware";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
-export interface FeedQueryRequest extends express.Request {
+export interface FeedQueryRequest extends AuthRequest {
     query: {
         limit?: number,
         afterId?: string,
@@ -16,7 +17,7 @@ export interface FeedQueryRequest extends express.Request {
     }
 }
 
-export interface FeedSearchQueryRequest extends express.Request {
+export interface FeedSearchQueryRequest extends AuthRequest {
     query: {
         limit?: number,
         afterId?: string,
@@ -61,6 +62,7 @@ export default class FeedRouterController {
      * ]
      * */
     @GET('/all')
+    @Middleware(authenticate)
     all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
         const { limit, afterId, categoryId } = req.query
         if (categoryId && isNaN(Number(categoryId))) {
@@ -72,12 +74,13 @@ export default class FeedRouterController {
 
         const category = Number(categoryId)
 
-        this.feedManager.getAll(limit, afterId, category).then((posts) => {
-            res.status(200).send(new HTTPResponse.Response({ posts }))
-        }).catch((e) => {
-            res.status(500)
-            next(e)
-        })
+        this.feedManager.getAll(limit, afterId, category, req.user)
+            .then((posts) => {
+                res.status(200).send(new HTTPResponse.Response({ posts }))
+            }).catch((e) => {
+                res.status(500)
+                next(e)
+            })
     }
 
     /**
@@ -112,10 +115,11 @@ export default class FeedRouterController {
      * ]
      * */
     @GET('/search')
+    @Middleware(authenticate)
     async search(req: FeedSearchQueryRequest, res: express.Response, next: express.NextFunction) {
         const { limit, afterId, keyword } = req.query
 
-        this.feedManager.search(keyword, limit, afterId)
+        this.feedManager.search(keyword, limit, afterId, req.user)
             .then((posts) => {
             res.status(200).send(new HTTPResponse.Response({ posts }))
         }).catch((e) => {

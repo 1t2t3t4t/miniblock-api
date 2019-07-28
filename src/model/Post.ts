@@ -1,7 +1,7 @@
-import mongoose from 'mongoose'
-import {UserModel, UserRef} from './User'
+import mongoose, {Types} from 'mongoose'
+import User, {UserModel, UserRef} from './User'
 import categories from './Categories'
-import {isNullOrUndefined} from "util";
+import {isNullOrUndefined, isString} from "util";
 
 const Schema = mongoose.Schema
 
@@ -38,16 +38,19 @@ const contentValidator = function (this: PostModel, content: PostContentInfo): b
 }
 
 export interface PostModel extends mongoose.Document {
+    _id: mongoose.Types.ObjectId
     title: string
     categoryId: number
     type: PostType
     content: PostContentInfo
     creator: UserRef
     likeInfo: {
-        like?: [UserRef]
-        dislike?: [UserRef]
-        isLike: boolean
+        like: [UserRef]
+        dislike: [UserRef]
+        isLiked?: boolean
     }
+
+    setInteractor: (user: UserModel) => void
 }
 
 const Post = new Schema({
@@ -120,6 +123,14 @@ const Post = new Schema({
     },
 })
 
+Post.methods.setInteractor = function(this: PostModel, user: UserModel) {
+    this.likeInfo.isLiked = !isNullOrUndefined(this.likeInfo.like.find((liker) => {
+        const likerId = liker as mongoose.Types.ObjectId
+        return likerId.equals(user._id)
+    }))
+}
+
+Post.virtual('likeInfo.isLiked')
 
 Post.index({  createdAt: -1, _id: -1 })
 Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
