@@ -311,3 +311,71 @@ describe('Seach post', () => {
     })
 
 })
+
+describe('Like info in feed', () => {
+    const dbManager = new DBManager()
+    let posts: Array<PostModel> = []
+    before((next) => {
+        const stubPost = async (creator: UserRef) => {
+            let likedPostModel = {
+                type: PostType.TEXT,
+                categoryId: Category.Loneliness,
+                content: {
+                    text: `text`
+                },
+                creator: creator,
+                title: `like`,
+                likeInfo: {
+                    like: [creator]
+                }
+            } as PostModel
+            const likedPost = await dbManager.stubPost(likedPostModel)
+            posts.push(likedPost)
+
+            let notLikedPostModel = {
+                type: PostType.TEXT,
+                categoryId: Category.Loneliness,
+                content: {
+                    text: `text`
+                },
+                creator: creator,
+                title: `not like`
+            } as PostModel
+            const notLikedPost = await dbManager.stubPost(notLikedPostModel)
+            posts.push(notLikedPost)
+        }
+
+
+        dbManager.start().then(() => {
+            return User.findByUID("1")
+        }).then((user: UserModel) => {
+            return stubPost(user._id)
+        }).then(() => {
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
+    const path = '/v1/feed/all'
+    it('like info is valid', (done) => {
+        request(app)
+            .get(path)
+            .set('authorization', 'Bearer admin')
+            .expect(200)
+            .expect(async (res: Response) => {
+                assert.notDeepEqual(res.body.body.posts, undefined)
+                const resPosts: Array<PostModel> = res.body.body.posts
+                const likePost = resPosts.find((post) => post.title == 'like')
+                const notLikePost = resPosts.find((post) => post.title == 'not like')
+                assert.notDeepEqual(likePost, undefined)
+                assert.notDeepEqual(notLikePost, undefined)
+                assert.deepEqual(likePost!.likeInfo.isLiked, true)
+                assert.deepEqual(notLikePost!.likeInfo.isLiked, false)
+            }).end(done)
+    })
+})
