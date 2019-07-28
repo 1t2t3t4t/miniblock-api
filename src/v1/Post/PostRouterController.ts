@@ -74,7 +74,7 @@ export default class PostRouterController {
             const userInLike = likes.find((like) => (like as mongoose.Types.ObjectId).equals(interactor._id))
 
             if(userInLike) {
-                res.status(500).send(new HTTPResponse.Response({ message: 'User already liked' }))
+                res.status(200).send(new HTTPResponse.Response({ message: 'User already liked' }))
                 return
             }
 

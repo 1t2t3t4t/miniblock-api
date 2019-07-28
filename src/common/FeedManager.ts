@@ -48,7 +48,7 @@ export default class FeedManager {
 
         const documentQuery = this.queryPaginate(query, afterId, limit)
 
-        return documentQuery.populate('creator').exec()
+        return documentQuery
     }
 
     protected queryPaginate(query: any | PostModel,
@@ -65,6 +65,7 @@ export default class FeedManager {
         }
         documentQuery
             .sort({ createdAt: 'desc' })
+            .populate('creator')
 
 
         return documentQuery
