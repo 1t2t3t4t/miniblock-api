@@ -2,9 +2,8 @@ import express from 'express'
 import AuthenticationFacade from './AuthenticationFacade'
 import User, {UserModel} from "../../model/User"
 import {MongoError} from "mongodb";
-
+import {ensureAuthenticate} from '../../middleware'
 const HTTPResponse = require('../../model/HTTPResponse')
-const authenticate = require('../../middleware/authenticate')
 
 interface AuthenticatedRequest extends express.Request {
     user?: UserModel
@@ -23,8 +22,8 @@ class AccountRouterController {
     private registerRoute() {
         this.router.post('/login', this.login.bind(this))
         this.router.post('/register', this.register.bind(this))
-        this.router.get('/profile', authenticate.ensureAuthenticate, this.profile.bind(this))
-        this.router.post('/profile', authenticate.ensureAuthenticate, this.saveProfile.bind(this))
+        this.router.get('/profile', ensureAuthenticate, this.profile.bind(this))
+        this.router.post('/profile', ensureAuthenticate, this.saveProfile.bind(this))
     }
 
     /**

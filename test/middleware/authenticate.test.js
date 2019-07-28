@@ -1,7 +1,8 @@
 import User from '../../src/model/User'
+import {ensureAuthenticate} from '../../src/middleware'
+
 const assert = require('assert')
 const request = require('supertest')
-const ensureAuthenticate = require('../../src/middleware/authenticate').ensureAuthenticate
 const utils = require('../../src/utils/VerifyIdToken')
 
 const DBManager = require('../DBManager')
@@ -51,14 +52,13 @@ describe('The middleware ensures that request has a valid token before perform a
 
         const next = (error) => {
             if (error) {
-                console.log(error)
                 throw Error('does not expect error')
             }
 
             assert.notDeepEqual(req.user, undefined)
-            assert.deepEqual(req.token, CORRECT_TOKEN)
             done()
         }
+
         ensureAuthenticate(req, res, next)
     })
 
@@ -77,7 +77,6 @@ describe('The middleware ensures that request has a valid token before perform a
         const next = (error) => {
             if (error) {
                 assert.deepEqual(req.user, undefined)
-                assert.deepEqual(req.token, undefined)
                 assert.deepEqual(error.message, 'Whatever error returned from actual firebase-admin')
                 done()
                 return
@@ -103,7 +102,6 @@ describe('The middleware ensures that request has a valid token before perform a
         const next = (error) => {
             if (error) {
                 assert.deepEqual(req.user, undefined)
-                assert.deepEqual(req.token, undefined)
                 assert.deepEqual(error.message, 'Invalid Auth Header.')
                 done()
             }
@@ -126,7 +124,6 @@ describe('The middleware ensures that request has a valid token before perform a
         const next = (error) => {
             if (error) {
                 assert.deepEqual(req.user, undefined)
-                assert.deepEqual(req.token, undefined)
                 assert.deepEqual(error.message, 'Require Authorization.')
                 done()
             }

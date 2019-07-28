@@ -1,12 +1,16 @@
-import User from '../model/User'
-const admin = require('firebase-admin')
+import User, {UserModel} from '../model/User'
+import express from 'express'
+import {Model} from "mongoose";
 const utils = require('../utils/VerifyIdToken')
-const {ErrorResponse} = require('../model/HTTPResponse')
 
 /**
  * @apiDefine loggedIn Logged In user
  * Every logged in user has to send auth token
  * */
+
+export interface AuthenticatedRequest extends express.Request {
+    user: Model<UserModel>
+}
 
 /**
  * @api {GET} / Authenticate
@@ -24,11 +28,11 @@ const {ErrorResponse} = require('../model/HTTPResponse')
  * @apiError InvalidAuthToken Error indicates token could be expired or invalid token.
  *
  * */
-const ensureAuthenticate = async (req, res, next) => {
+export async function ensureAuthenticate(req: express.Request, res: express.Response, next: express.NextFunction) {
     const authToken = req.headers.authorization
 
     if (!authToken) next(Error('Require Authorization.'))
-    const slicedAuthToken = authToken.split(' ')
+    const slicedAuthToken = authToken!.split(' ')
     if (slicedAuthToken[0] !== 'Bearer' || !slicedAuthToken[1]) {
         next(Error('Invalid Auth Header.'))
     }
@@ -36,25 +40,21 @@ const ensureAuthenticate = async (req, res, next) => {
 
     try {
         const user = await userFromToken(token)
+        const authenticatedRequest = req as AuthenticatedRequest
         if (!user) {
             throw Error('User is null or not found.')
         }
 
-        req.user = user
-        req.token = token
+        authenticatedRequest.user = user
         next()
     } catch(e) {
+        console.log(e)
         res.status(401)
         next(e)
     }
 
 }
 
-const userFromToken = (token) => {
-    return utils.verifyIdToken(token).then((decodedToken) => User.findByUID(decodedToken.uid))
-
-}
-
-module.exports = {
-    ensureAuthenticate
+const userFromToken = (token: string): Promise<Model<UserModel>> => {
+    return utils.verifyIdToken(token).then((decodedToken: any) => User.findByUID(decodedToken.uid))
 }

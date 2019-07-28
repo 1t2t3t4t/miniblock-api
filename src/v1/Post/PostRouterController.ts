@@ -1,9 +1,9 @@
 import express, {Router} from 'express'
 import {UserModel} from '../../model/User'
 import Post, {PostContentInfo, PostType} from '../../model/Post'
+import {ensureAuthenticate} from '../../middleware'
 
 const HTTPResponse = require('../../model/HTTPResponse');
-const auth = require('../../middleware/authenticate')
 
 interface PostRequest extends express.Request {
     user?: UserModel
@@ -25,7 +25,7 @@ export default class PostRouterController {
     }
 
     private registerRoute() {
-        this.router.post('/', auth.ensureAuthenticate, this.post.bind(this))
+        this.router.post('/', ensureAuthenticate, this.post.bind(this))
     }
 
     /**
