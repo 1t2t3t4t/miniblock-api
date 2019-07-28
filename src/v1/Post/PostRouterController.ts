@@ -62,6 +62,17 @@ export default class PostRouterController {
         })
     }
 
+    /**
+     * @api {POST} /post/:id/like Like post
+     * @apiDescription Like the post with the given id
+     * @apiGroup Post
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccess {Post} post Post model
+     *
+     * */
     @POST('/:id/like')
     @Middleware(ensureAuthenticate)
     async like(req: PostRequest, res: express.Response, next: express.NextFunction) {

@@ -51,7 +51,6 @@ export async function ensureAuthenticate(req: express.Request, res: express.Resp
         authenticatedRequest.user = user
         next()
     } catch(e) {
-        console.log(e)
         res.status(401)
         next(e)
     }
