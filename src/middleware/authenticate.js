@@ -24,7 +24,7 @@ const {ErrorResponse} = require('../model/HTTPResponse')
  * @apiError InvalidAuthToken Error indicates token could be expired or invalid token.
  *
  * */
-const authenticate = (req, res, next) => {
+const ensureAuthenticate = async (req, res, next) => {
     const authToken = req.headers.authorization
 
     if (!authToken) next(Error('Require Authorization.'))
@@ -34,23 +34,27 @@ const authenticate = (req, res, next) => {
     }
     const token = slicedAuthToken[1]
 
-    utils.verifyIdToken(token)
-        .then((decodedToken) => User.findByUID(decodedToken.uid))
-        .then((user) => {
-            if (!user) {
-                throw Error('User is null or not found.')
-            }
+    try {
+        const user = await userFromToken(token)
+        if (!user) {
+            throw Error('User is null or not found.')
+        }
 
-            req.user = user
-            req.token = token
-            next()
-        })
-        .catch((e) => {
-            res.status(401)
-            next(e)
-        })
+        req.user = user
+        req.token = token
+        next()
+    } catch(e) {
+        res.status(401)
+        next(e)
+    }
+
+}
+
+const userFromToken = (token) => {
+    return utils.verifyIdToken(token).then((decodedToken) => User.findByUID(decodedToken.uid))
+
 }
 
 module.exports = {
-    authenticate
+    ensureAuthenticate
 }

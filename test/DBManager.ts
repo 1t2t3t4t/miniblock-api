@@ -11,15 +11,14 @@ class DBManager {
     server: MongoMemoryServer
     connection!: mongoose.Connection
     uri! : string
-    defaultUser: UserModel
+    defaultUser = {
+        email: 'test@email.com',
+        displayName: 'username',
+        uid: "1"
+    } as UserModel
 
     constructor() {
         this.server = new MongoMemoryServer()
-        this.defaultUser = {
-            email: 'test@email.com',
-            displayName: 'username',
-            uid: "1"
-        } as UserModel
     }
 
     async start() {

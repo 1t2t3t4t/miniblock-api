@@ -25,7 +25,7 @@ export default class PostRouterController {
     }
 
     private registerRoute() {
-        this.router.post('/', auth.authenticate, this.post.bind(this))
+        this.router.post('/', auth.ensureAuthenticate, this.post.bind(this))
     }
 
     /**

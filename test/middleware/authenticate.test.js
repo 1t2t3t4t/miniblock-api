@@ -1,7 +1,7 @@
 import User from '../../src/model/User'
 const assert = require('assert')
 const request = require('supertest')
-const authenticate = require('../../src/middleware/authenticate').authenticate
+const ensureAuthenticate = require('../../src/middleware/authenticate').ensureAuthenticate
 const utils = require('../../src/utils/VerifyIdToken')
 
 const DBManager = require('../DBManager')
@@ -59,7 +59,7 @@ describe('The middleware ensures that request has a valid token before perform a
             assert.deepEqual(req.token, CORRECT_TOKEN)
             done()
         }
-        authenticate(req, res, next)
+        ensureAuthenticate(req, res, next)
     })
 
     it('should now add user if invalid token', (done) => {
@@ -85,7 +85,7 @@ describe('The middleware ensures that request has a valid token before perform a
 
             throw Error('expect error')
         }
-        authenticate(req, res, next)
+        ensureAuthenticate(req, res, next)
     })
 
     it('should check correct token format', (done) => {
@@ -110,7 +110,7 @@ describe('The middleware ensures that request has a valid token before perform a
 
             throw Error('expect error')
         }
-        authenticate(req, res, next)
+        ensureAuthenticate(req, res, next)
     })
 
     it('should check for empty auth', (done) => {
@@ -133,7 +133,7 @@ describe('The middleware ensures that request has a valid token before perform a
 
             throw Error('expect error')
         }
-        authenticate(req, res, next)
+        ensureAuthenticate(req, res, next)
     })
 })
 

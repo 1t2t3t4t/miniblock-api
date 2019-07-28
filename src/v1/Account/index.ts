@@ -23,8 +23,8 @@ class AccountRouterController {
     private registerRoute() {
         this.router.post('/login', this.login.bind(this))
         this.router.post('/register', this.register.bind(this))
-        this.router.get('/profile', authenticate.authenticate, this.profile.bind(this))
-        this.router.post('/profile', authenticate.authenticate, this.saveProfile.bind(this))
+        this.router.get('/profile', authenticate.ensureAuthenticate, this.profile.bind(this))
+        this.router.post('/profile', authenticate.ensureAuthenticate, this.saveProfile.bind(this))
     }
 
     /**
