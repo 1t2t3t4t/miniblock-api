@@ -1,7 +1,8 @@
 import User from '../../src/model/User'
+import {ensureAuthenticate} from '../../src/middleware'
+
 const assert = require('assert')
 const request = require('supertest')
-const authenticate = require('../../src/middleware/authenticate').authenticate
 const utils = require('../../src/utils/VerifyIdToken')
 
 const DBManager = require('../DBManager')
@@ -51,15 +52,14 @@ describe('The middleware ensures that request has a valid token before perform a
 
         const next = (error) => {
             if (error) {
-                console.log(error)
                 throw Error('does not expect error')
             }
 
             assert.notDeepEqual(req.user, undefined)
-            assert.deepEqual(req.token, CORRECT_TOKEN)
             done()
         }
-        authenticate(req, res, next)
+
+        ensureAuthenticate(req, res, next)
     })
 
     it('should now add user if invalid token', (done) => {
@@ -77,7 +77,6 @@ describe('The middleware ensures that request has a valid token before perform a
         const next = (error) => {
             if (error) {
                 assert.deepEqual(req.user, undefined)
-                assert.deepEqual(req.token, undefined)
                 assert.deepEqual(error.message, 'Whatever error returned from actual firebase-admin')
                 done()
                 return
@@ -85,7 +84,7 @@ describe('The middleware ensures that request has a valid token before perform a
 
             throw Error('expect error')
         }
-        authenticate(req, res, next)
+        ensureAuthenticate(req, res, next)
     })
 
     it('should check correct token format', (done) => {
@@ -103,14 +102,13 @@ describe('The middleware ensures that request has a valid token before perform a
         const next = (error) => {
             if (error) {
                 assert.deepEqual(req.user, undefined)
-                assert.deepEqual(req.token, undefined)
                 assert.deepEqual(error.message, 'Invalid Auth Header.')
                 done()
             }
 
             throw Error('expect error')
         }
-        authenticate(req, res, next)
+        ensureAuthenticate(req, res, next)
     })
 
     it('should check for empty auth', (done) => {
@@ -126,14 +124,13 @@ describe('The middleware ensures that request has a valid token before perform a
         const next = (error) => {
             if (error) {
                 assert.deepEqual(req.user, undefined)
-                assert.deepEqual(req.token, undefined)
                 assert.deepEqual(error.message, 'Require Authorization.')
                 done()
             }
 
             throw Error('expect error')
         }
-        authenticate(req, res, next)
+        ensureAuthenticate(req, res, next)
     })
 })
 

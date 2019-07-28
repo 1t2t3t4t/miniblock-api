@@ -1,5 +1,5 @@
 import Post, {PostModel, PostType} from '../../src/model/Post'
-import User, {UserModel} from '../../src/model/User'
+import User, {UserModel, UserRef} from '../../src/model/User'
 import {Category} from "../../src/model/Categories";
 import {Response} from 'superagent'
 
@@ -13,7 +13,7 @@ describe('Fetch all from feed with 1 category', () => {
     const dbManager = new DBManager()
     let posts: Array<PostModel> = []
     before((next) => {
-        const stubPost = async (creator: string) => {
+        const stubPost = async (creator: UserRef) => {
             for(let i=1;i<=25;i++) {
                 let modelLoneliness = {
                     type: PostType.TEXT,
@@ -110,7 +110,7 @@ describe('Fetch all from feed with mixed category', () => {
     const dbManager = new DBManager()
     let posts: Array<PostModel> = []
     before((next) => {
-        const stubPost = async (creator: string) => {
+        const stubPost = async (creator: UserRef) => {
             for(let i=1;i<=25;i++) {
                 let modelLoneliness = {
                     type: PostType.TEXT,
@@ -213,7 +213,7 @@ describe('Seach post', () => {
     const keyword = 'keyword'
     before((next) => {
 
-        const makePost = (title: string, creator: string): PostModel => {
+        const makePost = (title: string, creator: UserRef): PostModel => {
             return {
                 type: PostType.TEXT,
                 categoryId: Category.Loneliness,
@@ -225,7 +225,7 @@ describe('Seach post', () => {
             } as PostModel
         }
 
-        const stubPost = async (creator: string) => {
+        const stubPost = async (creator: UserRef) => {
             let postList: PostModel[] = []
             postList.push(makePost(keyword, creator))
             postList.push(makePost('random post', creator))
@@ -310,4 +310,74 @@ describe('Seach post', () => {
             }).end(done)
     })
 
+})
+
+describe('Like info in feed', () => {
+    const dbManager = new DBManager()
+    let posts: Array<PostModel> = []
+    before((next) => {
+        const stubPost = async (creator: UserRef) => {
+            let likedPostModel = {
+                type: PostType.TEXT,
+                categoryId: Category.Loneliness,
+                content: {
+                    text: `text`
+                },
+                creator: creator,
+                title: `like`,
+                likeInfo: {
+                    like: [creator]
+                }
+            } as PostModel
+            const likedPost = await dbManager.stubPost(likedPostModel)
+            posts.push(likedPost)
+
+            let notLikedPostModel = {
+                type: PostType.TEXT,
+                categoryId: Category.Loneliness,
+                content: {
+                    text: `text`
+                },
+                creator: creator,
+                title: `not like`
+            } as PostModel
+            const notLikedPost = await dbManager.stubPost(notLikedPostModel)
+            posts.push(notLikedPost)
+        }
+
+
+        dbManager.start().then(() => {
+            return User.findByUID("1")
+        }).then((user: UserModel) => {
+            return stubPost(user._id)
+        }).then(() => {
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
+    const path = '/v1/feed/all'
+    it('like info is valid', (done) => {
+        request(app)
+            .get(path)
+            .set('authorization', 'Bearer admin')
+            .expect(200)
+            .expect(async (res: Response) => {
+                assert.notDeepEqual(res.body.body.posts, undefined)
+                const resPosts: Array<PostModel> = res.body.body.posts
+                const likePost = resPosts.find((post) => post.title == 'like')
+                const notLikePost = resPosts.find((post) => post.title == 'not like')
+                assert.notDeepEqual(likePost, undefined)
+                assert.notDeepEqual(notLikePost, undefined)
+                assert.deepEqual(likePost!.likeInfo.isLiked, true)
+                assert.deepEqual(notLikePost!.likeInfo.isLiked, false)
+                assert.deepEqual(likePost!.likeInfo.count, 1)
+                assert.deepEqual(notLikePost!.likeInfo.count, 0)
+            }).end(done)
+    })
 })

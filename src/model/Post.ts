@@ -1,7 +1,7 @@
-import mongoose from 'mongoose'
-import {UserRef} from './User'
+import mongoose, {Types} from 'mongoose'
+import User, {UserModel, UserRef} from './User'
 import categories from './Categories'
-import {isNullOrUndefined} from "util";
+import {isNullOrUndefined, isString} from "util";
 
 const Schema = mongoose.Schema
 
@@ -38,13 +38,20 @@ const contentValidator = function (this: PostModel, content: PostContentInfo): b
 }
 
 export interface PostModel extends mongoose.Document {
+    _id: mongoose.Types.ObjectId
     title: string
     categoryId: number
     type: PostType
     content: PostContentInfo
     creator: UserRef
-    like?: [UserRef]
-    dislike?: [UserRef]
+    likeInfo: {
+        like: [UserRef]
+        dislike: [UserRef]
+        isLiked?: boolean
+        count?: number
+    }
+
+    setInteractor: (user: UserModel) => void
 }
 
 const Post = new Schema({
@@ -93,20 +100,40 @@ const Post = new Schema({
         required: true,
         index: true
     },
-    like: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        }
-    ],
-    dislike: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        }
-    ]
+    likeInfo: {
+        like: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            }
+        ],
+        dislike: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            }
+        ]
+    }
 }, {
-    timestamps: true
+    timestamps: true,
+    toObject: {
+        virtuals: true
+    },
+    toJSON: {
+        virtuals: true
+    },
+})
+
+Post.methods.setInteractor = function(this: PostModel, user: UserModel) {
+    this.likeInfo.isLiked = !isNullOrUndefined(this.likeInfo.like.find((liker) => {
+        const likerId = liker as mongoose.Types.ObjectId
+        return likerId.equals(user._id)
+    }))
+}
+
+Post.virtual('likeInfo.isLiked')
+Post.virtual('likeInfo.count').get(function(this: PostModel) {
+    return this.likeInfo.like.length
 })
 
 Post.index({  createdAt: -1, _id: -1 })

@@ -1,12 +1,13 @@
 import express, {Router} from 'express'
 import {UserModel} from '../../model/User'
 import Post, {PostContentInfo, PostType} from '../../model/Post'
+import {ensureAuthenticate, EnsureAuthRequest} from '../../middleware'
+import {GET, Middleware, POST, RouterController} from "../../framework/annotation-restapi";
+import * as mongoose from "mongoose";
 
 const HTTPResponse = require('../../model/HTTPResponse');
-const auth = require('../../middleware/authenticate')
 
-interface PostRequest extends express.Request {
-    user?: UserModel
+interface PostRequest extends EnsureAuthRequest {
     body: {
         content: PostContentInfo,
         title: string,
@@ -15,18 +16,8 @@ interface PostRequest extends express.Request {
     }
 }
 
+@RouterController('/')
 export default class PostRouterController {
-
-    router: Router
-
-    constructor(router: Router) {
-        this.router = router
-        this.registerRoute()
-    }
-
-    private registerRoute() {
-        this.router.post('/', auth.authenticate, this.post.bind(this))
-    }
 
     /**
      * @api {POST} /post Create Post
@@ -49,8 +40,10 @@ export default class PostRouterController {
      * @apiSuccess {Post} post Post model
      *
      * */
+    @POST('/')
+    @Middleware(ensureAuthenticate)
     post(req: PostRequest, res: express.Response, next: express.NextFunction) {
-        const creator = req.user
+        const creator = req.user!
         const { content, title, type, categoryId } = req.body
 
         const post = new Post({
@@ -67,6 +60,43 @@ export default class PostRouterController {
             res.status(500)
             next(e)
         })
+    }
+
+    /**
+     * @api {POST} /post/:id/like Like post
+     * @apiDescription Like the post with the given id
+     * @apiGroup Post
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccess {Post} post Post model
+     *
+     * */
+    @POST('/:id/like')
+    @Middleware(ensureAuthenticate)
+    async like(req: PostRequest, res: express.Response, next: express.NextFunction) {
+        const interactor = req.user!
+        try {
+            const post = await Post.findById(req.params.id)
+            if (!post) throw('Post does not exists')
+
+            const likes = post.likeInfo.like
+            const userInLike = likes.find((like) => (like as mongoose.Types.ObjectId).equals(interactor._id))
+
+            if(userInLike) {
+                res.status(200).send(new HTTPResponse.Response({ message: 'User already liked' }))
+                return
+            }
+
+            likes.push(interactor)
+            post.likeInfo.like = likes
+            const savedPost = await post.save()
+            res.status(200).send(new HTTPResponse.Response({ post: savedPost }))
+        } catch (e) {
+            res.status(500)
+            next(e)
+        }
     }
 
 }

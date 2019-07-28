@@ -10,16 +10,11 @@ class DBManager {
     db!: mongodb.Db
     server: MongoMemoryServer
     connection!: mongoose.Connection
-    uri! : string
-    defaultUser: UserModel
+    uri!: string
+    defaultUser!: UserModel
 
     constructor() {
         this.server = new MongoMemoryServer()
-        this.defaultUser = {
-            email: 'test@email.com',
-            displayName: 'username',
-            uid: "1"
-        } as UserModel
     }
 
     async start() {
@@ -30,7 +25,12 @@ class DBManager {
         })
         this.db = mongoose.connection.db
         this.dropDB()
-        await this.stubUser(this.defaultUser)
+        const user = {
+            email: 'test@email.com',
+            displayName: 'username',
+            uid: "1"
+        } as UserModel
+        this.defaultUser = await this.stubUser(user)
         console.log('reconnect db to', this.uri)
     }
 

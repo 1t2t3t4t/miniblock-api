@@ -25,7 +25,7 @@ const User = new Schema({
     }
 })
 
-User.statics.findByUID = async function(uid: string): Promise<UserModel> {
+User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>, uid: string) {
     if (!uid) throw Error('uid is missing')
 
     return this.findOne({ uid })
@@ -36,11 +36,12 @@ interface UserModelHelper extends Model<UserModel> {
 }
 
 export interface UserModel extends mongoose.Document {
+    _id: mongoose.Types.ObjectId
     uid: string
     email: string
     displayName?: string
 }
 
-export type UserRef = UserModel | string
+export type UserRef = UserModel | mongoose.Types.ObjectId
 
 export default mongoose.model<UserModel, UserModelHelper>('User', User)
