@@ -11,15 +11,8 @@ const utils = require('../utils/VerifyIdToken')
 /**
  * Middleware interface for request that could be authenticated
  * */
-export interface AuthRequest extends express.Request {
-    user?: UserModel
-}
-
-/**
- * Middleware interface for request that needed to be sure that it has valid authentication
- * */
 export interface EnsureAuthRequest extends express.Request {
-    user: UserModel
+    user?: UserModel
 }
 
 /**
@@ -81,7 +74,7 @@ export async function authenticate(req: express.Request, res: express.Response, 
 
     try {
         const user = await userFromToken(token)
-        const authenticatedRequest = req as AuthRequest
+        const authenticatedRequest = req as EnsureAuthRequest
         if (!user) {
             throw Error('User is null or not found.')
         }

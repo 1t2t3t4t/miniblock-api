@@ -5,11 +5,11 @@ import {DocumentQuery} from "mongoose";
 import User from "../../model/User";
 import {Category} from "../../model/Categories";
 import FeedManager from "../../common/FeedManager";
-import {authenticate, AuthRequest} from "../../middleware";
+import {authenticate, EnsureAuthRequest} from "../../middleware";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
-export interface FeedQueryRequest extends AuthRequest {
+export interface FeedQueryRequest extends EnsureAuthRequest {
     query: {
         limit?: number,
         afterId?: string,
@@ -17,7 +17,7 @@ export interface FeedQueryRequest extends AuthRequest {
     }
 }
 
-export interface FeedSearchQueryRequest extends AuthRequest {
+export interface FeedSearchQueryRequest extends EnsureAuthRequest {
     query: {
         limit?: number,
         afterId?: string,
