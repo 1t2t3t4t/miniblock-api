@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import {UserRef} from './User'
+import {UserModel, UserRef} from './User'
 import categories from './Categories'
 import {isNullOrUndefined} from "util";
 
@@ -43,8 +43,11 @@ export interface PostModel extends mongoose.Document {
     type: PostType
     content: PostContentInfo
     creator: UserRef
-    like?: [UserRef]
-    dislike?: [UserRef]
+    likeInfo: {
+        like?: [UserRef]
+        dislike?: [UserRef]
+        isLike: boolean
+    }
 }
 
 const Post = new Schema({
@@ -93,21 +96,30 @@ const Post = new Schema({
         required: true,
         index: true
     },
-    like: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        }
-    ],
-    dislike: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        }
-    ]
+    likeInfo: {
+        like: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            }
+        ],
+        dislike: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            }
+        ]
+    }
 }, {
-    timestamps: true
+    timestamps: true,
+    toObject: {
+        virtuals: true
+    },
+    toJSON: {
+        virtuals: true
+    },
 })
+
 
 Post.index({  createdAt: -1, _id: -1 })
 Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
