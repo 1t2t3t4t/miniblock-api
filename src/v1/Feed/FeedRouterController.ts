@@ -1,8 +1,10 @@
 import {GET, RouterController} from "../../framework/annotation-restapi"
 import express from "express"
-import Post, {PostModel} from '../../model/Post'
-import * as mongoose from "mongoose";
+import Post, {PostModel, PostType} from '../../model/Post'
 import {DocumentQuery} from "mongoose";
+import User from "../../model/User";
+import {Category} from "../../model/Categories";
+import FeedManager from "../../common/FeedManager";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -22,12 +24,10 @@ export interface FeedSearchQueryRequest extends express.Request {
     }
 }
 
-interface PostSearchModel extends PostModel {
-    title: any
-}
-
 @RouterController('/')
 export default class FeedRouterController {
+
+    feedManager = new FeedManager(Post)
 
     /**
      * @api {GET} v1/feed/all Get All Feed
@@ -63,15 +63,16 @@ export default class FeedRouterController {
     @GET('/all')
     all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
         const { limit, afterId, categoryId } = req.query
-        const query = {} as PostModel
-
-        if (categoryId) {
-            query.categoryId = Number(categoryId)
+        if (categoryId && isNaN(Number(categoryId))) {
+            console.log(categoryId, Number(categoryId))
+            res.status(400)
+            res.send( new HTTPResponse.ErrorResponse('invalid categoryId (should be number)') )
+            return
         }
 
-        const documentQuery = this.queryPaginate(query, afterId, limit)
+        const category = Number(categoryId)
 
-        documentQuery.populate('creator').then((posts) => {
+        this.feedManager.getAll(limit, afterId, category).then((posts) => {
             res.status(200).send(new HTTPResponse.Response({ posts }))
         }).catch((e) => {
             res.status(500)
@@ -111,15 +112,11 @@ export default class FeedRouterController {
      * ]
      * */
     @GET('/search')
-    search(req: FeedSearchQueryRequest, res: express.Response, next: express.NextFunction) {
+    async search(req: FeedSearchQueryRequest, res: express.Response, next: express.NextFunction) {
         const { limit, afterId, keyword } = req.query
-        const query = {} as PostSearchModel
 
-        query.title = new RegExp(`.*${keyword}.*`,'i')
-
-        const documentQuery = this.queryPaginate(query, afterId, limit)
-
-        documentQuery.populate('creator').then((posts) => {
+        this.feedManager.search(keyword, limit, afterId)
+            .then((posts) => {
             res.status(200).send(new HTTPResponse.Response({ posts }))
         }).catch((e) => {
             res.status(500)
@@ -127,19 +124,31 @@ export default class FeedRouterController {
         })
     }
 
-    queryPaginate(query: PostModel, afterId?: string, limit?: number): DocumentQuery<PostModel[], PostModel> {
-        if (afterId) {
-            query._id = { $lt: afterId }
+    async wait() {
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, 100)
+        })
+    }
+
+    @GET('/stub')
+    async stub(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const creator = await User.findByUID('1')
+
+        for(let i=0;i<100;i++) {
+            console.log('at', i)
+
+            const post = new Post({
+                creator,
+                content: {
+                    text: "test " + i
+                },
+                type: PostType.TEXT,
+                title: "title" + i,
+                categoryId: Category.Depression
+            })
+            await post.save()
         }
 
-        const documentQuery = Post.find(query)
-        if (limit) {
-            documentQuery.limit(Number(limit))
-        }
-        documentQuery
-            .sort({ createdAt: 'desc' })
-            .lean()
-
-        return documentQuery
+        res.status(200).send('DONE')
     }
 }
