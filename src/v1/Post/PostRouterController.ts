@@ -2,6 +2,7 @@ import express, {Router} from 'express'
 import {UserModel} from '../../model/User'
 import Post, {PostContentInfo, PostType} from '../../model/Post'
 import {ensureAuthenticate} from '../../middleware'
+import {Middleware, POST, RouterController} from "../../framework/annotation-restapi";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -15,18 +16,8 @@ interface PostRequest extends express.Request {
     }
 }
 
+@RouterController('/')
 export default class PostRouterController {
-
-    router: Router
-
-    constructor(router: Router) {
-        this.router = router
-        this.registerRoute()
-    }
-
-    private registerRoute() {
-        this.router.post('/', ensureAuthenticate, this.post.bind(this))
-    }
 
     /**
      * @api {POST} /post Create Post
@@ -49,6 +40,8 @@ export default class PostRouterController {
      * @apiSuccess {Post} post Post model
      *
      * */
+    @POST('/')
+    @Middleware(ensureAuthenticate)
     post(req: PostRequest, res: express.Response, next: express.NextFunction) {
         const creator = req.user
         const { content, title, type, categoryId } = req.body
