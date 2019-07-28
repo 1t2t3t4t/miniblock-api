@@ -48,6 +48,7 @@ export interface PostModel extends mongoose.Document {
         like: [UserRef]
         dislike: [UserRef]
         isLiked?: boolean
+        count?: number
     }
 
     setInteractor: (user: UserModel) => void
@@ -131,6 +132,9 @@ Post.methods.setInteractor = function(this: PostModel, user: UserModel) {
 }
 
 Post.virtual('likeInfo.isLiked')
+Post.virtual('likeInfo.count').get(function(this: PostModel) {
+    return this.likeInfo.like.length
+})
 
 Post.index({  createdAt: -1, _id: -1 })
 Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })

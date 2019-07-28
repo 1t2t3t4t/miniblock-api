@@ -376,6 +376,8 @@ describe('Like info in feed', () => {
                 assert.notDeepEqual(notLikePost, undefined)
                 assert.deepEqual(likePost!.likeInfo.isLiked, true)
                 assert.deepEqual(notLikePost!.likeInfo.isLiked, false)
+                assert.deepEqual(likePost!.likeInfo.count, 1)
+                assert.deepEqual(notLikePost!.likeInfo.count, 0)
             }).end(done)
     })
 })
