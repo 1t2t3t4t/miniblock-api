@@ -42,6 +42,6 @@ export interface UserModel extends mongoose.Document {
     displayName?: string
 }
 
-export type UserRef = UserModel | mongoose.Types.ObjectId
+export type UserRef = UserModel | mongoose.Types.ObjectId | string
 
 export default mongoose.model<UserModel, UserModelHelper>('User', User)

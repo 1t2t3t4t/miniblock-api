@@ -17,6 +17,11 @@ export type PostContentInfo = {
     image?: string
 }
 
+export enum Reaction {
+    like = 'like',
+    none = 'none'
+}
+
 const postTypeValidator = (str: string) => {
     return str === PostType.LINK || str === PostType.TEXT || str === PostType.IMAGE
 }
@@ -38,6 +43,7 @@ const contentValidator = function (this: PostModel, content: PostContentInfo): b
 }
 
 export interface PostModel extends mongoose.Document {
+    post: any;
     _id: mongoose.Types.ObjectId
     title: string
     categoryId: number
@@ -45,8 +51,8 @@ export interface PostModel extends mongoose.Document {
     content: PostContentInfo
     creator: UserRef
     likeInfo: {
-        like: [UserRef]
-        dislike: [UserRef]
+        like: UserRef[]
+        dislike: UserRef[]
         isLiked?: boolean
         count?: number
     }

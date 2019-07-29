@@ -1,8 +1,8 @@
 import express, {Router} from 'express'
-import {UserModel} from '../../model/User'
-import Post, {PostContentInfo, PostType} from '../../model/Post'
+import {UserModel, UserRef} from '../../model/User'
+import Post, {PostContentInfo, PostType, Reaction} from '../../model/Post'
 import {ensureAuthenticate, EnsureAuthRequest} from '../../middleware'
-import {GET, Middleware, POST, RouterController} from "../../framework/annotation-restapi";
+import {GET, Middleware, POST, PUT, RouterController} from "../../framework/annotation-restapi";
 import * as mongoose from "mongoose";
 
 const HTTPResponse = require('../../model/HTTPResponse');
@@ -13,6 +13,12 @@ interface PostRequest extends EnsureAuthRequest {
         title: string,
         categoryId: number,
         type: PostType
+    }
+}
+
+interface ReactionRequest extends EnsureAuthRequest {
+    body: {
+        reaction: Reaction
     }
 }
 
@@ -73,24 +79,38 @@ export default class PostRouterController {
      * @apiSuccess {Post} post Post model
      *
      * */
-    @POST('/:id/like')
+    @PUT('/:id/reaction')
     @Middleware(ensureAuthenticate)
-    async like(req: PostRequest, res: express.Response, next: express.NextFunction) {
+    async reaction(req: ReactionRequest, res: express.Response, next: express.NextFunction) {
         const interactor = req.user!
+        const reaction = req.body.reaction
+
         try {
             const post = await Post.findById(req.params.id)
             if (!post) throw('Post does not exists')
+            post.setInteractor(interactor)
 
-            const likes = post.likeInfo.like
-            const userInLike = likes.find((like) => (like as mongoose.Types.ObjectId).equals(interactor._id))
+            switch (reaction) {
+                case Reaction.like:
+                    if (post.likeInfo.isLiked) {
+                        res.status(200).send(new HTTPResponse.Response({ message: 'User already liked' }))
+                        return
+                    }
 
-            if(userInLike) {
-                res.status(200).send(new HTTPResponse.Response({ message: 'User already liked' }))
-                return
+                    post.likeInfo.like.push(interactor)
+                    break
+                case Reaction.none:
+                    if (!post.likeInfo.isLiked) {
+                        res.status(200).send(new HTTPResponse.Response({ message: 'User did not like' }))
+                        return
+                    }
+
+                    post.likeInfo.like = post.likeInfo.like.filter((liker) => {
+                        return !(liker as mongoose.Types.ObjectId).equals(interactor._id)
+                    })
+                    break
             }
 
-            likes.push(interactor)
-            post.likeInfo.like = likes
             const savedPost = await post.save()
             res.status(200).send(new HTTPResponse.Response({ post: savedPost }))
         } catch (e) {
