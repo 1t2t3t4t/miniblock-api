@@ -1,4 +1,4 @@
-import {GET, POST, Middleware, RouterController, SubRouterController} from "../../framework/annotation-restapi";
+import {GET, POST, Middleware, RouterController, SubRouterController, PUT} from "../../framework/annotation-restapi";
 import express from 'express';
 
 @RouterController('/test')
@@ -37,6 +37,13 @@ export default class TestRouterController {
         })
     }
 
+    @PUT('/endpoint')
+    testPut(req: express.Request, res: express.Response, next: express.NextFunction) {
+        res.send({
+            name: this.name,
+            body: req.body
+        })
+    }
 }
 
 @SubRouterController(TestRouterController, '/1stsubroute')
@@ -53,6 +60,14 @@ class TestSubRouterController {
 
     @POST('/endpoint')
     testPost(req: express.Request, res: express.Response, next: express.NextFunction) {
+        res.send({
+            name: this.subname,
+            body: req.body
+        })
+    }
+
+    @PUT('/endpoint')
+    testPut(req: express.Request, res: express.Response, next: express.NextFunction) {
         res.send({
             name: this.subname,
             body: req.body

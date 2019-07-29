@@ -48,6 +48,23 @@ describe('test RouterController', () => {
                 assert.deepEqual(body, res.body.body)
             }).end(done)
     })
+
+    it('should put successful to RouterController', (done) => {
+        const body = {
+            name: 'body',
+            something: {
+                hi: 1
+            }
+        }
+        request(server)
+            .put('/test/endpoint')
+            .send(body)
+            .expect(200)
+            .expect((res) => {
+                assert.deepEqual('TestRouterController', res.body.name)
+                assert.deepEqual(body, res.body.body)
+            }).end(done)
+    })
 })
 
 describe('test SubRouterController endpoint', () => {
@@ -69,6 +86,23 @@ describe('test SubRouterController endpoint', () => {
         }
         request(server)
             .post('/test/1stsubroute/endpoint')
+            .send(body)
+            .expect(200)
+            .expect((res) => {
+                assert.deepEqual('TestSubRouterController', res.body.name)
+                assert.deepEqual(body, res.body.body)
+            }).end(done)
+    })
+
+    it('should put successful to SubRouterController', (done) => {
+        const body = {
+            name: 'body',
+            something: {
+                hi: 1
+            }
+        }
+        request(server)
+            .put('/test/1stsubroute/endpoint')
             .send(body)
             .expect(200)
             .expect((res) => {
