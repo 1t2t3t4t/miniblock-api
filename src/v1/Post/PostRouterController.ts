@@ -101,7 +101,7 @@ export default class PostRouterController {
                     break
                 case Reaction.none:
                     if (!post.likeInfo.isLiked) {
-                        res.status(200).send(new HTTPResponse.Response({ message: 'User did not like' }))
+                        res.status(200).send(new HTTPResponse.Response({ message: 'User did not like the post' }))
                         return
                     }
 
