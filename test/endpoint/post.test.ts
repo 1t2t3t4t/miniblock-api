@@ -1,16 +1,17 @@
-import AppTestManager from '../AppTestManager'
 import assert from 'assert'
 import {PostModel, PostType} from "../../src/model/Post";
 import {Category} from "../../src/model/Categories";
 import PostFactory from "../PostFactory";
-import mongoose from 'mongoose'
 import {UserModel} from "../../src/model/User";
+
+const request = require('supertest')
+
+const app = require('../../server')
 const DBManager = require('../DBManager')
 
 
 describe('Create post', () => {
     const dbManager = new DBManager()
-    const manager = new AppTestManager()
 
     before((next) => {
         dbManager.start().then(() => {
@@ -28,7 +29,7 @@ describe('Create post', () => {
 
     it('can create post if valid', (done) => {
         const path = '/v1/post'
-        manager.agent
+        request(app)
             .post(path)
             .send({
                 type: PostType.TEXT,
@@ -53,8 +54,8 @@ describe('Create post', () => {
 
 describe('Interact with post', () => {
     const dbManager = new DBManager()
-    const manager = new AppTestManager()
-    let postID: string
+    let postID!: string
+
     before((next) => {
         dbManager.start().then(() => {
             const post = PostFactory.build(dbManager.defaultUser)
@@ -74,29 +75,39 @@ describe('Interact with post', () => {
     const validHeaderToken = { 'authorization': 'Bearer admin'}
 
     it('can like post', (done) => {
-        const path = `/v1/post/${postID}/like`
-        manager.agent
-            .post(path)
+        const path = `/v1/post/${postID}/reaction`
+        request(app)
+            .put(path)
             .set(validHeaderToken)
+            .send({
+                reaction: 'like'
+            })
             .expect(200)
             .expect((res: Response) => {
-                assert.notDeepEqual(res.body, undefined)
-                const body: any = res.body!
-                assert.notDeepEqual(body.body.post, undefined)
-                const post: PostModel = body.body.post
-                assert.deepEqual(post.likeInfo.count, 1)
-                assert.deepEqual(post.likeInfo.like.length, 1)
-                const liker = (post.likeInfo.like[0] as UserModel)
-                assert.deepEqual(liker._id, dbManager.defaultUser._id.toString())
+                try {
+                    assert.notDeepEqual(res.body, undefined)
+                    const body: any = res.body!
+                    assert.notDeepEqual(body.body.post, undefined)
+                    const post: PostModel = body.body.post
+                    assert.deepEqual(post.likeInfo.count, 1)
+                    assert.deepEqual(post.likeInfo.like.length, 1)
+                    const liker = (post.likeInfo.like[0] as UserModel)
+                    assert.deepEqual(liker._id, dbManager.defaultUser._id.toString())
+                } catch (e) {
+                    console.log(e)
+                }
             })
             .end(done)
     })
 
     it('show already liked message', (done) => {
-        const path = `/v1/post/${postID}/like`
-        manager.agent
-            .post(path)
+        const path = `/v1/post/${postID}/reaction`
+        request(app)
+            .put(path)
             .set(validHeaderToken)
+            .send({
+                reaction: 'like'
+            })
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body, undefined)
@@ -104,6 +115,49 @@ describe('Interact with post', () => {
                 assert.deepEqual(body.body.post, undefined)
                 const message = body.body.message
                 assert.deepEqual(message, 'User already liked')
+            })
+            .end(done)
+    })
+
+    it('can react none to liked post', (done) => {
+        const path = `/v1/post/${postID}/reaction`
+        request(app)
+            .put(path)
+            .set(validHeaderToken)
+            .send({
+                reaction: 'none'
+            })
+            .expect(200)
+            .expect((res: Response) => {
+                try {
+                    assert.notDeepEqual(res.body, undefined)
+                    const body: any = res.body!
+                    assert.notDeepEqual(body.body.post, undefined)
+                    const post: PostModel = body.body.post
+                    assert.deepEqual(post.likeInfo.count, 0)
+                    assert.deepEqual(post.likeInfo.like.length, 0)
+                } catch (e) {
+                    console.log(e)
+                }
+            })
+            .end(done)
+    })
+
+    it('show already none reaction message', (done) => {
+        const path = `/v1/post/${postID}/reaction`
+        request(app)
+            .put(path)
+            .set(validHeaderToken)
+            .send({
+                reaction: 'none'
+            })
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.deepEqual(body.body.post, undefined)
+                const message = body.body.message
+                assert.deepEqual(message, 'User did not like the post')
             })
             .end(done)
     })

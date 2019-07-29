@@ -5,7 +5,7 @@ const utils = require('../utils/VerifyIdToken')
 
 /**
  * @apiDefine loggedIn Logged In user
- * Every logged in user has to send auth token
+ * User has to be loggedIn in order to do the following action
  * */
 
 /**
@@ -58,6 +58,10 @@ export async function ensureAuthenticate(req: express.Request, res: express.Resp
 }
 
 export async function authenticate(req: express.Request, res: express.Response, next: express.NextFunction) {
+    if (!req.headers) {
+        next()
+        return
+    }
     const authToken = req.headers.authorization
 
     if (!authToken) {
@@ -81,7 +85,6 @@ export async function authenticate(req: express.Request, res: express.Response, 
         authenticatedRequest.user = user
         next()
     } catch(e) {
-        console.log(e)
         res.status(401)
         next(e)
     }

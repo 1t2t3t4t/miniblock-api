@@ -51,7 +51,11 @@ export function SubRouterController(parent: Object, path: string): ClassDecorato
 
 type EndpointFunction = (req: express.Request, res: express.Response, next: express.NextFunction) => any
 
-type HTTPMethod = 'get' | 'post'
+enum HTTPMethod {
+    get = 'get',
+    post = 'post',
+    put = 'put'
+}
 type EndpointInfo = {
     name: PropertyKey,
     path: string,
@@ -118,7 +122,7 @@ export function GET(path: string) {
     return function(target: Object,
                     propertyKey: string | symbol,
                     descriptor: TypedPropertyDescriptor<EndpointFunction>) {
-        return defineMethodMetadata(target, propertyKey, descriptor, path, "get")
+        return defineMethodMetadata(target, propertyKey, descriptor, path, HTTPMethod.get)
     }
 }
 
@@ -126,7 +130,15 @@ export function POST(path: string) {
     return function(target: Object,
                     propertyKey: string | symbol,
                     descriptor: TypedPropertyDescriptor<EndpointFunction>) {
-        return defineMethodMetadata(target, propertyKey, descriptor, path, "post")
+        return defineMethodMetadata(target, propertyKey, descriptor, path, HTTPMethod.post)
+    }
+}
+
+export function PUT(path: string) {
+    return function(target: Object,
+                    propertyKey: string | symbol,
+                    descriptor: TypedPropertyDescriptor<EndpointFunction>) {
+        return defineMethodMetadata(target, propertyKey, descriptor, path, HTTPMethod.put)
     }
 }
 
@@ -145,11 +157,14 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
             .filter((endpointInfo) => endpointInfo.name === info.name)
             .map((info) => info.middleware)
         switch (info.method) {
-            case "get":
+            case HTTPMethod.get:
                 router.get(info.path, ...middlewares, info.func.bind(controller))
                 break
-            case "post":
+            case HTTPMethod.post:
                 router.post(info.path, ...middlewares, info.func.bind(controller))
+                break
+            case HTTPMethod.put:
+                router.put(info.path, ...middlewares, info.func.bind(controller))
                 break
         }
     })
