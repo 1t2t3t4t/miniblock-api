@@ -35,8 +35,10 @@ export default class FeedRouterController {
      * @apiDescription Fetch all posts
      * @apiGroup Feed
      *
+     * @apiHeader {String} [Authorization] Token string from Firebase to set like status
+     *
      * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
-     * @apiParam {int} [limit] Set limit of fetching ** default value is 10
+     * @apiParam {int} [limit] Set limit of fetching
      * @apiParam {int} [categoryId] Set to filter for specific categoryId
      *
      * @apiSuccess {[Post]} posts Array of post
@@ -88,9 +90,11 @@ export default class FeedRouterController {
      * @apiDescription Get posts that its title contains the keyword.
      * @apiGroup Search
      *
+     * @apiHeader {String} [Authorization] Token string from Firebase to set like status
+     *
      * @apiParam {string} keyword Keyword used for searching the posts
      * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
-     * @apiParam {int} [limit] Set limit of fetching ** default value is 10
+     * @apiParam {int} [limit] Set limit of fetching
      *
      * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example

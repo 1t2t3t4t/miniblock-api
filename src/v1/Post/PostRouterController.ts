@@ -69,10 +69,12 @@ export default class PostRouterController {
     }
 
     /**
-     * @api {POST} /post/:id/like Like post
+     * @api {PUT} /post/:id/reaction Like post
      * @apiDescription Like the post with the given id
      * @apiGroup Post
      * @apiPermission loggedIn
+     *
+     * @apiParam {Reaction} reaction The reaction for the post [like, none]
      *
      * @apiHeader {String} Authorization Token string from Firebase
      *

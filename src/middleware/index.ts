@@ -58,6 +58,10 @@ export async function ensureAuthenticate(req: express.Request, res: express.Resp
 }
 
 export async function authenticate(req: express.Request, res: express.Response, next: express.NextFunction) {
+    if (!req.headers) {
+        next()
+        return
+    }
     const authToken = req.headers.authorization
 
     if (!authToken) {
@@ -81,7 +85,6 @@ export async function authenticate(req: express.Request, res: express.Response, 
         authenticatedRequest.user = user
         next()
     } catch(e) {
-        console.log(e)
         res.status(401)
         next(e)
     }
