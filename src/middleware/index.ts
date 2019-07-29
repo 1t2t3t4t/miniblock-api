@@ -5,7 +5,7 @@ const utils = require('../utils/VerifyIdToken')
 
 /**
  * @apiDefine loggedIn Logged In user
- * Every logged in user has to send auth token
+ * User has to be loggedIn in order to do the following action
  * */
 
 /**
