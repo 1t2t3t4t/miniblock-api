@@ -104,6 +104,7 @@ describe('The middleware ensures that request has a valid token before perform a
                 assert.deepEqual(req.user, undefined)
                 assert.deepEqual(error.message, 'Invalid Auth Header.')
                 done()
+                return
             }
 
             throw Error('expect error')
@@ -126,6 +127,7 @@ describe('The middleware ensures that request has a valid token before perform a
                 assert.deepEqual(req.user, undefined)
                 assert.deepEqual(error.message, 'Require Authorization.')
                 done()
+                return
             }
 
             throw Error('expect error')
