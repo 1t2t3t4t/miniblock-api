@@ -1,6 +1,6 @@
 import express, {Router} from 'express'
 import {UserModel, UserRef} from '../../model/User'
-import Post, {PostContentInfo, PostType, Reaction, ReactionError} from '../../model/Post'
+import Post, {PostContentInfo, PostType, Reaction, PostReactionError} from '../../model/Post'
 import {ensureAuthenticate, EnsureAuthRequest} from '../../middleware'
 import {GET, Middleware, POST, PUT, RouterController} from "../../framework/annotation-restapi";
 import * as mongoose from "mongoose";
