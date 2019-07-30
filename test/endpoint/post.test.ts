@@ -74,6 +74,21 @@ describe('Interact with post', () => {
 
     const validHeaderToken = { 'authorization': 'Bearer admin'}
 
+    it('throw error if invalid request', (done) => {
+        const path = `/v1/post/${postID}/reaction`
+        request(app)
+            .put(path)
+            .set(validHeaderToken)
+            .expect(400)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.deepEqual(body.body.post, undefined)
+                assert.deepEqual(body.body.message, 'No reaction in body')
+            })
+            .end(done)
+    })
+
     it('can like post', (done) => {
         const path = `/v1/post/${postID}/reaction`
         request(app)

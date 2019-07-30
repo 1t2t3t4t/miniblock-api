@@ -87,6 +87,11 @@ export default class PostRouterController {
         const interactor = req.user!
         const reaction = req.body.reaction
 
+        if (!reaction) {
+            res.status(400).send(new HTTPResponse.ErrorResponse('No reaction in body'))
+            return
+        }
+
         try {
             const post = await Post.findById(req.params.id)
             if (!post) throw('Post does not exists')
