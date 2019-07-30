@@ -14,7 +14,11 @@ export enum PostType {
 export type PostContentInfo = {
     link?: string,
     text?: string,
-    image?: string
+    imageInfo?: {
+        image: string,
+        width: number,
+        height: number
+    }
 }
 
 export enum Reaction {
@@ -33,7 +37,7 @@ const categoryValidator = (id: number): boolean => {
 const contentValidator = function (this: PostModel, content: PostContentInfo): boolean {
     switch (this.type) {
         case PostType.IMAGE:
-            return !isNullOrUndefined(content.image)
+            return !isNullOrUndefined(content.imageInfo)
         case PostType.TEXT:
             return !isNullOrUndefined(content.text)
         case PostType.LINK:
@@ -91,8 +95,17 @@ const Post = new Schema({
             link: {
                 type: String
             },
-            image: {
-                type: String
+            imageInfo: {
+                image: {
+                    required: true,
+                    type: String
+                },
+                width: {
+                    type: Number
+                },
+                height: {
+                    type: Number
+                }
             }
         },
         required: true,

@@ -50,6 +50,66 @@ describe('Create post', () => {
             .end(done)
     })
 
+    it('can create image post if valid', (done) => {
+        const path = '/v1/post'
+        request(app)
+            .post(path)
+            .send({
+                type: PostType.IMAGE,
+                categoryId: Category.Depression,
+                content: {
+                    imageInfo: {
+                        image: "imageurl",
+                        width: 600,
+                        height: 800
+                    }
+                },
+                creator: dbManager.defaultUser._id,
+                title: `title`
+            })
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                assert.notDeepEqual(body.body.post.content.imageInfo, undefined)
+                assert.notDeepEqual(body.body.post.content.imageInfo.image, undefined)
+                assert.notDeepEqual(body.body.post.content.imageInfo.width, undefined)
+                assert.notDeepEqual(body.body.post.content.imageInfo.height, undefined)
+            })
+            .end(done)
+    })
+
+    it('can create image post even if no width and height', (done) => {
+        const path = '/v1/post'
+        request(app)
+            .post(path)
+            .send({
+                type: PostType.IMAGE,
+                categoryId: Category.Depression,
+                content: {
+                    imageInfo: {
+                        image: "imageurl"
+                    }
+                },
+                creator: dbManager.defaultUser._id,
+                title: `title`
+            })
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                assert.notDeepEqual(body.body.post.content.imageInfo, undefined)
+                assert.notDeepEqual(body.body.post.content.imageInfo.image, undefined)
+                assert.deepEqual(body.body.post.content.imageInfo.width, undefined)
+                assert.deepEqual(body.body.post.content.imageInfo.height, undefined)
+            })
+            .end(done)
+    })
+
 })
 
 describe('Interact with post', () => {
