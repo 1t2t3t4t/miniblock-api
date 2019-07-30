@@ -84,18 +84,15 @@ describe('Interact with post', () => {
             })
             .expect(200)
             .expect((res: Response) => {
-                try {
-                    assert.notDeepEqual(res.body, undefined)
-                    const body: any = res.body!
-                    assert.notDeepEqual(body.body.post, undefined)
-                    const post: PostModel = body.body.post
-                    assert.deepEqual(post.likeInfo.count, 1)
-                    assert.deepEqual(post.likeInfo.like.length, 1)
-                    const liker = (post.likeInfo.like[0] as UserModel)
-                    assert.deepEqual(liker._id, dbManager.defaultUser._id.toString())
-                } catch (e) {
-                    console.log(e)
-                }
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                const post: PostModel = body.body.post
+                assert.deepEqual(post.likeInfo.count, 1)
+                assert.deepEqual(post.likeInfo.like.length, 1)
+                assert.deepEqual(post.likeInfo.isLiked, true)
+                const liker = (post.likeInfo.like[0] as UserModel)
+                assert.deepEqual(liker._id, dbManager.defaultUser._id.toString())
             })
             .end(done)
     })
@@ -129,16 +126,13 @@ describe('Interact with post', () => {
             })
             .expect(200)
             .expect((res: Response) => {
-                try {
-                    assert.notDeepEqual(res.body, undefined)
-                    const body: any = res.body!
-                    assert.notDeepEqual(body.body.post, undefined)
-                    const post: PostModel = body.body.post
-                    assert.deepEqual(post.likeInfo.count, 0)
-                    assert.deepEqual(post.likeInfo.like.length, 0)
-                } catch (e) {
-                    console.log(e)
-                }
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                const post: PostModel = body.body.post
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.likeInfo.like.length, 0)
+                assert.deepEqual(post.likeInfo.isLiked, false)
             })
             .end(done)
     })
