@@ -58,6 +58,7 @@ export interface PostModel extends mongoose.Document {
     }
 
     setInteractor: (user: UserModel) => void
+    setReaction: (this: PostModel, interactor: UserModel, reaction: Reaction) => void
 }
 
 const Post = new Schema({
@@ -135,6 +136,38 @@ Post.methods.setInteractor = function(this: PostModel, user: UserModel) {
         const likerId = liker as mongoose.Types.ObjectId
         return likerId.equals(user._id)
     }))
+}
+
+export class PostReactionError extends Error {
+
+    static UserAlreadyLiked = new PostReactionError('User already liked')
+    static UserDidNotLikePost = new PostReactionError('User did not like the post')
+
+}
+
+Post.methods.setReaction = function(this: PostModel, interactor: UserModel, reaction: Reaction) {
+    this.setInteractor(interactor)
+
+    switch (reaction) {
+        case Reaction.like:
+            if (this.likeInfo.isLiked) {
+                throw PostReactionError.UserAlreadyLiked
+            }
+
+            this.likeInfo.like.push(interactor)
+            break
+        case Reaction.none:
+            if (!this.likeInfo.isLiked) {
+                throw PostReactionError.UserDidNotLikePost
+            }
+
+            this.likeInfo.like = this.likeInfo.like.filter((liker) => {
+                return !(liker as mongoose.Types.ObjectId).equals(interactor._id)
+            })
+            break
+    }
+
+    this.setInteractor(interactor)
 }
 
 Post.virtual('likeInfo.isLiked')
