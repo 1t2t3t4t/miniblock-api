@@ -41,6 +41,10 @@ export default class FeedRouterController {
      * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
      * @apiParam {int} [limit] Set limit of fetching
      * @apiParam {int} [categoryId] Set to filter for specific categoryId
+     * @apiParam {SortType} [sortType] Set sort type of feed whether by 'new' or 'top'
+     *
+     * @apiParamExample Querystring example
+     * v1/feed/all?afterId=[ID]&limit=10&categoryId=1&sortType=new
      *
      * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example
@@ -141,6 +145,10 @@ export default class FeedRouterController {
 
     @GET('/stub')
     async stub(req: express.Request, res: express.Response, next: express.NextFunction) {
+        if (process.env.ENV == 'production') {
+            res.status(404)
+            return
+        }
         const creator = await User.findByUID('1')
 
         for(let i=0;i<100;i++) {
