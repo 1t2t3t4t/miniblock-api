@@ -56,7 +56,6 @@ export interface PostModel extends mongoose.Document {
     creator: UserRef
     likeInfo: {
         like: UserRef[]
-        dislike: UserRef[]
         isLiked?: boolean
         count?: number
     }
@@ -128,13 +127,6 @@ const Post = new Schema({
                 unique: true
             }
         ],
-        dislike: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-                unique: true
-            }
-        ],
         count: {
             type: Number
         }
@@ -195,6 +187,9 @@ Post.methods.setReaction = function(this: PostModel, interactor: UserModel, reac
 }
 
 Post.virtual('likeInfo.isLiked')
+
+Post.index({  categoryId: 1, _id: -1,'likeInfo.count': -1 })
+Post.index({  _id: -1,'likeInfo.count': -1 })
 
 Post.index({  createdAt: -1, _id: -1 })
 Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
