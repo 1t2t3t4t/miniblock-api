@@ -2,6 +2,7 @@ import Post, {PostModel, PostType} from '../../src/model/Post'
 import User, {UserModel, UserRef} from '../../src/model/User'
 import {Category} from "../../src/model/Categories";
 import {Response} from 'superagent'
+import mongoose from 'mongoose'
 
 const assert = require('assert')
 const request = require('supertest')
@@ -367,17 +368,174 @@ describe('Like info in feed', () => {
             .get(path)
             .set('authorization', 'Bearer admin')
             .expect(200)
-            .expect(async (res: Response) => {
+            .expect( (res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 const likePost = resPosts.find((post) => post.title == 'like')
                 const notLikePost = resPosts.find((post) => post.title == 'not like')
                 assert.notDeepEqual(likePost, undefined)
                 assert.notDeepEqual(notLikePost, undefined)
-                assert.deepEqual(likePost!.likeInfo.isLiked, true)
-                assert.deepEqual(notLikePost!.likeInfo.isLiked, false)
-                assert.deepEqual(likePost!.likeInfo.count, 1)
-                assert.deepEqual(notLikePost!.likeInfo.count, 0)
+                assert.deepStrictEqual(likePost!.likeInfo.isLiked, true)
+                assert.deepStrictEqual(notLikePost!.likeInfo.isLiked, false)
+                assert.deepStrictEqual(likePost!.likeInfo.count, 1)
+                assert.deepStrictEqual(notLikePost!.likeInfo.count, 0)
             }).end(done)
     })
+})
+
+describe('Fetch top from feed with mixed category', () => {
+    const dbManager = new DBManager()
+    let posts: Array<PostModel> = []
+
+    before((next) => {
+        const stubPost = async (creator: UserRef) => {
+            for(let i=1;i<=25;i++) {
+                const randA: mongoose.Types.ObjectId[] = []
+                const a = Math.ceil(Math.random() * 100)
+                for(let i=1;i<=a;i++) {
+                    randA.push(mongoose.Types.ObjectId())
+                }
+                let modelLoneliness = {
+                    type: PostType.TEXT,
+                    categoryId: Category.Loneliness,
+                    content: {
+                        text: `text number ${i}`
+                    },
+                    creator: creator,
+                    title: `${i} catA`,
+                    likeInfo: {
+                        like: randA
+                    }
+                } as PostModel
+                const randB: mongoose.Types.ObjectId[] = []
+                const b = Math.ceil(Math.random() * 100)
+                for(let i=1;i<=b;i++) {
+                    randB.push(mongoose.Types.ObjectId())
+                }
+                let modelDepression = {
+                    type: PostType.TEXT,
+                    categoryId: Category.Depression,
+                    content: {
+                        text: `text number ${i}`
+                    },
+                    creator: creator,
+                    title: `${i} catB`,
+                    likeInfo: {
+                        like: randB
+                    }
+                } as PostModel
+                const postLone = await dbManager.stubPost(modelLoneliness)
+                posts.push(postLone)
+                const postDepress = await dbManager.stubPost(modelDepression)
+                posts.push(postDepress)
+            }
+        }
+
+
+        dbManager.start().then(() => {
+            return User.findByUID("1")
+        }).then((user: UserModel) => {
+            return stubPost(user._id)
+        }).then(() => {
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
+    const isOrderedDesc = (posts: PostModel[]): boolean => {
+        for(let i=0;i<posts.length - 1;i++) {
+            if (posts[i].likeInfo.count! < posts[i].likeInfo.count!) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    const path = '/v1/feed/all?sortType=top'
+    it('should get all feed', (done) => {
+        request(app)
+            .get(path)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body.body.posts, undefined)
+                const resPosts: Array<PostModel> = res.body.body.posts
+                assert.equal(resPosts.length, posts.length)
+                assert(isOrderedDesc(resPosts), 'should ordered count by desc')
+            }).end(done)
+    })
+
+    it('should get 10 posts', (done) => {
+        request(app)
+            .get(path + '&limit=10')
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body.body.posts, undefined)
+                const resPosts: Array<PostModel> = res.body.body.posts
+                assert.deepEqual(resPosts.length, 10)
+                assert(isOrderedDesc(resPosts), 'should ordered count by desc')
+            }).end(done)
+    })
+
+    it('should get 10 posts after 10th', (done) => {
+        const categoryId = Category.Depression
+        const after = posts
+            .sort((a, b) => b.likeInfo.count! - a.likeInfo.count!)
+            .find((post, idx) => idx == 15)!
+        request(app)
+            .get(path + '&limit=10&afterId=' + after._id)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body.body.posts, undefined)
+                const resPosts: Array<PostModel> = res.body.body.posts
+                assert.deepEqual(resPosts.length, 10)
+                assert.deepEqual(resPosts.find((post) => post.title == after.title), undefined)
+                assert(resPosts[0].likeInfo.count! <= after.likeInfo.count!, 'should start with lower or equal likes')
+                assert(isOrderedDesc(resPosts), 'should ordered count by desc')
+            }).end(done)
+    })
+
+    it('should get 10 posts with specific categoryId', (done) => {
+        const categoryId = Category.Depression
+        request(app)
+            .get(path + '&limit=10&categoryId=' + categoryId)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body.body.posts, undefined)
+                const resPosts: Array<PostModel> = res.body.body.posts
+                assert.deepEqual(resPosts.length, 10)
+                resPosts.forEach((post) => {
+                    assert.deepEqual(post.categoryId, categoryId)
+                })
+                assert(isOrderedDesc(resPosts), 'should ordered count by desc')
+            }).end(done)
+    })
+
+    it('should get 10 posts with specific categoryId after 10th', (done) => {
+        const categoryId = Category.Depression
+        const after = posts
+            .filter((post) => post.categoryId == categoryId)
+            .sort((a, b) => b.likeInfo.count! - a.likeInfo.count!)
+            .find((post, idx) => idx == 8)!
+        request(app)
+            .get(path + '&limit=10&categoryId=' + categoryId + '&afterId=' + after._id)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body.body.posts, undefined)
+                const resPosts: Array<PostModel> = res.body.body.posts
+                assert.deepEqual(resPosts.length, 10)
+                assert.deepEqual(resPosts.find((post) => post.title == after.title), undefined)
+                assert(resPosts[0].likeInfo.count! <= after.likeInfo.count!, 'should start with lower or equal likes')
+                resPosts.forEach((post) => {
+                    assert.deepEqual(post.categoryId, categoryId)
+                })
+                assert(isOrderedDesc(resPosts), 'should ordered count by desc')
+            }).end(done)
+    })
+
 })

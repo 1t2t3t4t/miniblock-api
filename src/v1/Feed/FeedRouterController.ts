@@ -1,11 +1,11 @@
 import {GET, Middleware, RouterController} from "../../framework/annotation-restapi"
 import express from "express"
-import Post, {PostModel, PostType} from '../../model/Post'
-import {DocumentQuery} from "mongoose";
+import Post, {PostType} from '../../model/Post'
 import User from "../../model/User";
 import {Category} from "../../model/Categories";
-import FeedManager from "../../common/FeedManager";
+import FeedManager, {FeedSortType} from "../../common/FeedManager";
 import {authenticate, EnsureAuthRequest} from "../../middleware";
+import mongoose from "mongoose";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -13,7 +13,8 @@ export interface FeedQueryRequest extends EnsureAuthRequest {
     query: {
         limit?: number,
         afterId?: string,
-        categoryId?: string
+        categoryId?: string,
+        sortType: FeedSortType
     }
 }
 
@@ -40,6 +41,10 @@ export default class FeedRouterController {
      * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
      * @apiParam {int} [limit] Set limit of fetching
      * @apiParam {int} [categoryId] Set to filter for specific categoryId
+     * @apiParam {SortType} [sortType] Set sort type of feed whether by 'new' or 'top'
+     *
+     * @apiParamExample Querystring example
+     * v1/feed/all?afterId=[ID]&limit=10&categoryId=1&sortType=new
      *
      * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example
@@ -66,7 +71,7 @@ export default class FeedRouterController {
     @GET('/all')
     @Middleware(authenticate)
     all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
-        const { limit, afterId, categoryId } = req.query
+        const { sortType, limit, afterId, categoryId } = req.query
         if (categoryId && isNaN(Number(categoryId))) {
             console.log(categoryId, Number(categoryId))
             res.status(400)
@@ -76,7 +81,7 @@ export default class FeedRouterController {
 
         const category = Number(categoryId)
 
-        this.feedManager.getAll(limit, afterId, category, req.user)
+        this.feedManager.getAll(limit, afterId, category, sortType, req.user)
             .then((posts) => {
                 res.status(200).send(new HTTPResponse.Response({ posts }))
             }).catch((e) => {
@@ -140,10 +145,20 @@ export default class FeedRouterController {
 
     @GET('/stub')
     async stub(req: express.Request, res: express.Response, next: express.NextFunction) {
+        if (process.env.ENV == 'production') {
+            res.status(404)
+            return
+        }
         const creator = await User.findByUID('1')
 
         for(let i=0;i<100;i++) {
             console.log('at', i)
+
+            const likeCount = Math.ceil(Math.random() * 1000)
+            let likers: mongoose.Types.ObjectId[] = []
+            for(let i=0;i<likeCount;i++) {
+                likers.push(mongoose.Types.ObjectId())
+            }
 
             const post = new Post({
                 creator,
@@ -152,7 +167,10 @@ export default class FeedRouterController {
                 },
                 type: PostType.TEXT,
                 title: "title" + i,
-                categoryId: Category.Depression
+                categoryId: Category.Depression,
+                likeInfo: {
+                    like: likers
+                }
             })
             await post.save()
         }
