@@ -100,6 +100,7 @@ export default class PostRouterController {
                 post.setReaction(interactor, reaction)
             } catch (e) {
                 res.status(200).send(new HTTPResponse.Response({ message: e.message }))
+                return
             }
 
             const savedPost = await post.save()

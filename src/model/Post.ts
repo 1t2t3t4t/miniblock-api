@@ -142,7 +142,7 @@ const Post = new Schema({
 })
 
 Post.pre('save', function(this: PostModel) {
-    if (this.isModified('likeInfo')) {
+    if (this.isModified('likeInfo') || this.isNew) {
         this.likeInfo.count = this.likeInfo.like.length
     }
 })
