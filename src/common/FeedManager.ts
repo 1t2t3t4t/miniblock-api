@@ -28,8 +28,6 @@ export default class FeedManager {
         const documentQuery = this.queryPaginate(query, afterId, limit)
         const posts = await documentQuery.populate('creator')
 
-        const user = await User.findByUID('1')
-
         if (interactor) {
             posts.forEach(post => {
                 post.setInteractor(interactor)
@@ -47,8 +45,14 @@ export default class FeedManager {
         query.title = new RegExp(`.*${keyword}.*`,'i')
 
         const documentQuery = this.queryPaginate(query, afterId, limit)
+        const posts = await documentQuery.populate('creator')
 
-        return documentQuery
+        if (interactor) {
+            posts.forEach(post => {
+                post.setInteractor(interactor)
+            })
+        }
+        return posts
     }
 
     protected queryPaginate(query: any | PostModel,
@@ -65,7 +69,6 @@ export default class FeedManager {
         }
         documentQuery
             .sort({ createdAt: 'desc' })
-            .populate('creator')
 
 
         return documentQuery

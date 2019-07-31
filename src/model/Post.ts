@@ -125,14 +125,19 @@ const Post = new Schema({
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User',
+                unique: true
             }
         ],
         dislike: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User',
+                unique: true
             }
-        ]
+        ],
+        count: {
+            type: Number
+        }
     }
 }, {
     timestamps: true,
@@ -142,6 +147,12 @@ const Post = new Schema({
     toJSON: {
         virtuals: true
     },
+})
+
+Post.pre('save', function(this: PostModel) {
+    if (this.isModified('likeInfo')) {
+        this.likeInfo.count = this.likeInfo.like.length
+    }
 })
 
 Post.methods.setInteractor = function(this: PostModel, user: UserModel) {
@@ -184,9 +195,6 @@ Post.methods.setReaction = function(this: PostModel, interactor: UserModel, reac
 }
 
 Post.virtual('likeInfo.isLiked')
-Post.virtual('likeInfo.count').get(function(this: PostModel) {
-    return this.likeInfo.like.length
-})
 
 Post.index({  createdAt: -1, _id: -1 })
 Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
