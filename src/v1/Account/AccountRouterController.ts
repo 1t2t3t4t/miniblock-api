@@ -86,7 +86,8 @@ export default class AccountRouterController {
      *
      * @apiHeader {String} Authorization Token string from Firebase
      *
-     * @apiParam {String} displayName Display name to be saved
+     * @apiParam {String} [displayName] Display name to be saved
+     * @apiParam {String} [image] Display picture url
      *
      * @apiSuccess {User} user User model
      *
