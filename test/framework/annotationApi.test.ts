@@ -67,6 +67,20 @@ describe('test RouterController', () => {
     })
 })
 
+describe('test SubRouterController endpoint with params', () => {
+    it('should get successful to SubRouterController with params', (done) => {
+        request(server)
+            .get('/test/givemesmt/params')
+            .expect(200)
+            .expect((res) => {
+                assert.deepEqual('TestParamsEndpoint', res.body.name)
+                assert.deepEqual({
+                    smt: 'givemesmt'
+                }, res.body.params)
+            }).end(done)
+    })
+})
+
 describe('test SubRouterController endpoint', () => {
     it('should get successful to SubRouterController', (done) => {
         request(server)

@@ -8,11 +8,13 @@ import {
 } from "../../framework/annotation-restapi";
 import express from 'express';
 import TestSubRouterController from "./test-sub-endpoint";
+import TestParamsEndpoint from "./test-params-endpoint";
 
 
 @RouterController('/test')
 @SubRouterControllers([
-    TestSubRouterController
+    TestSubRouterController,
+    TestParamsEndpoint
 ])
 export default class TestRouterController {
 
