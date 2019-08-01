@@ -149,12 +149,13 @@ export default class FeedRouterController {
             res.status(404)
             return
         }
+
         const creator = await User.findByUID('1')
 
         for(let i=0;i<100;i++) {
             console.log('at', i)
 
-            const likeCount = Math.ceil(Math.random() * 1000)
+            const likeCount = Math.ceil(Math.random() * 75)
             let likers: mongoose.Types.ObjectId[] = []
             for(let i=0;i<likeCount;i++) {
                 likers.push(mongoose.Types.ObjectId())

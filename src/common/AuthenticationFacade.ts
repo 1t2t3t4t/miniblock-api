@@ -1,4 +1,4 @@
-import User, {UserModel} from "../../model/User"
+import User, {UserModel} from "../model/User"
 import {MongoError} from "mongodb";
 
 class AccountFacade {

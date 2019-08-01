@@ -1,3 +1,5 @@
+import AuthenticationFacade from './src/common/AuthenticationFacade'
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('./src/db/mongoose')
@@ -32,7 +34,11 @@ app.use((req, res, next) => {
 
 if (env == 'development') {
 	app.get('/clean', (req, res) => {
+		const facade = new AuthenticationFacade()
+
 		mongoose.connection.db.dropDatabase().then(() => {
+			return facade.register("email@test.com", "testman", "1")
+		}).then(() => {
 			res.status(200).send("done")
 		}).catch(() => {
 			res.status(500).send("error")
