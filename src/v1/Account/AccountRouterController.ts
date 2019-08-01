@@ -99,8 +99,16 @@ export default class AccountRouterController {
             return
         }
 
-        const { displayName } = req.body
-        req.user.displayName = displayName
+        const { displayName, image } = req.body
+
+        if (displayName) {
+            req.user.displayName = displayName
+        }
+
+        if (image) {
+            req.user.displayImageInfo = { image }
+        }
+
         req.user.save().then((newUser) => {
             res.status(200).send(new HTTPResponse.Response({ user: newUser }))
         }).catch((error: Error) => {

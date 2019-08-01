@@ -8,7 +8,7 @@ interface UserModelHelper extends Model<UserModel> {
 }
 
 export interface DisplayImageInfo {
-    image?: string
+    image: string
 }
 
 export interface UserModel extends mongoose.Document {
@@ -16,7 +16,7 @@ export interface UserModel extends mongoose.Document {
     uid: string
     email: string
     displayName?: string
-    displayImageInfo: DisplayImageInfo
+    displayImageInfo?: DisplayImageInfo
 }
 
 const User = new Schema({
