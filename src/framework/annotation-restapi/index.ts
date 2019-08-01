@@ -28,24 +28,19 @@ export function RouterController(path: string): ClassDecorator {
 //------------------SubRouter--------------------
 
 type SubRouterInfo = {
-    path: string,
-    target: Object
+    parent: Object,
+    controllers: Object[]
 }
 
-export function SubRouterController(parent: Object, path: string): ClassDecorator {
-    return function(target) {
+export function SubRouterControllers(controllers: Object[]): ClassDecorator {
+    return function(parent) {
         const info: SubRouterInfo = {
-            path, target
+            parent,
+            controllers
         }
 
-        if (!Reflect.hasMetadata(MetaDataKey.SubRouter, parent)) {
-            Reflect.defineMetadata(MetaDataKey.SubRouter, [], parent)
-        }
-
-        let subRouterInfos: Array<SubRouterInfo> = Reflect.getMetadata(MetaDataKey.SubRouter, parent)
-        subRouterInfos.push(info)
-        Reflect.defineMetadata(MetaDataKey.SubRouter, subRouterInfos, parent)
-        return target
+        Reflect.defineMetadata(MetaDataKey.SubRouter, info, parent)
+        return parent
     }
 }
 
@@ -170,18 +165,22 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
     })
 }
 
+
 function registerSubRouters(router: express.Router, parent: Class) {
-    const subRouterInfos: Array<SubRouterInfo> = Reflect.getMetadata(MetaDataKey.SubRouter, parent)
-    if (!subRouterInfos) { return }
-    subRouterInfos.forEach((subRouterInfo) => {
-        const subTarget = subRouterInfo.target as Class
-        const controller = new subTarget()
+    const subRouterInfo: SubRouterInfo = Reflect.getMetadata(MetaDataKey.SubRouter, parent)
+    if (!subRouterInfo) { return }
+
+    subRouterInfo.controllers.forEach((controller) => {
+        const subTarget = controller as Class
+        const subController = new subTarget()
 
         const subRouter = express.Router()
 
-        router.use(subRouterInfo.path, subRouter)
+        const routerInfo: RouterInfo = Reflect.getMetadata(MetaDataKey.Router, subTarget)
 
-        registerEndpoint(subTarget, subRouter, controller)
+        router.use(routerInfo.path, subRouter)
+
+        registerEndpoint(subTarget, subRouter, subController)
         registerSubRouters(subRouter, subTarget)
     })
 }
