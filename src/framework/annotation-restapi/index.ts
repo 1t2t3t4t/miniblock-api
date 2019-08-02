@@ -28,24 +28,19 @@ export function RouterController(path: string): ClassDecorator {
 //------------------SubRouter--------------------
 
 type SubRouterInfo = {
-    path: string,
-    target: Object
+    parent: Object,
+    controllers: Object[]
 }
 
-export function SubRouterController(parent: Object, path: string): ClassDecorator {
-    return function(target) {
+export function SubRouterControllers(controllers: Object[]): ClassDecorator {
+    return function(parent) {
         const info: SubRouterInfo = {
-            path, target
+            parent,
+            controllers
         }
 
-        if (!Reflect.hasMetadata(MetaDataKey.SubRouter, parent)) {
-            Reflect.defineMetadata(MetaDataKey.SubRouter, [], parent)
-        }
-
-        let subRouterInfos: Array<SubRouterInfo> = Reflect.getMetadata(MetaDataKey.SubRouter, parent)
-        subRouterInfos.push(info)
-        Reflect.defineMetadata(MetaDataKey.SubRouter, subRouterInfos, parent)
-        return target
+        Reflect.defineMetadata(MetaDataKey.SubRouter, info, parent)
+        return parent
     }
 }
 
@@ -170,18 +165,22 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
     })
 }
 
+
 function registerSubRouters(router: express.Router, parent: Class) {
-    const subRouterInfos: Array<SubRouterInfo> = Reflect.getMetadata(MetaDataKey.SubRouter, parent)
-    if (!subRouterInfos) { return }
-    subRouterInfos.forEach((subRouterInfo) => {
-        const subTarget = subRouterInfo.target as Class
-        const controller = new subTarget()
+    const subRouterInfo: SubRouterInfo = Reflect.getMetadata(MetaDataKey.SubRouter, parent)
+    if (!subRouterInfo) { return }
 
-        const subRouter = express.Router()
+    subRouterInfo.controllers.forEach((controller) => {
+        const subTarget = controller as Class
+        const subController = new subTarget()
 
-        router.use(subRouterInfo.path, subRouter)
+        const subRouter = express.Router({ mergeParams: true })
 
-        registerEndpoint(subTarget, subRouter, controller)
+        const routerInfo: RouterInfo = Reflect.getMetadata(MetaDataKey.Router, subTarget)
+
+        router.use(routerInfo.path, subRouter)
+
+        registerEndpoint(subTarget, subRouter, subController)
         registerSubRouters(subRouter, subTarget)
     })
 }
@@ -190,7 +189,7 @@ export function register(app: express.Application | express.Router, target: Clas
     const controller = new target()
     const routerInfo: RouterInfo = Reflect.getMetadata(MetaDataKey.Router, target)
 
-    const router = express.Router()
+    const router = express.Router({ mergeParams: true })
 
     registerEndpoint(target, router, controller)
     registerSubRouters(router, target)

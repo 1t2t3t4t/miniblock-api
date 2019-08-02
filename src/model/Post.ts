@@ -2,6 +2,7 @@ import mongoose, {Types} from 'mongoose'
 import User, {UserModel, UserRef} from './User'
 import categories from './Categories'
 import {isNullOrUndefined, isString} from "util";
+import {CommentModel, CommentRef} from "./Comment";
 
 const Schema = mongoose.Schema
 
@@ -57,6 +58,10 @@ export interface PostModel extends mongoose.Document {
     likeInfo: {
         like: UserRef[]
         isLiked?: boolean
+        count?: number
+    }
+    commentInfo: {
+        comments: CommentRef[]
         count?: number
     }
 
@@ -129,6 +134,17 @@ const Post = new Schema({
         count: {
             type: Number
         }
+    },
+    commentInfo: {
+        comments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Comment'
+            }
+        ],
+        count: {
+            type: Number
+        }
     }
 }, {
     timestamps: true,
@@ -143,6 +159,10 @@ const Post = new Schema({
 Post.pre('save', function(this: PostModel) {
     if (this.isModified('likeInfo') || this.isNew) {
         this.likeInfo.count = this.likeInfo.like.length
+    }
+
+    if (this.isModified('commentInfo') || this.isNew) {
+        this.commentInfo.count = this.commentInfo.comments.length
     }
 })
 
@@ -193,5 +213,7 @@ Post.index({  _id: -1,'likeInfo.count': -1 })
 Post.index({  createdAt: -1, _id: -1 })
 Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
 Post.index({ title: 1, createdAt: -1, _id: -1 })
+
+export type PostRef = CommentModel | mongoose.Types.ObjectId | string
 
 export default mongoose.model<PostModel>('Post', Post)
