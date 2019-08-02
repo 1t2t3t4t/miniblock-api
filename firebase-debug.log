@@ -1,0 +1,38 @@
+[debug] [2019-08-02T17:11:04.275Z] ----------------------------------------------------------------------
+[debug] [2019-08-02T17:11:04.276Z] Command:       /usr/local/Cellar/node/12.4.0/bin/node /usr/local/bin/firebase deploy
+[debug] [2019-08-02T17:11:04.276Z] CLI Version:   7.1.0
+[debug] [2019-08-02T17:11:04.276Z] Platform:      darwin
+[debug] [2019-08-02T17:11:04.276Z] Node Version:  v12.4.0
+[debug] [2019-08-02T17:11:04.281Z] Time:          Sat Aug 03 2019 00:11:04 GMT+0700 (Indochina Time)
+[debug] [2019-08-02T17:11:04.282Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-08-02T17:11:04.291Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-08-02T17:11:04.291Z] > authorizing via signed-in user
+[debug] [2019-08-02T17:11:04.291Z] [iam] checking project lovesick-react for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2019-08-02T17:11:04.292Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2019-08-02T17:11:04.292Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2019-08-02T17:11:04.634Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-02T17:11:04.656Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/lovesick-react:testIamPermissions  
+
+[debug] [2019-08-02T17:11:06.024Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-02T17:11:06.025Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/lovesick-react  
+ 
+[debug] [2019-08-02T17:11:06.518Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'lovesick-react'...
+[info] 
+[info] i  deploying hosting
+[debug] [2019-08-02T17:11:06.522Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/lovesick-react/versions  
+
+[debug] [2019-08-02T17:11:08.686Z] <<< HTTP RESPONSE 200
+[info] i  hosting[lovesick-react]: beginning deploy...
+[info] i  hosting[lovesick-react]: found 103 files in docs
+[debug] [2019-08-02T17:11:08.712Z] [hosting] hash cache [ZG9jcw] load error: lines is not defined
+[debug] [2019-08-02T17:11:08.780Z] [hosting] hash cache [ZG9jcw] stored for 103 files
+[debug] [2019-08-02T17:11:08.780Z] [hosting][hash queue][FINAL]
+[debug] [2019-08-02T17:11:08.780Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/lovesick-react/versions/deaca02ec6d86ecc:populateFiles  
+ <request body omitted>
+[debug] [2019-08-02T17:11:11.688Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-02T17:11:11.692Z] [hosting][populate queue][FINAL]
+[debug] [2019-08-02T17:11:11.692Z] [hosting] uploads queued: 4

@@ -2,7 +2,7 @@ import express from 'express'
 import Post, {PostContentInfo, PostType, Reaction} from '../../model/Post'
 import {ensureAuthenticate, EnsureAuthRequest} from '../../middleware'
 import {Middleware, POST, PUT, RouterController, SubRouterControllers} from "../../framework/annotation-restapi";
-import CommentRouterController from "../Comment/CommentRouterController";
+import CommentRouterController from '../Comment/CommentRouterController'
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -28,7 +28,7 @@ interface ReactionRequest extends EnsureAuthRequest {
 export default class PostRouterController {
 
     /**
-     * @api {POST} /post Create Post
+     * @api {POST} /v1/post Create Post
      * @apiDescription Create post. client has to send content that relates to type
      * @apiGroup Post
      * @apiPermission loggedIn
@@ -38,11 +38,11 @@ export default class PostRouterController {
      * @apiParamExample
      * body: {
      *     content: {
-     *          link | text | image: string
+     *          link | text | image: String
      *     },
-     *     title: string,
-     *     type: string ("link" | "text" | "image")
-     *     categoryId: int
+     *     title: String,
+     *     type: Enum ("link" | "text" | "image")
+     *     categoryId: Int
      * }
      *
      * @apiSuccess {Post} post Post model

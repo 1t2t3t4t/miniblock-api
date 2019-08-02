@@ -25,6 +25,26 @@ export default class CommentRouterController {
 
     commentDAO = new CommentDAO()
 
+    /**
+     * @api {GET} /v1/post/:postId/comment Get all comment
+     * @apiDescription Fetch all comments from given post
+     * @apiGroup Comment
+     *
+     *
+     * @apiSuccess {Comment[]} comments Array of comment model
+     * @apiSuccessExample Comment Model
+     * comments:  [
+     * {
+     *     post: PostRef,
+     *     creator: UserRef,
+     *     content: {
+     *         text: String
+     *     },
+     *     createdAt: Date
+     * }
+     * ]
+     *
+     * */
     @GET('/')
     async get(req: CommentRequest, res: Response, next: NextFunction) {
         try {
@@ -36,6 +56,31 @@ export default class CommentRouterController {
         }
     }
 
+    /**
+     * @api {POST} /v1/post/:postId/comment Create comment
+     * @apiDescription Add comment to the given post
+     * @apiGroup Comment
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiParamExample
+     * body: {
+     *     text: string
+     * }
+     *
+     * @apiSuccess {Comment} comment Comment model
+     * @apiSuccessExample Comment Model
+     * {
+     *     post: PostRef,
+     *     creator: UserRef,
+     *     content: {
+     *         text: String
+     *     },
+     *     createdAt: Date
+     * }
+     *
+     * */
     @POST('/')
     @Middleware(ensureAuthenticate)
     async addComment(req: CreateCommentRequest, res: Response, next: NextFunction) {
