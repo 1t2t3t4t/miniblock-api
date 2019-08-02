@@ -1,9 +1,8 @@
-import express, {Router} from 'express'
-import {UserModel, UserRef} from '../../model/User'
-import Post, {PostContentInfo, PostType, Reaction, PostReactionError} from '../../model/Post'
+import express from 'express'
+import Post, {PostContentInfo, PostType, Reaction} from '../../model/Post'
 import {ensureAuthenticate, EnsureAuthRequest} from '../../middleware'
-import {GET, Middleware, POST, PUT, RouterController} from "../../framework/annotation-restapi";
-import * as mongoose from "mongoose";
+import {Middleware, POST, PUT, RouterController, SubRouterControllers} from "../../framework/annotation-restapi";
+import CommentRouterController from "../Comment/CommentRouterController";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -23,6 +22,9 @@ interface ReactionRequest extends EnsureAuthRequest {
 }
 
 @RouterController('/')
+@SubRouterControllers([
+    CommentRouterController
+])
 export default class PostRouterController {
 
     /**
