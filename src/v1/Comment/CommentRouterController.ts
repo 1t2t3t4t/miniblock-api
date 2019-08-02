@@ -32,6 +32,7 @@ export default class CommentRouterController {
             res.status(200).send(new HTTPResponse.Response({ comments }))
         } catch (e) {
             res.status(500)
+            next(e)
         }
     }
 
@@ -44,6 +45,7 @@ export default class CommentRouterController {
             res.status(200).send(new HTTPResponse.Response({ comment }))
         } catch (e) {
             res.status(500)
+            next(e)
         }
     }
 

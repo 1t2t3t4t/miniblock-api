@@ -1,5 +1,5 @@
 import Comment, {CommentModel} from "../model/Comment";
-import {PostRef} from "../model/Post";
+import Post, {PostRef} from "../model/Post";
 import {UserRef} from "../model/User";
 
 export default class CommentDAO {
@@ -15,7 +15,7 @@ export default class CommentDAO {
         return documentQuery
     }
 
-    createComment(postId: PostRef,
+    async createComment(postId: PostRef,
                   creator: UserRef,
                   text: string) {
         const comment = new Comment({
@@ -26,7 +26,11 @@ export default class CommentDAO {
             }
         })
 
-        return comment.save()
+        const savedComment = await comment.save()
+        const post = await Post.findById(postId)
+        post!.commentInfo.comments.push(savedComment)
+        await post!.save()
+        return savedComment
     }
 
 }
