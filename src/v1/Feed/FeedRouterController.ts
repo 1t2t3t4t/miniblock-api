@@ -6,6 +6,8 @@ import {Category} from "../../model/Categories";
 import FeedManager, {FeedSortType} from "../../common/FeedManager";
 import {authenticate, EnsureAuthRequest} from "../../middleware";
 import mongoose from "mongoose";
+import Comment, {CommentModel} from "../../model/Comment";
+import CommentDAO from "../../common/CommentDAO";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -150,9 +152,12 @@ export default class FeedRouterController {
             return
         }
 
+        await Post.deleteMany({})
+        await Comment.deleteMany({})
+
         const creator = await User.findByUID('1')
 
-        for(let i=0;i<100;i++) {
+        for(let i=0;i<20;i++) {
             console.log('at', i)
 
             const likeCount = Math.ceil(Math.random() * 75)
@@ -161,19 +166,38 @@ export default class FeedRouterController {
                 likers.push(mongoose.Types.ObjectId())
             }
 
+            const cat = [Category.Loneliness, Category.Depression, Category.Relationships, Category.SocialProblems]
+
+            const categoryId = Math.ceil(Math.random() * cat.length)
+
             const post = new Post({
                 creator,
                 content: {
                     text: "test " + i
                 },
                 type: PostType.TEXT,
-                title: "title" + i,
-                categoryId: Category.Depression,
+                title: "title " + i + "cat " + categoryId,
+                categoryId,
                 likeInfo: {
                     like: likers
                 }
             })
-            await post.save()
+            const p = await post.save()
+
+            const commentCount = Math.ceil(Math.random() * 30)
+            let comments: CommentModel[]  = []
+            for(let i=0;i<commentCount;i++) {
+                comments.push({
+                    post: p,
+                    creator,
+                    content: {
+                        text: 'Content number ' + i
+                    }
+                } as CommentModel)
+            }
+            const savedComments = await Comment.insertMany(comments)
+            p.commentInfo.comments = savedComments
+            await p.save()
         }
 
         res.status(200).send('DONE')

@@ -2,7 +2,7 @@ import mongoose, {Types} from 'mongoose'
 import User, {UserModel, UserRef} from './User'
 import categories from './Categories'
 import {isNullOrUndefined, isString} from "util";
-import {CommentModel, CommentRef} from "./Comment";
+import {CommentModel, CommentRef} from './Comment'
 
 const Schema = mongoose.Schema
 
@@ -214,6 +214,6 @@ Post.index({  createdAt: -1, _id: -1 })
 Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
 Post.index({ title: 1, createdAt: -1, _id: -1 })
 
-export type PostRef = CommentModel | mongoose.Types.ObjectId | string
+export type PostRef = PostModel | mongoose.Types.ObjectId | string
 
 export default mongoose.model<PostModel>('Post', Post)

@@ -16,8 +16,8 @@ export default class CommentDAO {
     }
 
     async createComment(postId: PostRef,
-                  creator: UserRef,
-                  text: string) {
+                        creator: UserRef,
+                        text: string) {
         const comment = new Comment({
             post: postId,
             creator,
