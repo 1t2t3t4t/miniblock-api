@@ -35,6 +35,7 @@ export default class CommentRouterController {
      * @apiDescription Fetch all comments from given post
      * @apiGroup Comment
      *
+     * @apiParam {String} [parent] Id of the parent comment to get subComments
      *
      * @apiSuccess {Comment[]} comments Array of comment model
      * @apiSuccessExample Comment Model
@@ -45,7 +46,11 @@ export default class CommentRouterController {
      *     content: {
      *         text: String
      *     },
-     *     createdAt: Date
+     *     createdAt: Date,
+     *     subCommentInfo: {
+     *         comments: [CommentRef],
+     *         count: number
+     *     }
      * }
      * ]
      *
@@ -71,9 +76,13 @@ export default class CommentRouterController {
      *
      * @apiHeader {String} Authorization Token string from Firebase
      *
+     * @apiParam {String} text Content of comment
+     * @apiParam {String} [parent] Id of the parent comment to get subComments
+     *
      * @apiParamExample
      * body: {
-     *     text: string
+     *     text: string,
+     *     parent?: string
      * }
      *
      * @apiSuccess {Comment} comment Comment model
@@ -84,7 +93,11 @@ export default class CommentRouterController {
      *     content: {
      *         text: String
      *     },
-     *     createdAt: Date
+     *     createdAt: Date,
+     *     subCommentInfo: {
+     *         comments: [CommentRef],
+     *         count: number
+     *     }
      * }
      *
      * */
