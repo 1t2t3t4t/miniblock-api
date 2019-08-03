@@ -7,12 +7,18 @@ export interface CommentContentInfo {
     text: string
 }
 
+export interface SubCommentInfo {
+    comments: CommentRef[]
+    count: number
+}
+
 export interface CommentModel extends Document {
     post: PostRef
     parent?: CommentRef,
     creator: UserRef,
     content: CommentContentInfo,
-    createdAt: Date
+    createdAt: Date,
+    subCommentInfo: SubCommentInfo
 }
 
 export type CommentRef = CommentModel | mongoose.Types.ObjectId | string
@@ -47,9 +53,26 @@ const Comment = new mongoose.Schema({
             type: String,
             required: true
         }
+    },
+    subCommentInfo: {
+        comments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Comment'
+            }
+        ],
+        count: {
+            type: Number
+        }
     }
 }, {
     timestamps: true
+})
+
+Comment.pre('save', function(this: CommentModel) {
+    if (this.isModified('subCommentInfo') || this.isNew) {
+        this.subCommentInfo.count = this.subCommentInfo.comments.length
+    }
 })
 
 Comment.index({ post: -1, parent: 1, createdAt: -1, _id: -1 })
