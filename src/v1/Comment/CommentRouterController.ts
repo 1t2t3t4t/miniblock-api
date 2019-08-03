@@ -42,6 +42,7 @@ export default class CommentRouterController {
      * comments:  [
      * {
      *     post: PostRef,
+     *     parent?: CommentRef,
      *     creator: UserRef,
      *     content: {
      *         text: String
@@ -89,6 +90,7 @@ export default class CommentRouterController {
      * @apiSuccessExample Comment Model
      * {
      *     post: PostRef,
+     *     parent?: CommentRef,
      *     creator: UserRef,
      *     content: {
      *         text: String
