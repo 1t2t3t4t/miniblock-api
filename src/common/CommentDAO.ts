@@ -4,9 +4,11 @@ import {UserRef} from "../model/User";
 
 export default class CommentDAO {
 
-    getAll(postId: PostRef) {
+    getAll(postId: PostRef,
+           parent?: CommentRef) {
         let query = {} as any | CommentModel
         query.post = postId
+        query.parent = parent
 
         const documentQuery = Comment.find(query)
             .sort({ createdAt: -1 })
