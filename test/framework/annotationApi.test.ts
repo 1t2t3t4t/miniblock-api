@@ -65,6 +65,23 @@ describe('test RouterController', () => {
                 assert.deepEqual(body, res.body.body)
             }).end(done)
     })
+
+    it('should delete successful to RouterController', (done) => {
+        const body = {
+            name: 'body',
+            something: {
+                hi: 1
+            }
+        }
+        request(server)
+            .delete('/test/endpoint')
+            .send(body)
+            .expect(200)
+            .expect((res) => {
+                assert.deepEqual('TestRouterController', res.body.name)
+                assert.deepEqual(body, res.body.body)
+            }).end(done)
+    })
 })
 
 describe('test SubRouterController endpoint with params', () => {

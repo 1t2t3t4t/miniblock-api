@@ -49,7 +49,8 @@ type EndpointFunction = (req: express.Request, res: express.Response, next: expr
 enum HTTPMethod {
     get = 'get',
     post = 'post',
-    put = 'put'
+    put = 'put',
+    delete = 'delete'
 }
 type EndpointInfo = {
     name: PropertyKey,
@@ -137,6 +138,14 @@ export function PUT(path: string) {
     }
 }
 
+export function DELETE(path: string) {
+    return function(target: Object,
+                    propertyKey: string | symbol,
+                    descriptor: TypedPropertyDescriptor<EndpointFunction>) {
+        return defineMethodMetadata(target, propertyKey, descriptor, path, HTTPMethod.delete)
+    }
+}
+
 //------------------REGISTRATION--------------------
 
 interface Class extends Object {
@@ -160,6 +169,9 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
                 break
             case HTTPMethod.put:
                 router.put(info.path, ...middlewares, info.func.bind(controller))
+                break
+            case HTTPMethod.delete:
+                router.delete(info.path, ...middlewares, info.func.bind(controller))
                 break
         }
     })
