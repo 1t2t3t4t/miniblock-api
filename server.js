@@ -1,4 +1,5 @@
-import AuthenticationFacade from './src/common/AuthenticationFacade'
+import {register} from './src/framework/annotation-restapi'
+import HelperRouterController from "./src/v1/Helper";
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -32,21 +33,10 @@ app.use((req, res, next) => {
 	next()
 })
 
-if (env == 'development') {
-	app.get('/clean', (req, res) => {
-		const facade = new AuthenticationFacade()
-
-		mongoose.connection.db.dropDatabase().then(() => {
-			return facade.register("email@test.com", "testman", "1")
-		}).then(() => {
-			res.status(200).send("done")
-		}).catch(() => {
-			res.status(500).send("error")
-		})
-	})
+if (env != 'production') {
+	register(app, HelperRouterController)
 }
 
-import {register} from './src/framework/annotation-restapi'
 import TestRouterController from './src/framework/annotation-restapi/test-endpoint'
 
 if (env == 'test') {
