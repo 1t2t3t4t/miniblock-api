@@ -3,11 +3,111 @@ import {PostModel, PostType} from "../../src/model/Post";
 import {Category} from "../../src/model/Categories";
 import PostFactory from "../PostFactory";
 import {UserModel} from "../../src/model/User";
+import PostDAO from "../../src/common/PostDAO";
 
 const request = require('supertest')
 
 const app = require('../../server')
 const DBManager = require('../DBManager')
+
+describe('Get post', () => {
+    const dbManager = new DBManager()
+
+    let post!: PostModel
+    let postId!: string
+
+    const text = 'content'
+    const title = 'title'
+    const type = PostType.TEXT
+    const category = Category.Loneliness
+
+    before((next) => {
+        dbManager.start().then(() => {
+            return new PostDAO().createPost(dbManager.defaultUser,
+                { text: text},
+                type,
+                title,
+                category)
+        }).then((p: PostModel) => {
+            post = p
+            postId = p._id.toString()
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
+    const validHeaderToken = { 'authorization': 'Bearer admin'}
+
+    it('can fetch post', (done) => {
+        const path = `/v1/post/${postId}`
+        request(app)
+            .get(path)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                const post: PostModel = body.body!.post
+                assert.deepEqual(post.authInfo, undefined)
+                assert.deepEqual(post.likeInfo.isLiked, undefined)
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.title, title)
+                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.commentInfo.count, 0)
+                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.type, type)
+            })
+            .end(done)
+    })
+
+    it('can fetch post with auth', (done) => {
+        const path = `/v1/post/${postId}`
+        request(app)
+            .get(path)
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                const post: PostModel = body.body!.post
+                assert.notDeepEqual(post.authInfo, undefined)
+                assert.notDeepEqual(post.likeInfo.isLiked, undefined)
+
+                assert.deepEqual(post.authInfo!.canDelete, true)
+                assert.deepEqual(post.likeInfo.isLiked, false)
+
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.title, title)
+                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.commentInfo.count, 0)
+                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.type, type)
+            })
+            .end(done)
+    })
+
+    it('not exist post', (done) => {
+        const path = `/v1/post/5d47195dc5f3c2093a6503e5`
+        request(app)
+            .get(path)
+            .set(validHeaderToken)
+            .expect(400)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.deepEqual(body.body.post, undefined)
+                assert.deepEqual(body.body.message, 'Post does not exist')
+            })
+            .end(done)
+    })
+
+})
 
 
 describe('Create post', () => {

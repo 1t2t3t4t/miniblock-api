@@ -89,7 +89,7 @@ export default class PostRouterController {
             const post = await this.postDAO.getPost(postId, interactor)
             res.status(200).send(new HTTPResponse.Response({ post }))
         } catch (e) {
-            res.status(500)
+            res.status(400)
             console.log(e)
             next(e)
         }
@@ -105,7 +105,7 @@ export default class PostRouterController {
             const post = await this.postDAO.deletePost(postId, interactor)
             res.status(200).send(new HTTPResponse.Response({ post }))
         } catch (e) {
-            res.status(500)
+            res.status(400)
             next(e)
         }
     }
