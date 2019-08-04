@@ -29,11 +29,6 @@ export default class HelperRouterController {
 
     @GET('/stub')
     async stub(req: express.Request, res: express.Response, next: express.NextFunction) {
-        if (process.env.ENV == 'production') {
-            res.status(404)
-            return
-        }
-
         let date = Date.now()
 
         await Post.deleteMany({})
