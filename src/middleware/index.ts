@@ -34,10 +34,14 @@ export interface EnsureAuthRequest extends express.Request {
 export async function ensureAuthenticate(req: express.Request, res: express.Response, next: express.NextFunction) {
     const authToken = req.headers.authorization
 
-    if (!authToken) next(Error('Require Authorization.'))
+    if (!authToken) {
+        next(Error('Require Authorization.'))
+        return
+    }
     const slicedAuthToken = authToken!.split(' ')
     if (slicedAuthToken[0] !== 'Bearer' || !slicedAuthToken[1]) {
         next(Error('Invalid Auth Header.'))
+        return
     }
     const token = slicedAuthToken[1]
 
@@ -72,6 +76,7 @@ export async function authenticate(req: express.Request, res: express.Response, 
     const slicedAuthToken = authToken!.split(' ')
     if (slicedAuthToken[0] !== 'Bearer' || !slicedAuthToken[1]) {
         next(Error('Invalid Auth Header.'))
+        return
     }
     const token = slicedAuthToken[1]
 
