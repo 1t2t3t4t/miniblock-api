@@ -1,8 +1,17 @@
 import express from 'express'
 import Post, {PostContentInfo, PostType, Reaction} from '../../model/Post'
-import {ensureAuthenticate, EnsureAuthRequest} from '../../middleware'
-import {Middleware, POST, PUT, RouterController, SubRouterControllers} from "../../framework/annotation-restapi";
+import {authenticate, ensureAuthenticate, EnsureAuthRequest} from '../../middleware'
+import {
+    DELETE,
+    GET,
+    Middleware,
+    POST,
+    PUT,
+    RouterController,
+    SubRouterControllers
+} from "../../framework/annotation-restapi";
 import CommentRouterController from '../Comment/CommentRouterController'
+import PostDAO from "../../common/PostDAO";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -12,6 +21,12 @@ interface PostRequest extends EnsureAuthRequest {
         title: string,
         categoryId: number,
         type: PostType
+    }
+}
+
+interface GetPostRequest extends EnsureAuthRequest {
+    params: {
+        postId: string
     }
 }
 
@@ -26,6 +41,8 @@ interface ReactionRequest extends EnsureAuthRequest {
     CommentRouterController
 ])
 export default class PostRouterController {
+
+    postDAO = new PostDAO()
 
     /**
      * @api {POST} /v1/post Create Post
@@ -54,20 +71,43 @@ export default class PostRouterController {
         const creator = req.user!
         const { content, title, type, categoryId } = req.body
 
-        const post = new Post({
-            creator,
-            content,
-            type,
-            title,
-            categoryId
-        })
-
-        post.save().then(() => {
+        this.postDAO.createPost(creator, content, type, title, categoryId).then((post) => {
             res.status(200).send(new HTTPResponse.Response({ post }))
         }).catch((e) => {
             res.status(500)
             next(e)
         })
+    }
+
+    @GET('/:postId')
+    @Middleware(authenticate)
+    async getPost(req: GetPostRequest, res: express.Response, next: express.NextFunction) {
+        const interactor = req.user
+        const postId = req.params.postId
+
+        try {
+            const post = await this.postDAO.getPost(postId, interactor)
+            res.status(200).send(new HTTPResponse.Response({ post }))
+        } catch (e) {
+            res.status(500)
+            console.log(e)
+            next(e)
+        }
+    }
+
+    @DELETE('/:postId')
+    @Middleware(ensureAuthenticate)
+    async deletePost(req: GetPostRequest, res: express.Response, next: express.NextFunction) {
+        const interactor = req.user!
+        const postId = req.params.postId
+
+        try {
+            const post = await this.postDAO.deletePost(postId, interactor)
+            res.status(200).send(new HTTPResponse.Response({ post }))
+        } catch (e) {
+            res.status(500)
+            next(e)
+        }
     }
 
     /**
