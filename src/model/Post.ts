@@ -185,8 +185,9 @@ Post.methods.setInteractor = function(this: PostModel, interactor: UserRef) {
         return likerId.equals(interactorId)
     }))
 
-    const creatorId = (isUserModel(this.creator) ? this.creator._id : this.creator) as mongoose.Types.ObjectId
-    this.authInfo!.canDelete = creatorId.equals(interactorId)
+    const authInfo = this.checkAuth(interactor)
+    this.authInfo!.canDelete = authInfo.canDelete
+    this.authInfo!.canEdit = authInfo.canEdit
 }
 
 Post.methods.checkAuth = function(this: PostModel, interactor: UserRef): AuthInfo {
@@ -232,6 +233,7 @@ Post.methods.setReaction = function(this: PostModel, interactor: UserModel, reac
 
 Post.virtual('likeInfo.isLiked')
 Post.virtual('authInfo.canDelete')
+Post.virtual('authInfo.canEdit')
 
 Post.index({  categoryId: 1, _id: -1,'likeInfo.count': -1 })
 Post.index({  _id: -1,'likeInfo.count': -1 })

@@ -34,6 +34,7 @@ export default class PostDAO {
                    categoryId?: Category): Promise<PostModel> {
         const post = await Post.findById(postId)
         if (!post) throw PostNotFoundError
+        if (!post.checkAuth(interactor).canEdit) throw InvalidAuthError
 
         if (content) {
             post.content = content
