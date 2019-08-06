@@ -100,6 +100,10 @@
         ],
         count: {
             type: Number
+        },
+        isLiked: {
+            type: Boolean,
+            hasToBeAuthenticated: true
         }
     },
  commentInfo: {
@@ -112,7 +116,17 @@
         count: {
             type: Number
         }
+    },
+ authInfo: {
+    canDelete: {
+            type: Boolean,
+            hasToBeAuthenticated: true
+    },
+    canEdit: {
+            type: Boolean,
+            hasToBeAuthenticated: true
     }
+ }
  *
  * */
 

@@ -11,7 +11,7 @@ import {
     SubRouterControllers
 } from "../../framework/annotation-restapi";
 import CommentRouterController from '../Comment/CommentRouterController'
-import PostDAO from "../../common/PostDAO";
+import PostDAO from '../../common/PostDAO'
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -64,7 +64,7 @@ export default class PostRouterController {
      *
      * @apiHeader {String} Authorization Token string from Firebase
      *
-     * @apiParamExample
+     * @apiParamExample example
      * body: {
      *     content: {
      *          link | text | image: String
@@ -91,6 +91,16 @@ export default class PostRouterController {
         })
     }
 
+    /**
+     * @api {GET} /v1/post/:postId Get post
+     * @apiDescription Get post from given id
+     * @apiGroup Post
+     *
+     * @apiHeader {String} [Authorization] Token string from Firebase
+     *
+     * @apiSuccess {Post} post Post model
+     *
+     * */
     @GET('/:postId')
     @Middleware(authenticate)
     async getPost(req: GetPostRequest, res: express.Response, next: express.NextFunction) {
@@ -106,6 +116,32 @@ export default class PostRouterController {
         }
     }
 
+    /**
+     * @api {PATCH} /v1/post/:postId Edit post
+     * @apiDescription Edit given post id
+     * @apiGroup Post
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiParam {ContentInfo} [content] New content
+     * @apiParam {String} [title] New title
+     * @apiParam {String} [type] New type has to be corresponding with content
+     * @apiParam {Int} [categoryId] New category
+     *
+     * @apiParamExample
+     * body: {
+     *     content: {
+     *          link | text | image: String
+     *     },
+     *     title: String,
+     *     type: Enum ("link" | "text" | "image")
+     *     categoryId: Int
+     * }
+     *
+     * @apiSuccess {Post} post Post model
+     *
+     * */
     @PATCH('/:postId')
     @Middleware(authenticate)
     async editPost(req: EditPostRequest, res: express.Response, next: express.NextFunction) {
@@ -122,6 +158,20 @@ export default class PostRouterController {
         }
     }
 
+    /**
+     * @api {DELETE} /v1/post/:postId Delete post
+     * @apiDescription Delete post from given id
+     * @apiGroup Post
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccessExample Success body example
+     * body: {
+     *     message: String
+     * }
+     *
+     * */
     @DELETE('/:postId')
     @Middleware(ensureAuthenticate)
     async deletePost(req: GetPostRequest, res: express.Response, next: express.NextFunction) {
