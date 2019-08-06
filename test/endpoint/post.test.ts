@@ -109,6 +109,152 @@ describe('Get post', () => {
 
 })
 
+describe('Edit post', () => {
+    const dbManager = new DBManager()
+
+    let post!: PostModel
+    let postId!: string
+
+    const text = 'content'
+    const title = 'title'
+    const type = PostType.TEXT
+    const category = Category.Loneliness
+
+    before((next) => {
+        dbManager.start().then(() => {
+            return new PostDAO().createPost(dbManager.defaultUser,
+                { text: text},
+                type,
+                title,
+                category)
+        }).then((p: PostModel) => {
+            post = p
+            postId = p._id.toString()
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
+    const validHeaderToken = { 'authorization': 'Bearer admin'}
+
+    it('can edit post', (done) => {
+        const path = `/v1/post/${postId}`
+        const newText = 'NEW TEXT'
+        request(app)
+            .patch(path)
+            .set(validHeaderToken)
+            .send({
+                content: {
+                    text: newText
+                }
+            })
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                const post: PostModel = body.body!.post
+                assert.deepEqual(post.authInfo, undefined)
+                assert.deepEqual(post.likeInfo.isLiked, undefined)
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.title, title)
+                assert.deepEqual(post.content.text, newText)
+                assert.deepEqual(post.commentInfo.count, 0)
+                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.type, type)
+            })
+            .end(done)
+    })
+
+    it('error if token invalid', (done) => {
+        const path = `/v1/post/${postId}`
+        request(app)
+            .patch(path)
+            .set({ authorization: 'Bearer randomtoken'})
+            .send({
+                content: {
+                    text: 'some text'
+                }
+            })
+            .expect(401)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.deepEqual(body.status, 'error')
+            }).end(done)
+    })
+
+})
+
+describe('Delete post', () => {
+    const dbManager = new DBManager()
+
+    let post!: PostModel
+    let postId!: string
+
+    const text = 'content'
+    const title = 'title'
+    const type = PostType.TEXT
+    const category = Category.Loneliness
+
+    before((next) => {
+        dbManager.start().then(() => {
+            return new PostDAO().createPost(dbManager.defaultUser,
+                { text: text},
+                type,
+                title,
+                category)
+        }).then((p: PostModel) => {
+            post = p
+            postId = p._id.toString()
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
+    const validHeaderToken = { 'authorization': 'Bearer admin'}
+
+    it('can delete post', (done) => {
+        const path = `/v1/post/${postId}`
+        const newText = 'NEW TEXT'
+        request(app)
+            .delete(path)
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.deepEqual(body.body.post, undefined)
+                assert.deepEqual(body.body.message, 'Post is deleted')
+            })
+            .end(done)
+    })
+
+    it('error if token invalid', (done) => {
+        const path = `/v1/post/${postId}`
+        request(app)
+            .delete(path)
+            .set({ authorization: 'Bearer randomtoken'})
+            .expect(401)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.deepEqual(body.status, 'error')
+            }).end(done)
+    })
+
+})
+
 
 describe('Create post', () => {
     const dbManager = new DBManager()
@@ -148,6 +294,19 @@ describe('Create post', () => {
                 assert.notDeepEqual(body.body.post, undefined)
             })
             .end(done)
+    })
+
+    it('error if token invalid', (done) => {
+        const path = `/v1/post/`
+        request(app)
+            .post(path)
+            .set({ authorization: 'Bearer randomtoken'})
+            .expect(401)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.deepEqual(body.status, 'error')
+            }).end(done)
     })
 
     it('can create image post if valid', (done) => {
