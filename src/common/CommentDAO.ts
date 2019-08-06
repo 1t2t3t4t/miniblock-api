@@ -19,7 +19,7 @@ export default class CommentDAO {
 
     async createComment(postId: PostRef,
                         creator: UserRef,
-                        text: string) {
+                        text: string): Promise<CommentModel> {
         const comment = new Comment({
             post: postId,
             creator,
@@ -38,7 +38,7 @@ export default class CommentDAO {
     async createSubComment(postId: PostRef,
                            parent: CommentRef,
                            creator: UserRef,
-                           text: string) {
+                           text: string): Promise<CommentModel> {
         const comment = new Comment({
             post: postId,
             parent,

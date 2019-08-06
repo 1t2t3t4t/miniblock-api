@@ -19,7 +19,8 @@
       ".ts"
     ],
     "exclude": [
-      "src/db/*"
+      "src/db/*",
+      "src/v1/Helper/*"
     ]
   },
   "_moduleAliases": {

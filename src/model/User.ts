@@ -1,4 +1,5 @@
 import mongoose, {Model} from 'mongoose'
+import {isNullOrUndefined} from "util";
 const Schema = mongoose.Schema
 
 const validator = require('validator')
@@ -50,6 +51,10 @@ User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>,
     if (!uid) throw Error('uid is missing')
 
     return this.findOne({ uid })
+}
+
+export function isUserModel(user: UserRef): user is UserModel {
+    return !isNullOrUndefined((user as UserModel)._id)
 }
 
 export type UserRef = UserModel | mongoose.Types.ObjectId | string

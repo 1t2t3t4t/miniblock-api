@@ -3,6 +3,7 @@ import User, {UserModel, UserRef} from '../../src/model/User'
 import {Category} from "../../src/model/Categories";
 import {Response} from 'superagent'
 import mongoose from 'mongoose'
+import PostDAO from "../../src/common/PostDAO";
 
 const assert = require('assert')
 const request = require('supertest')
@@ -536,6 +537,70 @@ describe('Fetch top from feed with mixed category', () => {
                 })
                 assert(isOrderedDesc(resPosts), 'should ordered count by desc')
             }).end(done)
+    })
+
+})
+
+describe('Post in feed', () => {
+    const dbManager = new DBManager()
+
+    let post!: PostModel
+    let postId!: string
+
+    const text = 'content'
+    const title = 'title'
+    const type = PostType.TEXT
+    const category = Category.Loneliness
+
+    before((next) => {
+        dbManager.start().then(() => {
+            return new PostDAO().createPost(dbManager.defaultUser,
+                { text: text},
+                type,
+                title,
+                category)
+        }).then((p: PostModel) => {
+            post = p
+            postId = p._id.toString()
+            next()
+        }).catch((e: Error) => {
+            console.log(e)
+        })
+    })
+
+    after(() => {
+        dbManager.stop()
+    })
+
+    const validHeaderToken = { 'authorization': 'Bearer admin'}
+
+    it('can fetch post with auth', (done) => {
+        const path = '/v1/feed/all'
+        request(app)
+            .get(path)
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.posts, undefined)
+                const post: PostModel = body.body!.posts[0]
+
+                assert.notDeepEqual(post.authInfo, undefined)
+                assert.notDeepEqual(post.likeInfo.isLiked, undefined)
+
+                assert.deepEqual(post.authInfo!.canDelete, true)
+                assert.deepEqual(post.authInfo!.canEdit, true)
+                assert.deepEqual(post.likeInfo.isLiked, false)
+
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.title, title)
+                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.commentInfo.count, 0)
+                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.type, type)
+            })
+            .end(done)
     })
 
 })
