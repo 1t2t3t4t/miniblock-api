@@ -76,9 +76,7 @@ describe('Get post', () => {
                 const body: any = res.body!
                 assert.notDeepEqual(body.body.post, undefined)
                 const post: PostModel = body.body!.post
-
-                console.log(post.authInfo)
-
+                
                 assert.notDeepEqual(post.authInfo, undefined)
                 assert.notDeepEqual(post.likeInfo.isLiked, undefined)
 
