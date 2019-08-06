@@ -26,6 +26,34 @@ export default class PostDAO {
         return post
     }
 
+    async editPost(interactor: UserRef,
+                   postId: string,
+                   content?: PostContentInfo,
+                   type?: PostType,
+                   title?: string,
+                   categoryId?: Category): Promise<PostModel> {
+        const post = await Post.findById(postId)
+        if (!post) throw PostNotFoundError
+
+        if (content) {
+            post.content = content
+        }
+
+        if (type) {
+            post.type = type
+        }
+
+        if (title) {
+            post.title = title
+        }
+
+        if (categoryId) {
+            post.categoryId = categoryId
+        }
+
+        return post.save()
+    }
+
     async createPost(creator: UserRef,
                      content: PostContentInfo,
                      type: PostType,

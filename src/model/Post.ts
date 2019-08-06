@@ -17,8 +17,8 @@ export type PostContentInfo = {
     text?: string,
     imageInfo?: {
         image: string,
-        width: number,
-        height: number
+        width?: number,
+        height?: number
     }
 }
 
@@ -38,7 +38,7 @@ const categoryValidator = (id: number): boolean => {
 const contentValidator = function (this: PostModel, content: PostContentInfo): boolean {
     switch (this.type) {
         case PostType.IMAGE:
-            return !isNullOrUndefined(content.imageInfo)
+            return !isNullOrUndefined(content.imageInfo) && !isNullOrUndefined(content.imageInfo.image)
         case PostType.TEXT:
             return !isNullOrUndefined(content.text)
         case PostType.LINK:
@@ -53,6 +53,7 @@ export function isPostModel(post: PostRef): post is PostModel {
 
 export interface AuthInfo {
     canDelete: boolean
+    canEdit: boolean
 }
 
 export interface PostModel extends mongoose.Document {
@@ -192,7 +193,8 @@ Post.methods.checkAuth = function(this: PostModel, interactor: UserRef): AuthInf
     const interactorId = isUserModel(interactor) ? interactor._id : interactor
     const creatorId = (isUserModel(this.creator) ? this.creator._id : this.creator) as mongoose.Types.ObjectId
     return {
-        canDelete: creatorId.equals(interactorId)
+        canDelete: creatorId.equals(interactorId),
+        canEdit: creatorId.equals(interactorId)
     }
 }
 

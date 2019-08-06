@@ -4,7 +4,7 @@ import {authenticate, ensureAuthenticate, EnsureAuthRequest} from '../../middlew
 import {
     DELETE,
     GET,
-    Middleware,
+    Middleware, PATCH,
     POST,
     PUT,
     RouterController,
@@ -21,6 +21,18 @@ interface PostRequest extends EnsureAuthRequest {
         title: string,
         categoryId: number,
         type: PostType
+    }
+}
+
+interface EditPostRequest extends EnsureAuthRequest {
+    params: {
+        postId: string
+    }
+    body: {
+        content?: PostContentInfo,
+        title?: string,
+        categoryId?: number,
+        type?: PostType
     }
 }
 
@@ -90,7 +102,22 @@ export default class PostRouterController {
             res.status(200).send(new HTTPResponse.Response({ post }))
         } catch (e) {
             res.status(400)
-            console.log(e)
+            next(e)
+        }
+    }
+
+    @PATCH('/:postId')
+    @Middleware(authenticate)
+    async editPost(req: EditPostRequest, res: express.Response, next: express.NextFunction) {
+        const interactor = req.user!
+        const postId = req.params.postId
+        const { content, title, categoryId, type } = req.body
+
+        try {
+            const post = await this.postDAO.editPost(interactor, postId, content, type, title, categoryId)
+            res.status(200).send(new HTTPResponse.Response({ post }))
+        } catch (e) {
+            res.status(400)
             next(e)
         }
     }
