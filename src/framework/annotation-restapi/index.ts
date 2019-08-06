@@ -50,6 +50,7 @@ enum HTTPMethod {
     get = 'get',
     post = 'post',
     put = 'put',
+    patch = 'patch',
     delete = 'delete'
 }
 type EndpointInfo = {
@@ -138,6 +139,14 @@ export function PUT(path: string) {
     }
 }
 
+export function PATCH(path: string) {
+    return function(target: Object,
+                    propertyKey: string | symbol,
+                    descriptor: TypedPropertyDescriptor<EndpointFunction>) {
+        return defineMethodMetadata(target, propertyKey, descriptor, path, HTTPMethod.patch)
+    }
+}
+
 export function DELETE(path: string) {
     return function(target: Object,
                     propertyKey: string | symbol,
@@ -169,6 +178,9 @@ function registerEndpoint(target: Class, router: express.Router, controller: obj
                 break
             case HTTPMethod.put:
                 router.put(info.path, ...middlewares, info.func.bind(controller))
+                break
+            case HTTPMethod.patch:
+                router.patch(info.path, ...middlewares, info.func.bind(controller))
                 break
             case HTTPMethod.delete:
                 router.delete(info.path, ...middlewares, info.func.bind(controller))

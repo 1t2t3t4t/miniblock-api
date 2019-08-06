@@ -4,7 +4,7 @@ import {
     Middleware,
     RouterController,
     PUT,
-    SubRouterControllers, DELETE
+    SubRouterControllers, DELETE, PATCH
 } from "../../framework/annotation-restapi";
 import express from 'express';
 import TestSubRouterController from "./test-sub-endpoint";
@@ -45,6 +45,14 @@ export default class TestRouterController {
 
     @POST('/endpoint')
     testPost(req: express.Request, res: express.Response, next: express.NextFunction) {
+        res.send({
+            name: this.name,
+            body: req.body
+        })
+    }
+
+    @PATCH('/endpoint')
+    testPatch(req: express.Request, res: express.Response, next: express.NextFunction) {
         res.send({
             name: this.name,
             body: req.body
