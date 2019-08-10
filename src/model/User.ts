@@ -2,6 +2,7 @@ import mongoose, {Model} from 'mongoose'
 import {isNullOrUndefined} from "util";
 import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
+import UserPreferences from "./UserPreferences";
 const Schema = mongoose.Schema
 
 const validator = require('validator')
@@ -68,6 +69,15 @@ User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>,
 
     return this.findOne({ uid })
 }
+
+User.pre("save", async function(this: UserModel, next) {
+    if (this.isNew) {
+        const userPref = new UserPreferences({ userId: this._id })
+        await userPref.save()
+    }
+
+    next()
+})
 
 export function isUserModel(user: UserRef): user is UserModel {
     return !isNullOrUndefined((user as UserModel)._id)

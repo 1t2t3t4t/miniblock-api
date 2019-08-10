@@ -23,6 +23,22 @@ describe('UserPreferences Path', () => {
 
     const validHeaderToken = { 'authorization': 'Bearer admin'}
 
+    it('get default userPreferences', (done) => {
+        const path = '/v1/account/userPreferences'
+        manager.agent
+            .get(path)
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.userPref, undefined)
+                const userPref: UserPreferencesModel = body.body.userPref
+                assert.deepEqual(userPref.showInDiscovery, true)
+                assert.deepEqual(userPref.userId, dbManager.defaultUser._id.toString())
+            }).end(done)
+    })
+
     it('update userPreferences', (done) => {
         const path = '/v1/account/userPreferences'
         manager.agent
@@ -42,7 +58,7 @@ describe('UserPreferences Path', () => {
             }).end(done)
     })
 
-    it('get default userPreferences', (done) => {
+    it('get updated userPreferences', (done) => {
         const path = '/v1/account/userPreferences'
         manager.agent
             .get(path)
