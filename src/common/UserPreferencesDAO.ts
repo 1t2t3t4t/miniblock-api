@@ -1,23 +1,36 @@
 import mongoose from 'mongoose'
-import UserPreferences from "../model/UserPreferences";
+import UserPreferences, {UserPreferencesModel} from "../model/UserPreferences";
+import {isNullOrUndefined} from "util";
 
-export class UserPreferencesNotFoundError extends Error {
-    message = 'UserPreferences does not exist'
+export namespace UserPreferencesError {
+    export class NotFoundError extends Error {
+        message = 'UserPreferences does not exist'
+    }
 }
 
 export default class UserPreferencesDAO {
 
-    async createUserPreferences(userId: string | mongoose.Types.ObjectId) {
+    async getUserPreferences(userId: string | mongoose.Types.ObjectId): Promise<UserPreferencesModel> {
+        const userPref = await UserPreferences.findOne(({ userId }))
+        if (!userPref) throw new UserPreferencesError.NotFoundError()
+        return userPref
+    }
+
+    async createUserPreferences(userId: string | mongoose.Types.ObjectId): Promise<UserPreferencesModel> {
         const userPref = new UserPreferences({userId})
         return userPref.save()
     }
 
     async updateUserPreferences(userId: string | mongoose.Types.ObjectId,
-                                showInDiscovery: boolean) {
-        const userPref = await UserPreferences.findById(userId)
-        if (!userPref) throw UserPreferencesNotFoundError
+                                showInDiscovery?: boolean): Promise<UserPreferencesModel> {
+        let userPref = await UserPreferences.findOne(({ userId }))
+        if (!userPref) {
+            userPref = await this.createUserPreferences(userId)
+        }
 
-        userPref.showInDiscovery = showInDiscovery
+        if (!isNullOrUndefined(showInDiscovery)) {
+            userPref.showInDiscovery = showInDiscovery
+        }
 
         return userPref.save()
     }

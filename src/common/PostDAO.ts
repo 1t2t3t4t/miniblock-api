@@ -33,8 +33,8 @@ export default class PostDAO {
                    title?: string,
                    categoryId?: Category): Promise<PostModel> {
         const post = await Post.findById(postId)
-        if (!post) throw PostNotFoundError
-        if (!post.checkAuth(interactor).canEdit) throw InvalidAuthError
+        if (!post) throw new PostNotFoundError()
+        if (!post.checkAuth(interactor).canEdit) throw new InvalidAuthError()
 
         if (content) {
             post.content = content

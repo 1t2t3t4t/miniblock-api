@@ -11,7 +11,8 @@ const UserPreferences = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
+        unique: true
     },
     showInDiscovery: {
         type: Boolean,
