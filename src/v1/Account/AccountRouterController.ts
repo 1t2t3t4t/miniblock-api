@@ -3,11 +3,15 @@ import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import {UserModel} from "../../model/User";
 import {MongoError} from "mongodb";
 import express from 'express'
-import {GET, Middleware, POST, RouterController} from "../../framework/annotation-restapi";
+import {GET, Middleware, POST, RouterController, SubRouterControllers} from "../../framework/annotation-restapi";
+import UserPreferencesRouterController from "../UserPreferences/UserPreferencesRouterController";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
 @RouterController('/')
+@SubRouterControllers([
+    UserPreferencesRouterController
+])
 export default class AccountRouterController {
 
     protected facade: AuthenticationFacade = new AuthenticationFacade()
