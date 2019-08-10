@@ -172,3 +172,20 @@
     }
  *
  * */
+
+/**
+ * @api {GET} userPreferences UserPreferences Schema
+ * @apiGroup Schema
+ * @apiExample userPref schema
+ userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true
+},
+ showInDiscovery: {
+    type: Boolean,
+    default: true
+}
+ *
+ * */

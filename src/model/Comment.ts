@@ -1,7 +1,9 @@
 import mongoose, {Document} from "mongoose";
 import {UserRef} from "./User";
-import Post, {PostRef} from "./Post";
+import Post, {PostRef, PostType} from "./Post";
 import {isNullOrUndefined} from "util";
+import {toEnumArray} from "../utils/enum";
+import {Category} from "./Categories";
 
 export interface CommentContentInfo {
     text: string

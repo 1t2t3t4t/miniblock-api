@@ -1,5 +1,8 @@
 import mongoose, {Model} from 'mongoose'
 import {isNullOrUndefined} from "util";
+import {toEnumArray} from "../utils/enum";
+import {Category} from "./Categories";
+import UserPreferences from "./UserPreferences";
 const Schema = mongoose.Schema
 
 const validator = require('validator')
@@ -18,6 +21,12 @@ export interface UserModel extends mongoose.Document {
     email: string
     displayName?: string
     displayImageInfo?: DisplayImageInfo
+}
+
+export enum Gender {
+    MALE = 'male',
+    FEMALE = 'female',
+    OTHER = 'other'
 }
 
 const User = new Schema({
@@ -44,6 +53,14 @@ const User = new Schema({
         image: {
             type: String
         }
+    },
+    gender: {
+        type: String,
+        enum: toEnumArray(Gender)
+    },
+    currentFeeling: {
+        type: Number,
+        enum: toEnumArray(Category)
     }
 })
 
@@ -52,6 +69,15 @@ User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>,
 
     return this.findOne({ uid })
 }
+
+User.pre("save", async function(this: UserModel, next) {
+    if (this.isNew) {
+        const userPref = new UserPreferences({ userId: this._id })
+        await userPref.save()
+    }
+
+    next()
+})
 
 export function isUserModel(user: UserRef): user is UserModel {
     return !isNullOrUndefined((user as UserModel)._id)

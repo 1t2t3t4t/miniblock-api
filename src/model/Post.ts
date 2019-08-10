@@ -1,8 +1,9 @@
 import mongoose, {Types} from 'mongoose'
-import User, {isUserModel, UserModel, UserRef} from './User'
-import categories from './Categories'
+import User, {Gender, isUserModel, UserModel, UserRef} from './User'
+import categories, {Category} from './Categories'
 import {isNullOrUndefined, isString} from "util";
 import {CommentModel, CommentRef} from './Comment'
+import {toEnumArray} from "../utils/enum";
 
 const Schema = mongoose.Schema
 
@@ -25,14 +26,6 @@ export type PostContentInfo = {
 export enum Reaction {
     like = 'like',
     none = 'none'
-}
-
-const postTypeValidator = (str: string) => {
-    return str === PostType.LINK || str === PostType.TEXT || str === PostType.IMAGE
-}
-
-const categoryValidator = (id: number): boolean => {
-    return categories.find((cat) => cat.id == id) != undefined
 }
 
 const contentValidator = function (this: PostModel, content: PostContentInfo): boolean {
@@ -87,20 +80,14 @@ const Post = new Schema({
     },
     categoryId: {
         type: Number,
+        enum: toEnumArray(Category),
         required: true,
-        validate: {
-            validator: categoryValidator,
-            msg: 'we dont have categoryId {VALUE}.'
-        },
         index: true
     },
     type: {
         type: String,
-        required: true,
-        validate: {
-            validator: postTypeValidator,
-            msg: 'we have no type {VALUE}.'
-        }
+        enum: toEnumArray(PostType),
+        required: true
     },
     content: {
         type: {

@@ -35,11 +35,13 @@ export async function ensureAuthenticate(req: express.Request, res: express.Resp
     const authToken = req.headers.authorization
 
     if (!authToken) {
+        res.status(401)
         next(Error('Require Authorization.'))
         return
     }
     const slicedAuthToken = authToken!.split(' ')
     if (slicedAuthToken[0] !== 'Bearer' || !slicedAuthToken[1]) {
+        res.status(401)
         next(Error('Invalid Auth Header.'))
         return
     }
