@@ -1,8 +1,9 @@
 import {GET, Middleware, PUT, RouterController} from "../../framework/annotation-restapi";
 import express from 'express'
 import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
-import {UserModel} from "../../model/User";
 import UserPreferencesDAO from "../../common/UserPreferencesDAO";
+
+const HTTPResponse = require('../../model/HTTPResponse');
 
 interface UpdateUserPreferencesRequest extends EnsureAuthRequest {
     body: {
@@ -21,8 +22,9 @@ export default class UserPreferencesRouterController {
         const user = req.user!
 
         this.userPreferencesDAO.getUserPreferences(user._id).then((userPref) => {
-            res.status(200).send({ userPref })
+            res.status(200).send(new HTTPResponse.Response({ userPref }))
         }).catch((e) => {
+            console.log(e)
             res.status(500)
             next(e)
         })
@@ -35,7 +37,7 @@ export default class UserPreferencesRouterController {
         const { showInDiscovery } = req.body
 
         this.userPreferencesDAO.updateUserPreferences(user._id, showInDiscovery).then((userPref) => {
-            res.status(200).send({ userPref })
+            res.status(200).send(new HTTPResponse.Response({ userPref }))
         }).catch((e) => {
             res.status(500)
             next(e)
