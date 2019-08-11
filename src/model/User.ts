@@ -2,7 +2,7 @@ import mongoose, {Model} from 'mongoose'
 import {isNullOrUndefined} from "util";
 import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
-import UserPreferences from "./UserPreferences";
+
 const Schema = mongoose.Schema
 
 const validator = require('validator')
