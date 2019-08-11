@@ -26,6 +26,8 @@ export interface UserModel extends mongoose.Document {
     displayName?: string
     displayImageInfo?: DisplayImageInfo
     userPrefInfo: UserPreferencesInfo
+    gender: Gender
+    currentFeeling: Category
 }
 
 export enum Gender {
@@ -62,7 +64,8 @@ const User = new Schema({
     },
     gender: {
         type: String,
-        enum: toEnumArray(Gender)
+        enum: toEnumArray(Gender),
+        default: Gender.UNSPECIFIED
     },
     currentFeeling: {
         type: Number,
