@@ -1,6 +1,7 @@
 import AppTestManager from '../AppTestManager'
-import User, {UserModel} from "../../src/model/User";
+import User, {Gender, UserModel} from "../../src/model/User";
 import assert from 'assert'
+import {Category} from "../../src/model/Categories";
 const DBManager = require('../DBManager')
 
 describe('get user profile', () => {
@@ -35,6 +36,10 @@ describe('get user profile', () => {
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'username')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.displayImageInfo, undefined)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
+                assert.deepEqual(user.gender, Gender.UNSPECIFIED)
+                assert.deepEqual(user.currentFeeling, undefined)
             }).end(done)
     })
 
@@ -73,7 +78,7 @@ describe('save user profile', () => {
     it('save empty body should not mutate existing profile', (done) => {
         const path = '/v1/account/profile'
         manager.agent
-            .post(path)
+            .patch(path)
             .set(validHeaderToken)
             .send({})
             .expect(200)
@@ -86,13 +91,14 @@ describe('save user profile', () => {
                 assert.deepEqual(user.displayName, 'username')
                 assert.deepEqual(user.uid, '1')
                 assert.deepEqual(user.displayImageInfo, undefined)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
             }).end(done)
     })
 
     it('save name profile', (done) => {
         const path = '/v1/account/profile'
         manager.agent
-            .post(path)
+            .patch(path)
             .set(validHeaderToken)
             .send({ displayName: 'myNewName'})
             .expect(200)
@@ -105,13 +111,14 @@ describe('save user profile', () => {
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.uid, '1')
                 assert.deepEqual(user.displayImageInfo, undefined)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
             }).end(done)
     })
 
     it('save image profile', (done) => {
         const path = '/v1/account/profile'
         manager.agent
-            .post(path)
+            .patch(path)
             .set(validHeaderToken)
             .send({ image: 'https://somepic.jpg'})
             .expect(200)
@@ -125,13 +132,61 @@ describe('save user profile', () => {
                 assert.deepEqual(user.uid, '1')
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
+            }).end(done)
+    })
+
+    it('save show in discovery', (done) => {
+        const path = '/v1/account/profile'
+        manager.agent
+            .patch(path)
+            .set(validHeaderToken)
+            .send({ showInDiscovery: false })
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.user, undefined)
+                const user: UserModel = body.body.user
+                assert.deepEqual(user.email, 'test@email.com')
+                assert.deepEqual(user.displayName, 'myNewName')
+                assert.deepEqual(user.uid, '1')
+                assert.notDeepEqual(user.displayImageInfo, undefined)
+                assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
+            }).end(done)
+    })
+
+    it('save gender and currentFeelings in discovery', (done) => {
+        const path = '/v1/account/profile'
+        manager.agent
+            .patch(path)
+            .set(validHeaderToken)
+            .send({
+                gender: Gender.FEMALE,
+                currentFeeling: Category.Relationships
+            })
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.user, undefined)
+                const user: UserModel = body.body.user
+                assert.deepEqual(user.email, 'test@email.com')
+                assert.deepEqual(user.displayName, 'myNewName')
+                assert.deepEqual(user.uid, '1')
+                assert.notDeepEqual(user.displayImageInfo, undefined)
+                assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
+                assert.deepEqual(user.gender, Gender.FEMALE)
+                assert.deepEqual(user.currentFeeling, Category.Relationships)
             }).end(done)
     })
 
     it('error if token invalid', (done) => {
         const path = '/v1/account/profile'
         manager.agent
-            .post(path)
+            .patch(path)
             .set({ authorization: 'Bearer randomtoken'})
             .expect(401)
             .expect((res: Response) => {
