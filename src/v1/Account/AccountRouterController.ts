@@ -14,7 +14,7 @@ export default class AccountRouterController {
     protected facade: AuthenticationFacade = new AuthenticationFacade()
 
     /**
-     * @api {POST} /account/login Login (Dont do anything ATM.)
+     * @api {POST} v1/account/login Login (Dont do anything ATM.)
      * @apiDeprecated Dont really know if we need this or not so keep it just in case
      * @apiGroup Account
      *
@@ -31,7 +31,7 @@ export default class AccountRouterController {
     }
 
     /**
-     * @api {POST} /account/register Register
+     * @api {POST} v1/account/register Register
      * @apiDescription Register user from Firebase to the database **Must be called**
      * @apiGroup Account
      *
@@ -61,7 +61,7 @@ export default class AccountRouterController {
     }
 
     /**
-     * @api {GET} /account/profile Get User Profile
+     * @api {GET} v1/account/profile Get User Profile
      * @apiDescription Get user profile. User has to be loggedIn in order to call this
      * @apiGroup Account
      * @apiPermission loggedIn
@@ -79,7 +79,7 @@ export default class AccountRouterController {
     }
 
     /**
-     * @api {POST} /account/profile Update User Profile
+     * @api {PATCH} v1/account/profile Update User Profile
      * @apiDescription Update user's profile from parameters
      * @apiGroup Account
      * @apiPermission loggedIn
@@ -88,6 +88,9 @@ export default class AccountRouterController {
      *
      * @apiParam {String} [displayName] Display name to be saved
      * @apiParam {String} [image] Display picture url
+     * @apiParam {String} [gender] User gender
+     * @apiParam {Int} [currentFeeling] User feeling
+     * @apiParam {Boolean} [showInDiscovery] User's desire to be shown in discovery mode
      *
      * @apiSuccess {User} user User model
      *
