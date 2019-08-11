@@ -15,18 +15,24 @@ export interface DisplayImageInfo {
     image: string
 }
 
+export interface UserPreferencesInfo {
+    showInDiscovery: boolean
+}
+
 export interface UserModel extends mongoose.Document {
     _id: mongoose.Types.ObjectId
     uid: string
     email: string
     displayName?: string
     displayImageInfo?: DisplayImageInfo
+    userPrefInfo: UserPreferencesInfo
 }
 
 export enum Gender {
     MALE = 'male',
     FEMALE = 'female',
-    OTHER = 'other'
+    OTHER = 'other',
+    UNSPECIFIED = 'unspecified'
 }
 
 const User = new Schema({
@@ -61,6 +67,12 @@ const User = new Schema({
     currentFeeling: {
         type: Number,
         enum: toEnumArray(Category)
+    },
+    userPrefInfo: {
+        showInDiscovery: {
+            type: Boolean,
+            default: true
+        }
     }
 })
 
@@ -69,15 +81,6 @@ User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>,
 
     return this.findOne({ uid })
 }
-
-User.pre("save", async function(this: UserModel, next) {
-    if (this.isNew) {
-        const userPref = new UserPreferences({ userId: this._id })
-        await userPref.save()
-    }
-
-    next()
-})
 
 export function isUserModel(user: UserRef): user is UserModel {
     return !isNullOrUndefined((user as UserModel)._id)

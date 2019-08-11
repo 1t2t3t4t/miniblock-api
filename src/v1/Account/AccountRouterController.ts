@@ -3,15 +3,12 @@ import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import {UserModel} from "../../model/User";
 import {MongoError} from "mongodb";
 import express from 'express'
-import {GET, Middleware, POST, RouterController, SubRouterControllers} from "../../framework/annotation-restapi";
-import UserPreferencesRouterController from "../UserPreferences/UserPreferencesRouterController";
+import {GET, Middleware, PATCH, POST, RouterController, SubRouterControllers} from "../../framework/annotation-restapi";
+import {isNullOrUndefined} from "util";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
 @RouterController('/')
-@SubRouterControllers([
-    UserPreferencesRouterController
-])
 export default class AccountRouterController {
 
     protected facade: AuthenticationFacade = new AuthenticationFacade()
@@ -32,7 +29,6 @@ export default class AccountRouterController {
         const password = req.body.password
         res.send(new HTTPResponse.Response({ message: 'Did not do anything yet' }))
     }
-
 
     /**
      * @api {POST} /account/register Register
@@ -96,25 +92,26 @@ export default class AccountRouterController {
      * @apiSuccess {User} user User model
      *
      * */
-    @POST('/profile')
+    @PATCH('/profile')
     @Middleware(ensureAuthenticate)
     saveProfile(req: EnsureAuthRequest, res: express.Response, next: express.NextFunction) {
-        if (!req.user) {
-            next(Error('Unregistered'))
-            return
-        }
+        const user =  req.user!
 
-        const { displayName, image } = req.body
+        const { displayName, image, showInDiscovery } = req.body
 
         if (displayName) {
-            req.user.displayName = displayName
+            user.displayName = displayName
         }
 
         if (image) {
-            req.user.displayImageInfo = { image }
+            user.displayImageInfo = { image }
         }
 
-        req.user.save().then((newUser) => {
+        if (!isNullOrUndefined(showInDiscovery)) {
+            user.userPrefInfo.showInDiscovery = showInDiscovery
+        }
+
+        user.save().then((newUser) => {
             res.status(200).send(new HTTPResponse.Response({ user: newUser }))
         }).catch((error: Error) => {
             res.status(400)
