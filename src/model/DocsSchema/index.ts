@@ -29,6 +29,21 @@
         image: {
             type: String
         }
+    },
+ gender: {
+        type: String,
+        enum: toEnumArray(Gender),
+        default: Gender.UNSPECIFIED
+    },
+ currentFeeling: {
+        type: Number,
+        enum: toEnumArray(Category)
+    },
+ userPrefInfo: {
+        showInDiscovery: {
+            type: Boolean,
+            default: true
+        }
     }
  *
  * */
@@ -170,22 +185,5 @@
             type: Number
         }
     }
- *
- * */
-
-/**
- * @api {GET} userPreferences UserPreferences Schema
- * @apiGroup Schema
- * @apiExample userPref schema
- userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    unique: true
-},
- showInDiscovery: {
-    type: Boolean,
-    default: true
-}
  *
  * */
