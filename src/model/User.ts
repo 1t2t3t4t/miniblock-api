@@ -19,6 +19,18 @@ export interface UserPreferencesInfo {
     showInDiscovery: boolean
 }
 
+export interface LocationInfo {
+    coordinates: [number] // [longitude, latitude]
+}
+
+export interface DiscoveryInfo {
+    currentLocation?: LocationInfo
+}
+
+export enum LocationType {
+    POINT = 'Point'
+}
+
 export interface UserModel extends mongoose.Document {
     _id: mongoose.Types.ObjectId
     uid: string
@@ -28,6 +40,7 @@ export interface UserModel extends mongoose.Document {
     userPrefInfo: UserPreferencesInfo
     gender: Gender
     currentFeeling: Category
+    discoveryInfo: DiscoveryInfo
 }
 
 export enum Gender {
@@ -70,6 +83,18 @@ const User = new Schema({
     currentFeeling: {
         type: Number,
         enum: toEnumArray(Category)
+    },
+    discoveryInfo: {
+        currentLocation: {
+            type: {
+                type: String,
+                enum: toEnumArray(LocationType),
+                default: LocationType.POINT
+            },
+            coordinates: {
+                type: [Number] // [longitude, latitude]
+            }
+        }
     },
     userPrefInfo: {
         showInDiscovery: {
