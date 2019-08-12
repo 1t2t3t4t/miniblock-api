@@ -2,6 +2,7 @@ import mongoose, {Model} from 'mongoose'
 import {isNullOrUndefined} from "util";
 import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
+import Location, {LocationModel} from "./Location";
 
 const Schema = mongoose.Schema
 
@@ -19,20 +20,8 @@ export interface UserPreferencesInfo {
     showInDiscovery: boolean
 }
 
-export type Longitude = number
-export type Latitude = number
-export type Coordinates = [Longitude, Latitude]
-
-export interface LocationInfo {
-    coordinates: Coordinates
-}
-
 export interface DiscoveryInfo {
-    currentLocation?: LocationInfo
-}
-
-export enum LocationType {
-    POINT = 'Point'
+    currentLocation: LocationModel
 }
 
 export interface UserModel extends mongoose.Document {
@@ -66,7 +55,7 @@ const User = new Schema({
         unique: true,
         validate: {
             validator: validator.isEmail,
-            msg: '{VALUE is not a valid email.}'
+            msg: '{VALUE} is not a valid email.'
         }
     },
     displayName: {
@@ -90,14 +79,8 @@ const User = new Schema({
     },
     discoveryInfo: {
         currentLocation: {
-            type: {
-                type: String,
-                enum: toEnumArray(LocationType),
-                default: LocationType.POINT
-            },
-            coordinates: {
-                type: [Number] // [longitude, latitude]
-            }
+            type: Location,
+            default: null
         }
     },
     userPrefInfo: {
@@ -107,6 +90,8 @@ const User = new Schema({
         }
     }
 })
+
+User.index({ 'discoveryInfo.currentLocation': '2dsphere' })
 
 User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>, uid: string) {
     if (!uid) throw Error('uid is missing')

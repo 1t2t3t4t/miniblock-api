@@ -1,8 +1,10 @@
-import {Middleware, PUT, RouterController} from "../../framework/annotation-restapi";
+import {GET, Middleware, PUT, RouterController} from "../../framework/annotation-restapi";
 import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import express from 'express'
-import {Coordinates} from "../../model/User";
+import {Gender} from "../../model/User";
 import DiscoveryManager from "../../common/DiscoveryManager";
+import {Category} from "../../model/Categories";
+import {Coordinates} from "../../model/Location";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -10,6 +12,14 @@ interface UpdateCurrentLocationRequest extends EnsureAuthRequest {
     body: {
         latitude: number
         longitude: number
+    }
+}
+
+interface DiscoveryRequest extends EnsureAuthRequest {
+    query: {
+        gender: Gender
+        currentFeeling: Category
+        maxDistance: number
     }
 }
 
@@ -27,6 +37,21 @@ export default class DiscoveryRouterController {
         this.discoveryManager.updateLocation(user, coordinates).then((user) => {
             res.status(200)
             res.send(new HTTPResponse.Response({ updatedLocation: user.discoveryInfo.currentLocation }))
+        }).catch((e) => {
+            res.status(500)
+            next(e)
+        })
+    }
+
+    @GET('/')
+    @Middleware(ensureAuthenticate)
+    discovery(req: DiscoveryRequest, res: express.Response, next: express.NextFunction) {
+        const user = req.user!
+        const { gender, currentFeeling, maxDistance } = req.query
+
+        this.discoveryManager.discovery(user, gender, currentFeeling, maxDistance).then((users) => {
+            res.status(200)
+            res.send(new HTTPResponse.Response({ users }))
         }).catch((e) => {
             res.status(500)
             next(e)
