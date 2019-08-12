@@ -19,8 +19,12 @@ export interface UserPreferencesInfo {
     showInDiscovery: boolean
 }
 
+export type Longitude = number
+export type Latitude = number
+export type Coordinates = [Longitude, Latitude]
+
 export interface LocationInfo {
-    coordinates: [number] // [longitude, latitude]
+    coordinates: Coordinates
 }
 
 export interface DiscoveryInfo {
