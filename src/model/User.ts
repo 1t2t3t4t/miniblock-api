@@ -2,7 +2,7 @@ import mongoose, {Model} from 'mongoose'
 import {isNullOrUndefined} from "util";
 import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
-import Location, {LocationModel} from "./Location";
+import Location, {LocationInfo} from "./Location";
 
 const Schema = mongoose.Schema
 
@@ -21,7 +21,7 @@ export interface UserPreferencesInfo {
 }
 
 export interface DiscoveryInfo {
-    currentLocation: LocationModel
+    currentLocation?: LocationInfo
 }
 
 export interface UserModel extends mongoose.Document {

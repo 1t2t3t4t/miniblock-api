@@ -3,6 +3,12 @@ import {Category} from "../model/Categories";
 import {isNullOrUndefined} from "util";
 import {Coordinates, LocationType} from "../model/Location";
 
+export namespace DiscoveryError {
+    export class NullLocation extends Error {
+        message = 'User has no location'
+    }
+}
+
 export default class DiscoveryManager {
 
     updateLocation(user: UserModel,
@@ -20,7 +26,10 @@ export default class DiscoveryManager {
                     page: number,
                     limit: number,
                     gender?: Gender,): Promise<UserModel[]> {
-        const coordinates = user.discoveryInfo.currentLocation.coordinates
+        const currentLocation = user.discoveryInfo.currentLocation
+        if (isNullOrUndefined(currentLocation)) throw new DiscoveryError.NullLocation()
+
+        const coordinates = currentLocation.coordinates
         const locationQuery: any = {
             near: {
                 type: LocationType.POINT,
