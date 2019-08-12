@@ -20,6 +20,8 @@ interface DiscoveryRequest extends EnsureAuthRequest {
         gender?: Gender
         currentFeeling: Category
         maxDistance: number
+        page: number
+        limit: number
     }
 }
 
@@ -48,13 +50,16 @@ export default class DiscoveryRouterController {
     discovery(req: DiscoveryRequest, res: express.Response, next: express.NextFunction) {
         const user = req.user!
         const { gender, currentFeeling, maxDistance } = req.query
+        const page = Number(req.query.page) || 0
+        const limit = Number(req.query.limit) || 10
 
-        this.discoveryManager.discovery(user, currentFeeling, maxDistance, gender).then((users) => {
-            res.status(200)
-            res.send(new HTTPResponse.Response({ users }))
-        }).catch((e) => {
-            res.status(500)
-            next(e)
-        })
+        this.discoveryManager.discovery(user, currentFeeling, maxDistance, page, limit, gender)
+            .then((users) => {
+                res.status(200)
+                res.send(new HTTPResponse.Response({ users }))
+            }).catch((e) => {
+                res.status(500)
+                next(e)
+            })
     }
 }
