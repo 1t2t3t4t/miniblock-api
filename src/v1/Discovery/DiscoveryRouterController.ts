@@ -17,7 +17,7 @@ interface UpdateCurrentLocationRequest extends EnsureAuthRequest {
 
 interface DiscoveryRequest extends EnsureAuthRequest {
     query: {
-        gender: Gender
+        gender?: Gender
         currentFeeling: Category
         maxDistance: number
     }
@@ -49,7 +49,7 @@ export default class DiscoveryRouterController {
         const user = req.user!
         const { gender, currentFeeling, maxDistance } = req.query
 
-        this.discoveryManager.discovery(user, gender, currentFeeling, maxDistance).then((users) => {
+        this.discoveryManager.discovery(user, currentFeeling, maxDistance, gender).then((users) => {
             res.status(200)
             res.send(new HTTPResponse.Response({ users }))
         }).catch((e) => {

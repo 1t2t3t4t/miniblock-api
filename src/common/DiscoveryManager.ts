@@ -15,30 +15,39 @@ export default class DiscoveryManager {
     }
 
     async discovery(user: UserModel,
-              gender: Gender,
-              currentFeeling: Category,
-              maxDistance: number): Promise<UserModel[]> {
+                    currentFeeling: Category,
+                    maxDistance: number,
+                    gender?: Gender,): Promise<UserModel[]> {
         const coordinates = user.discoveryInfo.currentLocation.coordinates
         const locationQuery: any = {
-            $near: {
-                $geometry: {
-                    type: LocationType.POINT,
-                    coordinates: coordinates
-                }
-            }
+            near: {
+                type: LocationType.POINT,
+                coordinates: coordinates
+            },
+            distanceField: "distance",
+            spherical : true,
+            distanceMultiplier : 0.001
         }
 
         if (!isNullOrUndefined(maxDistance)) {
             locationQuery.$near.$maxDistance = maxDistance
         }
 
-        const query = User.find({
+        let query: any = {
             _id: {
                 $ne: user._id
             },
-            'discoveryInfo.currentLocation': locationQuery
-        })
+            currentFeeling: currentFeeling
+        }
 
-        return await query
+        if (!isNullOrUndefined(gender)) {
+            query.gender = gender
+        }
+
+        console.log(locationQuery)
+
+        return await User.aggregate()
+            .near(locationQuery)
+            .match(query)
     }
 }
