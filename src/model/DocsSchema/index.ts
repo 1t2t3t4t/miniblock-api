@@ -17,7 +17,7 @@
         unique: true,
         validate: {
             validator: validator.isEmail,
-            msg: '{VALUE is not a valid email.}'
+            msg: '{VALUE} is not a valid email.'
         }
     },
  displayName: {
@@ -39,12 +39,22 @@
         type: Number,
         enum: toEnumArray(Category)
     },
+ discoveryInfo: {
+        currentLocation: {
+            type: Location,
+            default: null
+        }
+    },
  userPrefInfo: {
         showInDiscovery: {
             type: Boolean,
             default: true
         }
     }
+ distance: {
+    type: Number
+    note: "only available in discovery mode in km unit"
+ }
  *
  * */
 
