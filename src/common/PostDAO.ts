@@ -14,7 +14,7 @@ export default class PostDAO {
 
     async getPost(postId: string,
                   interactor?: UserRef): Promise<PostModel> {
-        const post = await Post.findById(postId)
+        const post = await Post.findById(postId).populate('creator')
         if (!post) {
             throw new PostNotFoundError()
         }
