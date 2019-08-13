@@ -31,6 +31,17 @@ export default class DiscoveryRouterController {
 
     discoveryManager = new DiscoveryManager()
 
+    /**
+     * @api {PUT} /v1/discovery/currentLocation Update current location
+     * @apiDescription Get post from given id
+     * @apiGroup Discovery
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccess {LocationInfo} updatedLocation Saved location
+     *
+     * */
     @PUT('/currentLocation')
     @Middleware(ensureAuthenticate)
     updateCurrentLocation(req: UpdateCurrentLocationRequest, res: express.Response, next: express.NextFunction) {
@@ -46,6 +57,23 @@ export default class DiscoveryRouterController {
         })
     }
 
+    /**
+     * @api {GET} /v1/discovery Get users from discovery
+     * @apiDescription Get post from given id
+     * @apiGroup Discovery
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiParam {Category} currentFeeling Id of interested feeling
+     * @apiParam {Gender} [gender] Filter users' gender
+     * @apiParam {Number} [maxDistance] Maximum distance is Kilometers
+     * @apiParam {Number} [page] Number of page
+     * @apiParam {Number} [limit] Limit of users per page
+     *
+     * @apiSuccess {[User]} users Array of user
+     *
+     * */
     @GET('/')
     @Middleware(ensureAuthenticate)
     discovery(req: DiscoveryRequest, res: express.Response, next: express.NextFunction) {
