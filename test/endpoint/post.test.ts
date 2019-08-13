@@ -2,8 +2,9 @@ import assert from 'assert'
 import {PostModel, PostType} from "../../src/model/Post";
 import {Category} from "../../src/model/Categories";
 import PostFactory from "../PostFactory";
-import {UserModel} from "../../src/model/User";
+import User, {UserModel} from "../../src/model/User";
 import PostDAO from "../../src/common/PostDAO";
+import AccountFacade from "../../src/common/AuthenticationFacade";
 
 const request = require('supertest')
 
@@ -76,12 +77,10 @@ describe('Get post', () => {
                 const body: any = res.body!
                 assert.notDeepEqual(body.body.post, undefined)
                 const post: PostModel = body.body!.post
-                
-                assert.notDeepEqual(post.authInfo, undefined)
-                assert.notDeepEqual(post.likeInfo.isLiked, undefined)
 
                 assert.deepEqual(post.authInfo!.canDelete, true)
                 assert.deepEqual(post.authInfo!.canEdit, true)
+                assert.deepEqual(post.authInfo!.canSeeProfile, true)
                 assert.deepEqual(post.likeInfo.isLiked, false)
 
                 assert.deepEqual(post.likeInfo.count, 0)
@@ -90,8 +89,51 @@ describe('Get post', () => {
                 assert.deepEqual(post.commentInfo.count, 0)
                 assert.deepEqual(post.categoryId, category)
                 assert.deepEqual(post.type, type)
+
+                const creator = post.creator as UserModel
+                assert.deepEqual(creator.displayName, dbManager.defaultUser.displayName)
+                assert.deepEqual(creator.anonymousInfo.displayName, dbManager.defaultUser.anonymousInfo.displayName)
             })
             .end(done)
+    })
+
+    it('can fetch others post with auth', async () => {
+        const newUser = await new AccountFacade().register('random@hotmail.com',
+            "BosS",
+            "3")
+        const othersPost = await new PostDAO().createPost(newUser,
+            { text: text},
+            type,
+            title,
+            category)
+
+        const path = `/v1/post/${othersPost._id}`
+        await request(app)
+            .get(path)
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+                const post: PostModel = body.body!.post
+
+                assert.deepEqual(post.authInfo!.canDelete, false)
+                assert.deepEqual(post.authInfo!.canEdit, false)
+                assert.deepEqual(post.authInfo!.canSeeProfile, false)
+                assert.deepEqual(post.likeInfo.isLiked, false)
+
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.title, title)
+                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.commentInfo.count, 0)
+                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.type, type)
+
+                const creator = post.creator as UserModel
+                assert.deepEqual(creator.displayName, newUser.displayName)
+                assert.deepEqual(creator.anonymousInfo.displayName, newUser.anonymousInfo.displayName)
+            })
     })
 
     it('not exist post', (done) => {

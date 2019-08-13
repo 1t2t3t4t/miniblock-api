@@ -47,6 +47,7 @@ export function isPostModel(post: PostRef): post is PostModel {
 export interface AuthInfo {
     canDelete: boolean
     canEdit: boolean
+    canSeeProfile: boolean
 }
 
 export interface PostModel extends mongoose.Document {
@@ -175,6 +176,7 @@ Post.methods.setInteractor = function(this: PostModel, interactor: UserRef) {
     const authInfo = this.checkAuth(interactor)
     this.authInfo!.canDelete = authInfo.canDelete
     this.authInfo!.canEdit = authInfo.canEdit
+    this.authInfo!.canSeeProfile = authInfo.canSeeProfile
 }
 
 Post.methods.checkAuth = function(this: PostModel, interactor: UserRef): AuthInfo {
@@ -182,7 +184,8 @@ Post.methods.checkAuth = function(this: PostModel, interactor: UserRef): AuthInf
     const creatorId = (isUserModel(this.creator) ? this.creator._id : this.creator) as mongoose.Types.ObjectId
     return {
         canDelete: creatorId.equals(interactorId),
-        canEdit: creatorId.equals(interactorId)
+        canEdit: creatorId.equals(interactorId),
+        canSeeProfile: creatorId.equals(interactorId)
     }
 }
 
@@ -219,8 +222,10 @@ Post.methods.setReaction = function(this: PostModel, interactor: UserModel, reac
 }
 
 Post.virtual('likeInfo.isLiked')
+
 Post.virtual('authInfo.canDelete')
 Post.virtual('authInfo.canEdit')
+Post.virtual('authInfo.canSeeProfile')
 
 Post.index({  categoryId: 1, _id: -1,'likeInfo.count': -1 })
 Post.index({  _id: -1,'likeInfo.count': -1 })

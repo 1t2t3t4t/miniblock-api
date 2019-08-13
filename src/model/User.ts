@@ -3,6 +3,7 @@ import {isNullOrUndefined} from "util";
 import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
 import Location, {LocationInfo} from "./Location";
+import {anonymousDisplayName} from "../utils/userHelper";
 
 const Schema = mongoose.Schema
 
@@ -24,6 +25,10 @@ export interface DiscoveryInfo {
     currentLocation?: LocationInfo
 }
 
+export interface AnonymousInfo {
+    displayName: string
+}
+
 export interface UserModel extends mongoose.Document {
     _id: mongoose.Types.ObjectId
     uid: string
@@ -33,7 +38,8 @@ export interface UserModel extends mongoose.Document {
     userPrefInfo: UserPreferencesInfo
     gender: Gender
     currentFeeling: Category
-    discoveryInfo: DiscoveryInfo
+    discoveryInfo: DiscoveryInfo,
+    anonymousInfo: AnonymousInfo
 }
 
 export enum Gender {
@@ -87,6 +93,19 @@ const User = new Schema({
         showInDiscovery: {
             type: Boolean,
             default: true
+        }
+    },
+    anonymousInfo: {
+        displayName: {
+            type: String
+        }
+    }
+})
+
+User.pre('save', function (this: UserModel)  {
+    if (this.isModified('displayName') && this.displayName) {
+        this.anonymousInfo = {
+            displayName: anonymousDisplayName(this.displayName)
         }
     }
 })

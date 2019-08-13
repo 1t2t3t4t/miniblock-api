@@ -89,6 +89,7 @@ describe('save user profile', () => {
                 const user: UserModel = body.body.user
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'username')
+                assert.deepEqual(user.anonymousInfo.displayName, 'uxxxe')
                 assert.deepEqual(user.uid, '1')
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
@@ -109,6 +110,7 @@ describe('save user profile', () => {
                 const user: UserModel = body.body.user
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'myNewName')
+                assert.deepEqual(user.anonymousInfo.displayName, 'mxxxe')
                 assert.deepEqual(user.uid, '1')
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
