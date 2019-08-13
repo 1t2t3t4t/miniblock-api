@@ -168,6 +168,22 @@ describe('Discovery endpoint', () => {
                 })
         })
 
+        it('get users with currentFeeling and max distance', async () => {
+            const dis = new DiscoveryManager()
+            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await User.ensureIndexes()
+            await manager.agent
+                .get(path + '?currentFeeling=' + Category.Relationships + '&maxDistance=9000')
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const u: UserModel[] = res.body.body.users
+                    assert.deepEqual(u.length, 1)
+                    assert.deepEqual(u[0].currentFeeling, Category.Relationships)
+                    assert.deepEqual(u[0].uid, "2")
+                })
+        })
+
         it('get users with gender filters', async () => {
             const dis = new DiscoveryManager()
             await dis.updateLocation(dbManager.defaultUser, [0, 0])

@@ -37,11 +37,11 @@ export default class DiscoveryManager {
             },
             distanceField: "distance",
             spherical : true,
-            distanceMultiplier : 0.001
+            distanceMultiplier : 1 / 1000
         }
 
         if (!isNullOrUndefined(maxDistance)) {
-            locationQuery.maxDistance = maxDistance
+            locationQuery.maxDistance = maxDistance * 1000
         }
 
         let query: any = {
