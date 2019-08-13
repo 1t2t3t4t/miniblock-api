@@ -91,7 +91,8 @@ const User = new Schema({
     }
 })
 
-User.index({ 'discoveryInfo.currentLocation': '2dsphere' })
+User.index({ currentFeeling: 1, 'userPrefInfo.showInDiscovery': 1, 'discoveryInfo.currentLocation': '2dsphere' },
+    { name: "discovery_index" })
 
 User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>, uid: string) {
     if (!uid) throw Error('uid is missing')

@@ -48,18 +48,21 @@ export default class DiscoveryManager {
             _id: {
                 $ne: user._id
             },
-            currentFeeling: currentFeeling
+            currentFeeling: currentFeeling,
+            'userPrefInfo.showInDiscovery': true
         }
 
         if (!isNullOrUndefined(gender)) {
             query.gender = gender
         }
+
+        locationQuery.query = query
+
         const skip = page * limit
 
         return await User
             .aggregate()
             .near(locationQuery)
-            .match(query)
             .skip(skip)
             .limit(limit)
     }
