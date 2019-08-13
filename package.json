@@ -20,7 +20,8 @@
     ],
     "exclude": [
       "src/db/*",
-      "src/v1/Helper/*"
+      "src/v1/Helper/*",
+      "test/*"
     ]
   },
   "_moduleAliases": {

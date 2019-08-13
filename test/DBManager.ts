@@ -12,6 +12,7 @@ class DBManager {
     connection!: mongoose.Connection
     uri!: string
     defaultUser!: UserModel
+    authHeader = { 'Authorization': 'Bearer admin' }
 
     constructor() {
         this.server = new MongoMemoryServer()

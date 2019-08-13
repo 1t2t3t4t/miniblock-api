@@ -2,6 +2,7 @@ import mongoose, {Model} from 'mongoose'
 import {isNullOrUndefined} from "util";
 import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
+import Location, {LocationInfo} from "./Location";
 
 const Schema = mongoose.Schema
 
@@ -19,6 +20,10 @@ export interface UserPreferencesInfo {
     showInDiscovery: boolean
 }
 
+export interface DiscoveryInfo {
+    currentLocation?: LocationInfo
+}
+
 export interface UserModel extends mongoose.Document {
     _id: mongoose.Types.ObjectId
     uid: string
@@ -28,6 +33,7 @@ export interface UserModel extends mongoose.Document {
     userPrefInfo: UserPreferencesInfo
     gender: Gender
     currentFeeling: Category
+    discoveryInfo: DiscoveryInfo
 }
 
 export enum Gender {
@@ -49,7 +55,7 @@ const User = new Schema({
         unique: true,
         validate: {
             validator: validator.isEmail,
-            msg: '{VALUE is not a valid email.}'
+            msg: '{VALUE} is not a valid email.'
         }
     },
     displayName: {
@@ -71,6 +77,12 @@ const User = new Schema({
         type: Number,
         enum: toEnumArray(Category)
     },
+    discoveryInfo: {
+        currentLocation: {
+            type: Location,
+            default: null
+        }
+    },
     userPrefInfo: {
         showInDiscovery: {
             type: Boolean,
@@ -78,6 +90,9 @@ const User = new Schema({
         }
     }
 })
+
+User.index({ currentFeeling: 1, 'userPrefInfo.showInDiscovery': 1, 'discoveryInfo.currentLocation': '2dsphere' },
+    { name: "discovery_index" })
 
 User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>, uid: string) {
     if (!uid) throw Error('uid is missing')
