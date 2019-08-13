@@ -11,7 +11,7 @@ export default class CommentDAO {
         query.parent = parent
 
         const documentQuery = Comment.find(query)
-            .sort({ createdAt: -1 })
+            .sort({ createdAt: 1 })
             .populate('creator')
 
         return documentQuery
