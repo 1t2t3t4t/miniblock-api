@@ -3,6 +3,18 @@
  * */
 
 /**
+ * @api {GET} auth Post AuthInfo Schema
+ * @apiGroup Schema
+ * @apiExample auth schema
+ *
+ AuthInfo {
+    canDelete: boolean
+    canEdit: boolean
+    canSeeProfile: boolean
+}
+ * */
+
+/**
  * @api {GET} user User Schema
  * @apiGroup Schema
  * @apiExample user schema
@@ -49,6 +61,11 @@
         showInDiscovery: {
             type: Boolean,
             default: true
+        }
+    },
+ anonymousInfo: {
+        displayName: {
+            type: String
         }
     }
  distance: {
