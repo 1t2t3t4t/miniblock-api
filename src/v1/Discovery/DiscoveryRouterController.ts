@@ -39,6 +39,9 @@ export default class DiscoveryRouterController {
      *
      * @apiHeader {String} Authorization Token string from Firebase
      *
+     * @apiParam {Number} latitude Latitude values from -90 to 90
+     * @apiParam {Number} longitude Longitude values from -180 to 180
+     *
      * @apiSuccess {LocationInfo} updatedLocation Saved location
      *
      * */
