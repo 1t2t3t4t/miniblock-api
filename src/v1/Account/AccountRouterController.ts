@@ -89,6 +89,7 @@ export default class AccountRouterController {
      * @apiParam {String} [displayName] Display name to be saved
      * @apiParam {String} [image] Display picture url
      * @apiParam {String} [gender] User gender
+     * @apiParam {Int} [age] User age
      * @apiParam {Int} [currentFeeling] User feeling
      * @apiParam {Boolean} [showInDiscovery] User's desire to be shown in discovery mode
      *
@@ -100,10 +101,14 @@ export default class AccountRouterController {
     saveProfile(req: EnsureAuthRequest, res: express.Response, next: express.NextFunction) {
         const user =  req.user!
 
-        const { displayName, image, showInDiscovery, gender, currentFeeling } = req.body
+        const { displayName, age, image, showInDiscovery, gender, currentFeeling } = req.body
 
         if (displayName) {
             user.displayName = displayName
+        }
+
+        if (age) {
+            user.age = age
         }
 
         if (image) {

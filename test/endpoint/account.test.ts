@@ -91,6 +91,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.displayName, 'username')
                 assert.deepEqual(user.anonymousInfo.displayName, 'uxxxe')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
             }).end(done)
@@ -112,6 +113,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.anonymousInfo.displayName, 'mxxxe')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
             }).end(done)
@@ -132,6 +134,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
@@ -153,20 +156,22 @@ describe('save user profile', () => {
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
             }).end(done)
     })
 
-    it('save gender and currentFeelings in discovery', (done) => {
+    it('save gender and currentFeelings and age in discovery', (done) => {
         const path = '/v1/account/profile'
         manager.agent
             .patch(path)
             .set(validHeaderToken)
             .send({
                 gender: Gender.FEMALE,
-                currentFeeling: Category.Relationships
+                currentFeeling: Category.Relationships,
+                age: 18
             })
             .expect(200)
             .expect((res: Response) => {
@@ -177,6 +182,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 18)
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
