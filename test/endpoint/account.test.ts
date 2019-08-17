@@ -2,6 +2,7 @@ import AppTestManager from '../AppTestManager'
 import User, {Gender, UserModel} from "../../src/model/User";
 import assert from 'assert'
 import {Category} from "../../src/model/Categories";
+import {CurrentFeeling} from "../../src/model/CurrentFeeling";
 const DBManager = require('../DBManager')
 
 describe('get user profile', () => {
@@ -39,7 +40,7 @@ describe('get user profile', () => {
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
                 assert.deepEqual(user.gender, Gender.UNSPECIFIED)
-                assert.deepEqual(user.currentFeeling, undefined)
+                assert.deepEqual(user.currentFeeling, [])
             }).end(done)
     })
 
@@ -91,6 +92,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.displayName, 'username')
                 assert.deepEqual(user.anonymousInfo.displayName, 'uxxxe')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
             }).end(done)
@@ -112,6 +114,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.anonymousInfo.displayName, 'mxxxe')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
             }).end(done)
@@ -132,6 +135,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
@@ -153,20 +157,22 @@ describe('save user profile', () => {
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 0)
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
             }).end(done)
     })
 
-    it('save gender and currentFeelings in discovery', (done) => {
+    it('save gender and currentFeelings and age in discovery', (done) => {
         const path = '/v1/account/profile'
         manager.agent
             .patch(path)
             .set(validHeaderToken)
             .send({
                 gender: Gender.FEMALE,
-                currentFeeling: Category.Relationships
+                currentFeeling: CurrentFeeling.Relationships,
+                age: 18
             })
             .expect(200)
             .expect((res: Response) => {
@@ -177,11 +183,12 @@ describe('save user profile', () => {
                 assert.deepEqual(user.email, 'test@email.com')
                 assert.deepEqual(user.displayName, 'myNewName')
                 assert.deepEqual(user.uid, '1')
+                assert.deepEqual(user.age, 18)
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
                 assert.deepEqual(user.gender, Gender.FEMALE)
-                assert.deepEqual(user.currentFeeling, Category.Relationships)
+                assert.deepEqual(user.currentFeeling, [CurrentFeeling.Relationships])
             }).end(done)
     })
 

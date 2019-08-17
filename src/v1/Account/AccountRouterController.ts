@@ -89,7 +89,8 @@ export default class AccountRouterController {
      * @apiParam {String} [displayName] Display name to be saved
      * @apiParam {String} [image] Display picture url
      * @apiParam {String} [gender] User gender
-     * @apiParam {Int} [currentFeeling] User feeling
+     * @apiParam {Int} [age] User age
+     * @apiParam {[Int]} [currentFeeling] Array user current feeling
      * @apiParam {Boolean} [showInDiscovery] User's desire to be shown in discovery mode
      *
      * @apiSuccess {User} user User model
@@ -100,33 +101,14 @@ export default class AccountRouterController {
     saveProfile(req: EnsureAuthRequest, res: express.Response, next: express.NextFunction) {
         const user =  req.user!
 
-        const { displayName, image, showInDiscovery, gender, currentFeeling } = req.body
+        const { displayName, age, image, showInDiscovery, gender, currentFeeling } = req.body
 
-        if (displayName) {
-            user.displayName = displayName
-        }
-
-        if (image) {
-            user.displayImageInfo = { image }
-        }
-
-        if (!isNullOrUndefined(showInDiscovery)) {
-            user.userPrefInfo.showInDiscovery = showInDiscovery
-        }
-
-        if (gender) {
-            user.gender = gender
-        }
-
-        if (currentFeeling) {
-            user.currentFeeling = currentFeeling
-        }
-
-        user.save().then((newUser) => {
-            res.status(200).send(new HTTPResponse.Response({ user: newUser }))
-        }).catch((error: Error) => {
-            res.status(400)
-            next(error)
-        })
+        this.facade.update(user, displayName, age, image, showInDiscovery, gender, currentFeeling)
+            .then((newUser) => {
+                res.status(200).send(new HTTPResponse.Response({ user: newUser }))
+            }).catch((error: Error) => {
+                res.status(400)
+                next(error)
+            })
     }
 }
