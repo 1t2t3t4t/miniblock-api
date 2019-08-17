@@ -2,6 +2,7 @@ import AppTestManager from '../AppTestManager'
 import User, {Gender, UserModel} from "../../src/model/User";
 import assert from 'assert'
 import {Category} from "../../src/model/Categories";
+import {CurrentFeeling} from "../../src/model/CurrentFeeling";
 const DBManager = require('../DBManager')
 
 describe('get user profile', () => {
@@ -39,7 +40,7 @@ describe('get user profile', () => {
                 assert.deepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
                 assert.deepEqual(user.gender, Gender.UNSPECIFIED)
-                assert.deepEqual(user.currentFeeling, undefined)
+                assert.deepEqual(user.currentFeeling, [])
             }).end(done)
     })
 
@@ -170,7 +171,7 @@ describe('save user profile', () => {
             .set(validHeaderToken)
             .send({
                 gender: Gender.FEMALE,
-                currentFeeling: Category.Relationships,
+                currentFeeling: CurrentFeeling.Relationships,
                 age: 18
             })
             .expect(200)
@@ -187,7 +188,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
                 assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
                 assert.deepEqual(user.gender, Gender.FEMALE)
-                assert.deepEqual(user.currentFeeling, Category.Relationships)
+                assert.deepEqual(user.currentFeeling, [CurrentFeeling.Relationships])
             }).end(done)
     })
 
