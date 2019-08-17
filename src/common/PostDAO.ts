@@ -68,6 +68,8 @@ export default class PostDAO {
             categoryId
         })
 
+        post.setInteractor(creator)
+
         return post.save()
     }
 
