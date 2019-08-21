@@ -5,7 +5,7 @@ import User, {UserRef} from "../../model/User";
 import mongoose from "mongoose";
 import express from 'express'
 import {Category} from "../../model/Categories";
-import AuthenticationFacade from "../../common/AuthenticationFacade";
+import AuthenticationFacade from "../../common/AccountFacade";
 import CommentDAO from "../../common/CommentDAO";
 
 @RouterController('/helper')

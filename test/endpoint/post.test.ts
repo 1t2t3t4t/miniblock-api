@@ -4,7 +4,7 @@ import {Category} from "../../src/model/Categories";
 import PostFactory from "../PostFactory";
 import User, {UserModel} from "../../src/model/User";
 import PostDAO from "../../src/common/PostDAO";
-import AccountFacade from "../../src/common/AuthenticationFacade";
+import AccountFacade from "../../src/common/AccountFacade";
 
 const request = require('supertest')
 
