@@ -1,4 +1,4 @@
-import AuthenticationFacade from "../../common/AuthenticationFacade";
+import AuthenticationFacade from "../../common/AccountFacade";
 import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import {UserModel} from "../../model/User";
 import {MongoError} from "mongodb";

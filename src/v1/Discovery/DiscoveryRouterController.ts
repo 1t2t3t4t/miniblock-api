@@ -6,6 +6,7 @@ import DiscoveryManager from "../../common/DiscoveryManager";
 import {Category} from "../../model/Categories";
 import {Coordinates} from "../../model/Location";
 import {isNullOrUndefined} from "util";
+import AccountFacade from "../../common/AccountFacade";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -26,10 +27,17 @@ interface DiscoveryRequest extends EnsureAuthRequest {
     }
 }
 
+interface LikeDiscoveryRequest extends EnsureAuthRequest {
+    params: {
+        userId: string
+    }
+}
+
 @RouterController('/')
 export default class DiscoveryRouterController {
 
     discoveryManager = new DiscoveryManager()
+    accountFacade = new AccountFacade()
 
     /**
      * @api {PUT} /v1/discovery/currentLocation Update current location
@@ -100,5 +108,21 @@ export default class DiscoveryRouterController {
                 res.status(500)
                 next(e)
             })
+    }
+
+    @GET('/:userId/like')
+    @Middleware(ensureAuthenticate)
+    like(req: LikeDiscoveryRequest, res: express.Response, next: express.NextFunction) {
+        const user = req.user!
+        const userId = req.params.userId
+
+        this.accountFacade.friendRequest(user, userId)
+            .then((friendRequest) => {
+            res.status(200)
+            res.send(new HTTPResponse.Response({ friendRequest }))
+        }).catch((e) => {
+            res.status(500)
+            next(e)
+        })
     }
 }
