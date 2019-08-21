@@ -37,7 +37,7 @@ describe('get user profile', () => {
                 assert.deepEqual(user.displayName, 'username')
                 assert.deepEqual(user.uid, '1')
                 assert.deepEqual(user.displayImageInfo, undefined)
-                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
                 assert.deepEqual(user.gender, Gender.UNSPECIFIED)
                 assert.deepEqual(user.currentFeeling, undefined)
             }).end(done)
@@ -92,7 +92,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.anonymousInfo.displayName, 'uxxxe')
                 assert.deepEqual(user.uid, '1')
                 assert.deepEqual(user.displayImageInfo, undefined)
-                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
             }).end(done)
     })
 
@@ -113,7 +113,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.anonymousInfo.displayName, 'mxxxe')
                 assert.deepEqual(user.uid, '1')
                 assert.deepEqual(user.displayImageInfo, undefined)
-                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
             }).end(done)
     })
 
@@ -134,7 +134,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.uid, '1')
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
-                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
             }).end(done)
     })
 
@@ -143,7 +143,7 @@ describe('save user profile', () => {
         manager.agent
             .patch(path)
             .set(validHeaderToken)
-            .send({ showInDiscovery: false })
+            .send({ showInDiscovery: true })
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body, undefined)
@@ -155,7 +155,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.uid, '1')
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
-                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
             }).end(done)
     })
 
@@ -179,7 +179,7 @@ describe('save user profile', () => {
                 assert.deepEqual(user.uid, '1')
                 assert.notDeepEqual(user.displayImageInfo, undefined)
                 assert.deepEqual(user.displayImageInfo!.image, 'https://somepic.jpg')
-                assert.deepEqual(user.userPrefInfo.showInDiscovery, false)
+                assert.deepEqual(user.userPrefInfo.showInDiscovery, true)
                 assert.deepEqual(user.gender, Gender.FEMALE)
                 assert.deepEqual(user.currentFeeling, Category.Relationships)
             }).end(done)

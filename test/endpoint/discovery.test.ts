@@ -80,7 +80,10 @@ describe('Discovery endpoint', () => {
                 discoveryInfo: {
                     currentLocation: {
                         coordinates: [69, 45]
-                    }
+                    },
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
                 }
             } as UserModel)
             users.push({
@@ -93,6 +96,9 @@ describe('Discovery endpoint', () => {
                     currentLocation: {
                         coordinates: [69.5, 45.5]
                     }
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
                 }
             } as UserModel)
             users.push({
@@ -105,6 +111,9 @@ describe('Discovery endpoint', () => {
                     currentLocation: {
                         coordinates: [180, 90]
                     }
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
                 }
             } as UserModel)
             users.push({

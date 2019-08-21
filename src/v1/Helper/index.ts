@@ -7,11 +7,14 @@ import express from 'express'
 import {Category} from "../../model/Categories";
 import AuthenticationFacade from "../../common/AccountFacade";
 import CommentDAO from "../../common/CommentDAO";
+import AccountFacade from "../../common/AccountFacade";
+import stringGenerator from "../../utils/stringGenerator";
 
 @RouterController('/helper')
 export default class HelperRouterController {
 
     commentDAO = new CommentDAO()
+    accountFacade = new AccountFacade()
 
     @GET('/clean')
     async clean(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -27,8 +30,19 @@ export default class HelperRouterController {
         })
     }
 
-    @GET('/stub')
-    async stub(req: express.Request, res: express.Response, next: express.NextFunction) {
+    @GET('/stubUser')
+    async stubUser(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const email = stringGenerator(10) + '@gmail.com'
+        const displayName = stringGenerator(10)
+        const uid = stringGenerator(10)
+        const user = await this.accountFacade.register(email, displayName, uid)
+        res.send({
+            user
+        })
+    }
+
+    @GET('/stubPost')
+    async stubPost(req: express.Request, res: express.Response, next: express.NextFunction) {
         let date = Date.now()
 
         await Post.deleteMany({})

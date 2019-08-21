@@ -92,7 +92,7 @@ const User = new Schema({
     userPrefInfo: {
         showInDiscovery: {
             type: Boolean,
-            default: true
+            default: false
         }
     },
     anonymousInfo: {
