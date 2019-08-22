@@ -211,6 +211,7 @@ describe('Edit post', () => {
                 assert.deepEqual(post.commentInfo.count, 0)
                 assert.deepEqual(post.categoryId, category)
                 assert.deepEqual(post.type, type)
+                assert.notDeepEqual((post.creator as UserModel)._id, undefined)
             })
             .end(done)
     })
@@ -327,7 +328,6 @@ describe('Create post', () => {
                 content: {
                     text: `text number`
                 },
-                creator: dbManager.defaultUser._id,
                 title: `title`
             })
             .set(validHeaderToken)
@@ -336,6 +336,16 @@ describe('Create post', () => {
                 assert.notDeepEqual(res.body, undefined)
                 const body: any = res.body!
                 assert.notDeepEqual(body.body.post, undefined)
+                const post: PostModel = body.body!.post
+                assert.deepEqual(post.authInfo, undefined)
+                assert.deepEqual(post.likeInfo.isLiked, undefined)
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.title, 'title')
+                assert.deepEqual(post.content.text, 'text number')
+                assert.deepEqual(post.commentInfo.count, 0)
+                assert.deepEqual(post.categoryId, Category.Depression)
+                assert.deepEqual(post.type, PostType.TEXT)
+                assert.notDeepEqual((post.creator as UserModel)._id, undefined)
             })
             .end(done)
     })
