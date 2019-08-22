@@ -4,6 +4,7 @@ import {LocationInfo} from "../../src/model/Location";
 import User, {Gender, UserModel} from "../../src/model/User";
 import DiscoveryManager from "../../src/common/DiscoveryManager";
 import {Category} from "../../src/model/Categories";
+import {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
 
 const DBManager = require('../DBManager')
 
@@ -206,6 +207,53 @@ describe('Discovery endpoint', () => {
                     assert.deepEqual(u.length, 1)
                     assert.deepEqual(u[0].currentFeeling, Category.Relationships)
                 })
+        })
+    })
+
+    describe('Like user', () => {
+
+        const dbManager = new DBManager()
+        const manager = new AppTestManager()
+
+        let user: UserModel
+
+        before( async () => {
+            await dbManager.start()
+            user = {
+                uid: "2",
+                email: "a@a.com",
+                displayName: "2",
+                gender: Gender.MALE,
+                currentFeeling: Category.Relationships,
+                discoveryInfo: {
+                    currentLocation: {
+                        coordinates: [69, 45]
+                    },
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
+                }
+            } as UserModel
+            user = await new User(user).save()
+        })
+
+        after(() => {
+            dbManager.stop()
+        })
+
+        it('can like user', (done) => {
+            const path = `/v1/discovery/${user._id.toHexString()}/like`
+            manager.agent
+                .get(path)
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const friendRequest: FriendRequestModel = res.body.body.friendRequest
+                    assert.deepEqual(friendRequest.status, FriendRequestStatus.Pending)
+                    assert.deepEqual(friendRequest.requestedUser, user._id.toHexString())
+                    assert.deepEqual((friendRequest.user as UserModel)._id, dbManager.defaultUser._id.toHexString())
+                })
+                .end(done)
         })
     })
 })
