@@ -62,7 +62,12 @@ class AccountFacade {
         return user.save()
     }
 
-    async friendRequest(fromUser: UserModel,
+    async friendRequests(user: UserModel) {
+        const requests = await FriendRequest.find({ requestedUser: user })
+        return requests
+    }
+
+    async createFriendRequest(fromUser: UserModel,
                         toUserId: string): Promise<FriendRequestModel> {
         const request = new FriendRequest({
             user: fromUser,
@@ -72,9 +77,8 @@ class AccountFacade {
         return request.save()
     }
 
-    async friendRequestDecline(fromUser: UserModel,
-                               toUserId: string) {
-        const request = await FriendRequest.findOne({ user: fromUser, requestedUser: toUserId })
+    async friendRequestDecline(requestId: string) {
+        const request = await FriendRequest.findOne({ _id: requestId })
         if (!request) throw new FriendRequestError.RequestNotFound()
 
         request.status = FriendRequestStatus.Decline
@@ -82,16 +86,14 @@ class AccountFacade {
         return request.remove()
     }
 
-    async friendRequestAccept(fromUser: UserModel,
-                              toUserId: string) {
-        const request = await FriendRequest.findOne({ user: fromUser, requestedUser: toUserId })
+    async friendRequestAccept(requestId: string) {
+        const request = await FriendRequest.findOne({ _id: requestId })
         if (!request) throw new FriendRequestError.RequestNotFound()
 
         request.status = FriendRequestStatus.Accept
 
-        const chatRoom = await this.chatRoomDAO.create([fromUser, toUserId])
+        const chatRoom = await this.chatRoomDAO.create([request.user, request.requestedUser])
 
-        await chatRoom.save()
         await request.remove()
 
         return chatRoom

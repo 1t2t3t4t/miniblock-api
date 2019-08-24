@@ -4,6 +4,8 @@ import Post from './Post'
 import Categories from './Categories'
 import Feed from './Feed'
 import Discovery from './Discovery'
+import FriendRequests from './Friend'
+
 const router = express.Router()
 
 router.use('/account', Account)
@@ -11,5 +13,6 @@ router.use('/post', Post)
 router.use('/categories', Categories)
 router.use('/feed', Feed)
 router.use('/discovery', Discovery)
+router.use('/friendRequests', FriendRequests)
 
 module.exports = router

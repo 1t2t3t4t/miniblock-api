@@ -58,11 +58,15 @@ export default class HelperRouterController {
         const displayName = stringGenerator(10) + ' mockedLocation: ' + mockLocation
         const uid = stringGenerator(10)
         const user = await this.accountFacade.register(email, displayName, uid)
+        const age = Math.ceil(Math.random() * 10) + 18
 
         const gender = randomEnum<Gender>(Gender)
-        const currentFeeling = [randomEnum<CurrentFeeling>(CurrentFeeling)]
+        const currentFeeling = [randomEnum<CurrentFeeling>(CurrentFeeling), randomEnum<CurrentFeeling>(CurrentFeeling)]
+        if (currentFeeling[0] == currentFeeling[1]) {
+            currentFeeling.pop()
+        }
 
-        await this.accountFacade.updateProfile(user, { currentFeeling, gender })
+        await this.accountFacade.updateProfile(user, { currentFeeling, gender, age })
         if (mockLocation) {
             await this.accountFacade.updateProfile(user, { showInDiscovery: true })
             // 13.75398, 100.50144 is Bangkok Lat and Long

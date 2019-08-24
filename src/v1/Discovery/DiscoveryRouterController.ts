@@ -114,7 +114,7 @@ export default class DiscoveryRouterController {
         const user = req.user!
         const userId = req.params.userId
 
-        this.accountFacade.friendRequest(user, userId)
+        this.accountFacade.createFriendRequest(user, userId)
             .then((friendRequest) => {
             res.status(200)
             res.send(new HTTPResponse.Response({ friendRequest }))
