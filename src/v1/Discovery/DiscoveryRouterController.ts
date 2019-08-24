@@ -4,8 +4,6 @@ import express from 'express'
 import {Gender} from "../../model/User";
 import DiscoveryManager from "../../common/DiscoveryManager";
 import {Category} from "../../model/Categories";
-import {Coordinates} from "../../model/Location";
-import {isNullOrUndefined} from "util";
 import AccountFacade from "../../common/AccountFacade";
 
 const HTTPResponse = require('../../model/HTTPResponse');

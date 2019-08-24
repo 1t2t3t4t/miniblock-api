@@ -118,12 +118,40 @@ describe('Discovery endpoint', () => {
                     showInDiscovery: true
                 }
             } as UserModel)
+            // Case user does not allow discovery
             users.push({
                 uid: "5",
                 email: "b@c.com",
                 displayName: "5",
                 gender: Gender.OTHER,
                 currentFeeling: [CurrentFeeling.Relationships],
+                userPrefInfo: {
+                    showInDiscovery: false
+                }
+            } as UserModel)
+            // Case user allows discovery but has no location
+            users.push({
+                uid: "6",
+                email: "a@def.com",
+                displayName: '6',
+                gender: Gender.FEMALE,
+                currentFeeling: [CurrentFeeling.Loneliness],
+                userPrefInfo: {
+                    showInDiscovery: true
+                }
+            } as UserModel)
+            // Case user allows discovery but has location
+            users.push({
+                uid: "7",
+                email: "b@cefs.com",
+                displayName: "7",
+                gender: Gender.OTHER,
+                currentFeeling: [CurrentFeeling.Relationships],
+                discoveryInfo: {
+                    currentLocation: {
+                        coordinates: [69.5, 45.5]
+                    }
+                },
                 userPrefInfo: {
                     showInDiscovery: false
                 }
