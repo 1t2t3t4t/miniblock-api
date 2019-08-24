@@ -8,8 +8,7 @@ export default class ChatRoomDAO {
     firebaseDB = new FirebaseDatabase()
 
     async create(users: UserRef[]) {
-        const fbChatRoomModel = new FirebaseDBModel.ChatRoom()
-        const fbChatRoom = await this.firebaseDB.chatRoom().push(fbChatRoomModel)
+        const fbChatRoom = await this.firebaseDB.createChatRoom()
 
         const chatRoom = new ChatRoom({
             users,

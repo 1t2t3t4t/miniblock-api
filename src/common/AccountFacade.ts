@@ -73,7 +73,7 @@ class AccountFacade {
     }
 
     async friendRequestDecline(fromUser: UserModel,
-                                toUserId: string) {
+                               toUserId: string) {
         const request = await FriendRequest.findOne({ user: fromUser, requestedUser: toUserId })
         if (!request) throw new FriendRequestError.RequestNotFound()
 

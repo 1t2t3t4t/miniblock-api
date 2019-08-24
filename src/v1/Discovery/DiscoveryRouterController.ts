@@ -3,8 +3,8 @@ import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import express from 'express'
 import {Gender} from "../../model/User";
 import DiscoveryManager from "../../common/DiscoveryManager";
-import {Category} from "../../model/Categories";
 import AccountFacade from "../../common/AccountFacade";
+import {CurrentFeeling} from "../../model/CurrentFeeling";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -18,7 +18,7 @@ interface UpdateCurrentLocationRequest extends EnsureAuthRequest {
 interface DiscoveryRequest extends EnsureAuthRequest {
     query: {
         gender?: Gender
-        currentFeeling: Category
+        currentFeeling: CurrentFeeling
         maxDistance: number
         page: number
         limit: number
