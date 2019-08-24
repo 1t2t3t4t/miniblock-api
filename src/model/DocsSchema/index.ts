@@ -42,15 +42,21 @@
             type: String
         }
     },
+ age: {
+        type: Number,
+        default: 0
+    },
  gender: {
         type: String,
         enum: toEnumArray(Gender),
         default: Gender.UNSPECIFIED
     },
- currentFeeling: {
-        type: Number,
-        enum: toEnumArray(Category)
-    },
+ currentFeeling: [
+ {
+            type: Number,
+            enum: toEnumArray(CurrentFeeling)
+        }
+ ],
  discoveryInfo: {
         currentLocation: {
             type: Location,

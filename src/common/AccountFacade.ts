@@ -1,9 +1,8 @@
 import User, {Gender, UserModel} from "../model/User"
-import {MongoError} from "mongodb";
 import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../model/FriendRequest";
 import ChatRoomDAO from "./ChatRoomDAO";
 import {isNullOrUndefined} from "util";
-import {Category} from "../model/Categories";
+import {CurrentFeeling} from "../model/CurrentFeeling";
 
 export namespace FriendRequestError {
     export class RequestNotFound extends Error {
@@ -18,9 +17,10 @@ export namespace FriendRequestError {
 interface UpdateProfileParams {
     displayName?: string,
     image?: string,
+    age?: number,
     showInDiscovery?: boolean,
     gender?: Gender,
-    currentFeeling?: Category
+    currentFeeling?: CurrentFeeling[]
 }
 
 class AccountFacade {
@@ -33,10 +33,14 @@ class AccountFacade {
     }
     
     async updateProfile(user: UserModel, params: UpdateProfileParams) {
-        const { displayName, image, showInDiscovery, gender, currentFeeling } = params
+        const { displayName, image, age, showInDiscovery, gender, currentFeeling } = params
 
         if (displayName) {
             user.displayName = displayName
+        }
+
+        if (age) {
+            user.age = age
         }
 
         if (image) {

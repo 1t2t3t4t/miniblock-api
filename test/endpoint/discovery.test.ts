@@ -4,7 +4,7 @@ import {LocationInfo} from "../../src/model/Location";
 import User, {Gender, UserModel} from "../../src/model/User";
 import DiscoveryManager from "../../src/common/DiscoveryManager";
 import {Category} from "../../src/model/Categories";
-import {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
+import {CurrentFeeling, FriendRequestModel, FriendRequestStatus} from "../../src/model/CurrentFeeling";
 
 const DBManager = require('../DBManager')
 
@@ -77,7 +77,7 @@ describe('Discovery endpoint', () => {
                 email: "a@a.com",
                 displayName: "2",
                 gender: Gender.MALE,
-                currentFeeling: Category.Relationships,
+                currentFeeling: [CurrentFeeling.Relationships],
                 discoveryInfo: {
                     currentLocation: {
                         coordinates: [69, 45]
@@ -92,7 +92,7 @@ describe('Discovery endpoint', () => {
                 email: "a@b.com",
                 displayName: "3",
                 gender: Gender.MALE,
-                currentFeeling: Category.Loneliness,
+                currentFeeling: [CurrentFeeling.Loneliness, CurrentFeeling.Relationships],
                 discoveryInfo: {
                     currentLocation: {
                         coordinates: [69.5, 45.5]
@@ -107,7 +107,7 @@ describe('Discovery endpoint', () => {
                 email: "a@c.com",
                 displayName: "4",
                 gender: Gender.FEMALE,
-                currentFeeling: Category.Relationships,
+                currentFeeling: [CurrentFeeling.Loneliness],
                 discoveryInfo: {
                     currentLocation: {
                         coordinates: [180, 90]
@@ -122,7 +122,7 @@ describe('Discovery endpoint', () => {
                 email: "b@c.com",
                 displayName: "5",
                 gender: Gender.OTHER,
-                currentFeeling: Category.Relationships,
+                currentFeeling: [CurrentFeeling.Relationships],
                 userPrefInfo: {
                     showInDiscovery: false
                 }
@@ -170,11 +170,11 @@ describe('Discovery endpoint', () => {
                 .expect((res) => {
                     const u: UserModel[] = res.body.body.users
                     assert.deepEqual(u.length, 2)
-                    assert.deepEqual(u[0].currentFeeling, Category.Relationships)
+                    assert(u[0].currentFeeling.includes(CurrentFeeling.Relationships))
                     assert.deepEqual(u[0].uid, "2")
 
-                    assert.deepEqual(u[1].currentFeeling, Category.Relationships)
-                    assert.deepEqual(u[1].uid, "4")
+                    assert(u[1].currentFeeling.includes(CurrentFeeling.Relationships))
+                    assert.deepEqual(u[1].uid, "3")
                 })
         })
 
@@ -183,13 +183,13 @@ describe('Discovery endpoint', () => {
             await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
-                .get(path + '?currentFeeling=' + Category.Relationships + '&maxDistance=9000')
+                .get(path + '?currentFeeling=' + Category.Relationships + '&maxDistance=8400')
                 .set(dbManager.authHeader)
                 .expect(200)
                 .expect((res) => {
                     const u: UserModel[] = res.body.body.users
                     assert.deepEqual(u.length, 1)
-                    assert.deepEqual(u[0].currentFeeling, Category.Relationships)
+                    assert(u[0].currentFeeling.includes(CurrentFeeling.Relationships))
                     assert.deepEqual(u[0].uid, "2")
                 })
         })
@@ -199,13 +199,15 @@ describe('Discovery endpoint', () => {
             await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
-                .get(path + '?currentFeeling=' + Category.Relationships + '&gender=male')
+                .get(path + '?currentFeeling=' + Category.Loneliness + '&gender=female')
                 .set(dbManager.authHeader)
                 .expect(200)
                 .expect((res) => {
                     const u: UserModel[] = res.body.body.users
                     assert.deepEqual(u.length, 1)
-                    assert.deepEqual(u[0].currentFeeling, Category.Relationships)
+                    assert(u[0].currentFeeling.includes(CurrentFeeling.Loneliness))
+                    assert.deepEqual(u[0].gender, Gender.FEMALE)
+                    assert.deepEqual(u[0].uid, "4")
                 })
         })
     })

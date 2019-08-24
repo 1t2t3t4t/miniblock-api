@@ -4,6 +4,7 @@ import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
 import Location, {LocationInfo} from "./Location";
 import {anonymousDisplayName} from "../utils/userHelper";
+import {CurrentFeeling} from "./CurrentFeeling";
 
 const Schema = mongoose.Schema
 
@@ -34,10 +35,11 @@ export interface UserModel extends mongoose.Document {
     uid: string
     email: string
     displayName?: string
+    age: number
     displayImageInfo?: DisplayImageInfo
     userPrefInfo: UserPreferencesInfo
     gender: Gender
-    currentFeeling: Category
+    currentFeeling: CurrentFeeling[]
     discoveryInfo: DiscoveryInfo,
     anonymousInfo: AnonymousInfo
 }
@@ -74,15 +76,21 @@ const User = new Schema({
             type: String
         }
     },
+    age: {
+        type: Number,
+        default: 0
+    },
     gender: {
         type: String,
         enum: toEnumArray(Gender),
         default: Gender.UNSPECIFIED
     },
-    currentFeeling: {
-        type: Number,
-        enum: toEnumArray(Category)
-    },
+    currentFeeling: [
+        {
+            type: Number,
+            enum: toEnumArray(CurrentFeeling)
+        }
+    ],
     discoveryInfo: {
         currentLocation: {
             type: Location,
