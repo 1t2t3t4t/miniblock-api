@@ -32,7 +32,7 @@ class AccountFacade {
         return user.save()
     }
     
-    async updateProfile(user: UserModel, params: UpdateProfileParams) {
+    async updateProfile(user: UserModel, params: UpdateProfileParams): Promise<UserModel> {
         const { displayName, image, age, showInDiscovery, gender, currentFeeling } = params
 
         if (displayName) {

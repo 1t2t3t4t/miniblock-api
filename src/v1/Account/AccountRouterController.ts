@@ -1,4 +1,4 @@
-import AuthenticationFacade from "../../common/AccountFacade";
+import AccountFacade from "../../common/AccountFacade";
 import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import {UserModel} from "../../model/User";
 import {MongoError} from "mongodb";
@@ -11,7 +11,7 @@ const HTTPResponse = require('../../model/HTTPResponse');
 @RouterController('/')
 export default class AccountRouterController {
 
-    protected facade: AuthenticationFacade = new AuthenticationFacade()
+    protected facade = new AccountFacade()
 
     /**
      * @api {POST} v1/account/login Login (Dont do anything ATM.)
@@ -101,23 +101,11 @@ export default class AccountRouterController {
     saveProfile(req: EnsureAuthRequest, res: express.Response, next: express.NextFunction) {
         const user =  req.user!
 
-<<<<<<< HEAD
         this.facade.updateProfile(user, req.body).then((newUser) => {
             res.status(200).send(new HTTPResponse.Response({ user: newUser }))
         }).catch((error: Error) => {
             res.status(400)
             next(error)
         })
-=======
-        const { displayName, age, image, showInDiscovery, gender, currentFeeling } = req.body
-
-        this.facade.update(user, displayName, age, image, showInDiscovery, gender, currentFeeling)
-            .then((newUser) => {
-                res.status(200).send(new HTTPResponse.Response({ user: newUser }))
-            }).catch((error: Error) => {
-                res.status(400)
-                next(error)
-            })
->>>>>>> master
     }
 }

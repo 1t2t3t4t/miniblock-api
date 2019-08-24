@@ -5,13 +5,14 @@ import User, {Gender, UserModel, UserRef} from "../../model/User";
 import mongoose from "mongoose";
 import express from 'express'
 import {Category} from "../../model/Categories";
-import AuthenticationFacade from "../../common/AccountFacade";
+import AuthenticationFacade from '../../common/AccountFacade';
 import CommentDAO from "../../common/CommentDAO";
 import AccountFacade from "../../common/AccountFacade";
 import stringGenerator from "../../utils/stringGenerator";
 import DiscoveryManager from "../../common/DiscoveryManager";
 import {randomEnum} from "../../utils/enum";
 import {isNullOrUndefined} from "util";
+import {CurrentFeeling} from "../../model/CurrentFeeling";
 
 @RouterController('/helper')
 export default class HelperRouterController {
@@ -59,7 +60,7 @@ export default class HelperRouterController {
         const user = await this.accountFacade.register(email, displayName, uid)
 
         const gender = randomEnum<Gender>(Gender)
-        const currentFeeling = randomEnum<Category>(Category)
+        const currentFeeling = [randomEnum<CurrentFeeling>(CurrentFeeling)]
 
         await this.accountFacade.updateProfile(user, { currentFeeling, gender })
         if (mockLocation) {

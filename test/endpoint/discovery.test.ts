@@ -4,7 +4,8 @@ import {LocationInfo} from "../../src/model/Location";
 import User, {Gender, UserModel} from "../../src/model/User";
 import DiscoveryManager from "../../src/common/DiscoveryManager";
 import {Category} from "../../src/model/Categories";
-import {CurrentFeeling, FriendRequestModel, FriendRequestStatus} from "../../src/model/CurrentFeeling";
+import {CurrentFeeling} from "../../src/model/CurrentFeeling";
+import {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
 
 const DBManager = require('../DBManager')
 
@@ -226,7 +227,7 @@ describe('Discovery endpoint', () => {
                 email: "a@a.com",
                 displayName: "2",
                 gender: Gender.MALE,
-                currentFeeling: Category.Relationships,
+                currentFeeling: [CurrentFeeling.Relationships],
                 discoveryInfo: {
                     currentLocation: {
                         coordinates: [69, 45]
