@@ -147,7 +147,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with no currentFeeling', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path)
@@ -161,7 +161,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with currentFeeling', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path + '?currentFeeling=' + Category.Relationships)
@@ -180,7 +180,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with currentFeeling and max distance', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path + '?currentFeeling=' + Category.Relationships + '&maxDistance=9000')
@@ -196,7 +196,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with gender filters', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path + '?currentFeeling=' + Category.Relationships + '&gender=male')

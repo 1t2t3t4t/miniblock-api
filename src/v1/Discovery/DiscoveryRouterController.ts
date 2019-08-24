@@ -57,9 +57,9 @@ export default class DiscoveryRouterController {
     @Middleware(ensureAuthenticate)
     updateCurrentLocation(req: UpdateCurrentLocationRequest, res: express.Response, next: express.NextFunction) {
         const user = req.user!
-        const coordinates: Coordinates = [req.body.longitude, req.body.latitude]
+        const { latitude, longitude } = req.body
 
-        this.discoveryManager.updateLocation(user, coordinates).then((user) => {
+        this.discoveryManager.updateLocation(user, latitude, longitude).then((user) => {
             res.status(200)
             res.send(new HTTPResponse.Response({ updatedLocation: user.discoveryInfo.currentLocation }))
         }).catch((e) => {

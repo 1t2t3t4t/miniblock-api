@@ -12,7 +12,9 @@ export namespace DiscoveryError {
 export default class DiscoveryManager {
 
     updateLocation(user: UserModel,
-                   coordinates: Coordinates): Promise<UserModel> {
+                   latitude: number,
+                   longitude: number): Promise<UserModel> {
+        const coordinates: Coordinates = [longitude, latitude]
         user.discoveryInfo.currentLocation = {
             coordinates
         }
