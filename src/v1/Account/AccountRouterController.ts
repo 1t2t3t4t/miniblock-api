@@ -100,29 +100,7 @@ export default class AccountRouterController {
     saveProfile(req: EnsureAuthRequest, res: express.Response, next: express.NextFunction) {
         const user =  req.user!
 
-        const { displayName, image, showInDiscovery, gender, currentFeeling } = req.body
-
-        if (displayName) {
-            user.displayName = displayName
-        }
-
-        if (image) {
-            user.displayImageInfo = { image }
-        }
-
-        if (!isNullOrUndefined(showInDiscovery)) {
-            user.userPrefInfo.showInDiscovery = showInDiscovery
-        }
-
-        if (gender) {
-            user.gender = gender
-        }
-
-        if (currentFeeling) {
-            user.currentFeeling = currentFeeling
-        }
-
-        user.save().then((newUser) => {
+        this.facade.updateProfile(user, req.body).then((newUser) => {
             res.status(200).send(new HTTPResponse.Response({ user: newUser }))
         }).catch((error: Error) => {
             res.status(400)

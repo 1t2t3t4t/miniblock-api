@@ -1,12 +1,26 @@
-import User, {UserModel} from "../model/User"
+import User, {Gender, UserModel} from "../model/User"
 import {MongoError} from "mongodb";
 import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../model/FriendRequest";
 import ChatRoomDAO from "./ChatRoomDAO";
+import {isNullOrUndefined} from "util";
+import {Category} from "../model/Categories";
 
 export namespace FriendRequestError {
     export class RequestNotFound extends Error {
         message = 'There is no request for this user'
     }
+
+    export class AlreadyAdded extends Error {
+        message = 'User already added'
+    }
+}
+
+interface UpdateProfileParams {
+    displayName?: string,
+    image?: string,
+    showInDiscovery?: boolean,
+    gender?: Gender,
+    currentFeeling?: Category
 }
 
 class AccountFacade {
@@ -15,6 +29,32 @@ class AccountFacade {
 
     async register(email: string, displayName: string, uid: string): Promise<UserModel>  {
         let user = new User({ email, displayName, uid })
+        return user.save()
+    }
+    
+    async updateProfile(user: UserModel, params: UpdateProfileParams) {
+        const { displayName, image, showInDiscovery, gender, currentFeeling } = params
+
+        if (displayName) {
+            user.displayName = displayName
+        }
+
+        if (image) {
+            user.displayImageInfo = { image }
+        }
+
+        if (!isNullOrUndefined(showInDiscovery)) {
+            user.userPrefInfo.showInDiscovery = showInDiscovery
+        }
+
+        if (gender) {
+            user.gender = gender
+        }
+
+        if (currentFeeling) {
+            user.currentFeeling = currentFeeling
+        }
+
         return user.save()
     }
 
