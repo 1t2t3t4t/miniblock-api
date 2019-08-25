@@ -2,6 +2,7 @@ import User, {Gender, UserModel} from "../model/User";
 import {Category} from "../model/Categories";
 import {isNullOrUndefined} from "util";
 import {Coordinates, LocationType} from "../model/Location";
+import {CurrentFeeling} from "../model/CurrentFeeling";
 
 export namespace DiscoveryError {
     export class NullLocation extends Error {
@@ -12,7 +13,9 @@ export namespace DiscoveryError {
 export default class DiscoveryManager {
 
     updateLocation(user: UserModel,
-                   coordinates: Coordinates): Promise<UserModel> {
+                   latitude: number,
+                   longitude: number): Promise<UserModel> {
+        const coordinates: Coordinates = [longitude, latitude]
         user.discoveryInfo.currentLocation = {
             coordinates
         }
@@ -21,7 +24,7 @@ export default class DiscoveryManager {
     }
 
     async discovery(user: UserModel,
-                    currentFeeling: Category,
+                    currentFeeling: CurrentFeeling,
                     maxDistance: number,
                     page: number,
                     limit: number,

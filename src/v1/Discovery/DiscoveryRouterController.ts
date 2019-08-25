@@ -3,9 +3,8 @@ import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import express from 'express'
 import {Gender} from "../../model/User";
 import DiscoveryManager from "../../common/DiscoveryManager";
-import {Category} from "../../model/Categories";
-import {Coordinates} from "../../model/Location";
-import {isNullOrUndefined} from "util";
+import AccountFacade from "../../common/AccountFacade";
+import {CurrentFeeling} from "../../model/CurrentFeeling";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -19,10 +18,16 @@ interface UpdateCurrentLocationRequest extends EnsureAuthRequest {
 interface DiscoveryRequest extends EnsureAuthRequest {
     query: {
         gender?: Gender
-        currentFeeling: Category
+        currentFeeling: CurrentFeeling
         maxDistance: number
         page: number
         limit: number
+    }
+}
+
+interface LikeDiscoveryRequest extends EnsureAuthRequest {
+    params: {
+        userId: string
     }
 }
 
@@ -30,6 +35,7 @@ interface DiscoveryRequest extends EnsureAuthRequest {
 export default class DiscoveryRouterController {
 
     discoveryManager = new DiscoveryManager()
+    accountFacade = new AccountFacade()
 
     /**
      * @api {PUT} /v1/discovery/currentLocation Update current location
@@ -49,9 +55,9 @@ export default class DiscoveryRouterController {
     @Middleware(ensureAuthenticate)
     updateCurrentLocation(req: UpdateCurrentLocationRequest, res: express.Response, next: express.NextFunction) {
         const user = req.user!
-        const coordinates: Coordinates = [req.body.longitude, req.body.latitude]
+        const { latitude, longitude } = req.body
 
-        this.discoveryManager.updateLocation(user, coordinates).then((user) => {
+        this.discoveryManager.updateLocation(user, latitude, longitude).then((user) => {
             res.status(200)
             res.send(new HTTPResponse.Response({ updatedLocation: user.discoveryInfo.currentLocation }))
         }).catch((e) => {
@@ -100,5 +106,32 @@ export default class DiscoveryRouterController {
                 res.status(500)
                 next(e)
             })
+    }
+
+    /**
+     * @api {GET} /v1/discovery/:userId/like Like user
+     * @apiDescription Send friend request to user
+     * @apiGroup Discovery
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccess {FriendRequestModel} friendRequest FriendRequest model
+     *
+     * */
+    @GET('/:userId/like')
+    @Middleware(ensureAuthenticate)
+    like(req: LikeDiscoveryRequest, res: express.Response, next: express.NextFunction) {
+        const user = req.user!
+        const userId = req.params.userId
+
+        this.accountFacade.createFriendRequest(user, userId)
+            .then((friendRequest) => {
+            res.status(200)
+            res.send(new HTTPResponse.Response({ friendRequest }))
+        }).catch((e) => {
+            res.status(500)
+            next(e)
+        })
     }
 }

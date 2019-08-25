@@ -32,7 +32,7 @@ export default class PostDAO {
                    type?: PostType,
                    title?: string,
                    categoryId?: Category): Promise<PostModel> {
-        const post = await Post.findById(postId)
+        const post = await Post.findById(postId).populate('creator')
         if (!post) throw new PostNotFoundError()
         if (!post.checkAuth(interactor).canEdit) throw new InvalidAuthError()
 

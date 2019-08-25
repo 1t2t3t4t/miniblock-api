@@ -5,6 +5,8 @@ import {Category} from "./Categories";
 import Location, {LocationInfo} from "./Location";
 import {anonymousDisplayName} from "../utils/userHelper";
 import {CurrentFeeling} from "./CurrentFeeling";
+import FriendRequest, {FriendRequestModel} from "./FriendRequest";
+import ChatRoom from "./ChatRoom";
 
 const Schema = mongoose.Schema
 
@@ -41,7 +43,10 @@ export interface UserModel extends mongoose.Document {
     gender: Gender
     currentFeeling: CurrentFeeling[]
     discoveryInfo: DiscoveryInfo,
-    anonymousInfo: AnonymousInfo
+    anonymousInfo: AnonymousInfo,
+    isFriend?: boolean
+
+    setInteractor: (interactor: UserModel) => Promise<boolean>
 }
 
 export enum Gender {
@@ -100,7 +105,7 @@ const User = new Schema({
     userPrefInfo: {
         showInDiscovery: {
             type: Boolean,
-            default: true
+            default: false
         }
     },
     anonymousInfo: {
@@ -109,6 +114,8 @@ const User = new Schema({
         }
     }
 })
+
+User.virtual('isFriend')
 
 User.pre('save', function (this: UserModel)  {
     if (this.isModified('displayName') && this.displayName) {
@@ -124,7 +131,14 @@ User.index({ currentFeeling: 1, 'userPrefInfo.showInDiscovery': 1, 'discoveryInf
 User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>, uid: string) {
     if (!uid) throw Error('uid is missing')
 
-    return this.findOne({ uid })
+    return this.findOne({uid})
+}
+
+User.methods.setInteractor = async function(this: UserModel, interactor: UserModel) {
+    const isFriendRequest = await !isNullOrUndefined(FriendRequest.find({ user: interactor, requestedUser: this }))
+    const isFriend = await !isNullOrUndefined(ChatRoom.findOne({ users: [this, interactor] }))
+
+    this.isFriend = isFriend || isFriendRequest
 }
 
 export function isUserModel(user: UserRef): user is UserModel {

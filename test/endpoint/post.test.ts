@@ -4,7 +4,7 @@ import {Category} from "../../src/model/Categories";
 import PostFactory from "../PostFactory";
 import User, {UserModel} from "../../src/model/User";
 import PostDAO from "../../src/common/PostDAO";
-import AccountFacade from "../../src/common/AuthenticationFacade";
+import AccountFacade from "../../src/common/AccountFacade";
 
 const request = require('supertest')
 
@@ -211,6 +211,7 @@ describe('Edit post', () => {
                 assert.deepEqual(post.commentInfo.count, 0)
                 assert.deepEqual(post.categoryId, category)
                 assert.deepEqual(post.type, type)
+                assert.notDeepEqual((post.creator as UserModel)._id, undefined)
             })
             .end(done)
     })
@@ -327,7 +328,6 @@ describe('Create post', () => {
                 content: {
                     text: `text number`
                 },
-                creator: dbManager.defaultUser._id,
                 title: `title`
             })
             .set(validHeaderToken)

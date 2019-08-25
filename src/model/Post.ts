@@ -155,6 +155,19 @@ const Post = new Schema({
     },
 })
 
+Post.virtual('likeInfo.isLiked')
+
+Post.virtual('authInfo.canDelete')
+Post.virtual('authInfo.canEdit')
+Post.virtual('authInfo.canSeeProfile')
+
+Post.index({  categoryId: 1, _id: -1,'likeInfo.count': -1 })
+Post.index({  _id: -1,'likeInfo.count': -1 })
+
+Post.index({  createdAt: -1, _id: -1 })
+Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
+Post.index({ title: 1, createdAt: -1, _id: -1 })
+
 Post.pre('save', function(this: PostModel) {
     if (this.isModified('likeInfo') || this.isNew) {
         this.likeInfo.count = this.likeInfo.like.length
@@ -220,19 +233,6 @@ Post.methods.setReaction = function(this: PostModel, interactor: UserModel, reac
 
     this.setInteractor(interactor)
 }
-
-Post.virtual('likeInfo.isLiked')
-
-Post.virtual('authInfo.canDelete')
-Post.virtual('authInfo.canEdit')
-Post.virtual('authInfo.canSeeProfile')
-
-Post.index({  categoryId: 1, _id: -1,'likeInfo.count': -1 })
-Post.index({  _id: -1,'likeInfo.count': -1 })
-
-Post.index({  createdAt: -1, _id: -1 })
-Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
-Post.index({ title: 1, createdAt: -1, _id: -1 })
 
 export type PostRef = PostModel | mongoose.Types.ObjectId | string
 

@@ -1,17 +1,25 @@
 import {GET, RouterController} from "../../framework/annotation-restapi";
 import Post, {PostModel, PostRef, PostType} from "../../model/Post";
 import Comment, {CommentModel, CommentRef} from "../../model/Comment";
-import User, {UserRef} from "../../model/User";
+import User, {Gender, UserModel, UserRef} from "../../model/User";
 import mongoose from "mongoose";
 import express from 'express'
 import {Category} from "../../model/Categories";
-import AuthenticationFacade from "../../common/AuthenticationFacade";
+import AuthenticationFacade from '../../common/AccountFacade';
 import CommentDAO from "../../common/CommentDAO";
+import AccountFacade from "../../common/AccountFacade";
+import stringGenerator from "../../utils/stringGenerator";
+import DiscoveryManager from "../../common/DiscoveryManager";
+import {randomEnum} from "../../utils/enum";
+import {isNullOrUndefined} from "util";
+import {CurrentFeeling} from "../../model/CurrentFeeling";
 
 @RouterController('/helper')
 export default class HelperRouterController {
 
     commentDAO = new CommentDAO()
+    accountFacade = new AccountFacade()
+    discoveryManager = new DiscoveryManager()
 
     @GET('/clean')
     async clean(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -27,8 +35,51 @@ export default class HelperRouterController {
         })
     }
 
-    @GET('/stub')
-    async stub(req: express.Request, res: express.Response, next: express.NextFunction) {
+    @GET('/stubUser')
+    async stubUser(req: express.Request, res: express.Response, next: express.NextFunction) {
+        let users: UserModel[] = []
+        if (isNullOrUndefined(req.query.length)) {
+            users.push(await this.addUser())
+        } else {
+            const length = Number(req.query.length)
+            for(let i=0;i<length;i++) {
+                users.push(await this.addUser())
+            }
+        }
+
+        res.send({
+            users
+        })
+    }
+
+    private async addUser(): Promise<UserModel> {
+        const mockLocation = Math.random() <= 0.5
+        const email = stringGenerator(10) + '@gmail.com'
+        const displayName = stringGenerator(10) + ' mockedLocation: ' + mockLocation
+        const uid = stringGenerator(10)
+        const user = await this.accountFacade.register(email, displayName, uid)
+        const age = Math.ceil(Math.random() * 10) + 18
+
+        const gender = randomEnum<Gender>(Gender)
+        const currentFeeling = [randomEnum<CurrentFeeling>(CurrentFeeling), randomEnum<CurrentFeeling>(CurrentFeeling)]
+        if (currentFeeling[0] == currentFeeling[1]) {
+            currentFeeling.pop()
+        }
+
+        await this.accountFacade.updateProfile(user, { currentFeeling, gender, age })
+        if (mockLocation) {
+            await this.accountFacade.updateProfile(user, { showInDiscovery: true })
+            // 13.75398, 100.50144 is Bangkok Lat and Long
+            const latitude = 13.75398 + Math.random()
+            const longitude = 100.50144 + Math.random()
+            await this.discoveryManager.updateLocation(user, latitude, longitude)
+        }
+
+        return user
+    }
+
+    @GET('/stubPost')
+    async stubPost(req: express.Request, res: express.Response, next: express.NextFunction) {
         let date = Date.now()
 
         await Post.deleteMany({})

@@ -4,7 +4,7 @@ import {Category} from "../../src/model/Categories";
 import {Response} from 'superagent'
 import mongoose from 'mongoose'
 import PostDAO from "../../src/common/PostDAO";
-import AccountFacade from "../../src/common/AuthenticationFacade";
+import AccountFacade from "../../src/common/AccountFacade";
 
 const assert = require('assert')
 const request = require('supertest')

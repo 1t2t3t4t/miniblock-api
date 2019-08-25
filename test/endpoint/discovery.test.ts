@@ -5,6 +5,7 @@ import User, {Gender, UserModel} from "../../src/model/User";
 import DiscoveryManager from "../../src/common/DiscoveryManager";
 import {Category} from "../../src/model/Categories";
 import {CurrentFeeling} from "../../src/model/CurrentFeeling";
+import {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
 
 const DBManager = require('../DBManager')
 
@@ -81,7 +82,10 @@ describe('Discovery endpoint', () => {
                 discoveryInfo: {
                     currentLocation: {
                         coordinates: [69, 45]
-                    }
+                    },
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
                 }
             } as UserModel)
             users.push({
@@ -94,6 +98,9 @@ describe('Discovery endpoint', () => {
                     currentLocation: {
                         coordinates: [69.5, 45.5]
                     }
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
                 }
             } as UserModel)
             users.push({
@@ -106,14 +113,45 @@ describe('Discovery endpoint', () => {
                     currentLocation: {
                         coordinates: [180, 90]
                     }
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
                 }
             } as UserModel)
+            // Case user does not allow discovery
             users.push({
                 uid: "5",
                 email: "b@c.com",
                 displayName: "5",
                 gender: Gender.OTHER,
                 currentFeeling: [CurrentFeeling.Relationships],
+                userPrefInfo: {
+                    showInDiscovery: false
+                }
+            } as UserModel)
+            // Case user allows discovery but has no location
+            users.push({
+                uid: "6",
+                email: "a@def.com",
+                displayName: '6',
+                gender: Gender.FEMALE,
+                currentFeeling: [CurrentFeeling.Loneliness],
+                userPrefInfo: {
+                    showInDiscovery: true
+                }
+            } as UserModel)
+            // Case user allows discovery but has location
+            users.push({
+                uid: "7",
+                email: "b@cefs.com",
+                displayName: "7",
+                gender: Gender.OTHER,
+                currentFeeling: [CurrentFeeling.Relationships],
+                discoveryInfo: {
+                    currentLocation: {
+                        coordinates: [69.5, 45.5]
+                    }
+                },
                 userPrefInfo: {
                     showInDiscovery: false
                 }
@@ -138,7 +176,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with no currentFeeling', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path)
@@ -152,7 +190,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with currentFeeling', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path + '?currentFeeling=' + Category.Relationships)
@@ -171,7 +209,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with currentFeeling and max distance', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path + '?currentFeeling=' + Category.Relationships + '&maxDistance=8400')
@@ -187,7 +225,7 @@ describe('Discovery endpoint', () => {
 
         it('get users with gender filters', async () => {
             const dis = new DiscoveryManager()
-            await dis.updateLocation(dbManager.defaultUser, [0, 0])
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
             await User.ensureIndexes()
             await manager.agent
                 .get(path + '?currentFeeling=' + Category.Loneliness + '&gender=female')
@@ -200,6 +238,53 @@ describe('Discovery endpoint', () => {
                     assert.deepEqual(u[0].gender, Gender.FEMALE)
                     assert.deepEqual(u[0].uid, "4")
                 })
+        })
+    })
+
+    describe('Like user', () => {
+
+        const dbManager = new DBManager()
+        const manager = new AppTestManager()
+
+        let user: UserModel
+
+        before( async () => {
+            await dbManager.start()
+            user = {
+                uid: "2",
+                email: "a@a.com",
+                displayName: "2",
+                gender: Gender.MALE,
+                currentFeeling: [CurrentFeeling.Relationships],
+                discoveryInfo: {
+                    currentLocation: {
+                        coordinates: [69, 45]
+                    },
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
+                }
+            } as UserModel
+            user = await new User(user).save()
+        })
+
+        after(() => {
+            dbManager.stop()
+        })
+
+        it('can like user', (done) => {
+            const path = `/v1/discovery/${user._id.toHexString()}/like`
+            manager.agent
+                .get(path)
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const friendRequest: FriendRequestModel = res.body.body.friendRequest
+                    assert.deepEqual(friendRequest.status, FriendRequestStatus.Pending)
+                    assert.deepEqual(friendRequest.requestedUser, user._id.toHexString())
+                    assert.deepEqual((friendRequest.user as UserModel)._id, dbManager.defaultUser._id.toHexString())
+                })
+                .end(done)
         })
     })
 })
