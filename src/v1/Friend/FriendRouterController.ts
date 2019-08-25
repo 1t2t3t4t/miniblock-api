@@ -24,6 +24,17 @@ export default class FriendRouterController {
 
     accountFacade = new AccountFacade()
 
+    /**
+     * @api {GET} /v1/friendRequests Get friend request list
+     * @apiDescription Get friend request list
+     * @apiGroup FriendRequest
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccess {FriendRequestModel[]} requests FriendRequest array model
+     *
+     * */
     @GET('/')
     @Middleware(ensureAuthenticate)
     friendRequests(req: FriendRequestsRequest, res: express.Response, next: express.NextFunction) {
@@ -37,6 +48,20 @@ export default class FriendRouterController {
         })
     }
 
+    /**
+     * @api {PUT} /v1/friendRequests Friend request action
+     * @apiDescription Set friend request action
+     * @apiGroup FriendRequest
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiParam {String} id Id of friend request
+     * @apiParam {String} action Action to do with friend request {'accept' || 'decline'}
+     *
+     * @apiSuccess {ChatRoom} chatRoom Chat Room Model if send accept
+     *
+     * */
     @PUT('/')
     @Middleware(ensureAuthenticate)
     friendRequestsAction(req: FriendRequestsActionRequest, res: express.Response, next: express.NextFunction) {

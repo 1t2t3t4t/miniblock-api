@@ -108,6 +108,17 @@ export default class DiscoveryRouterController {
             })
     }
 
+    /**
+     * @api {GET} /v1/discovery/:userId/like Like user
+     * @apiDescription Send friend request to user
+     * @apiGroup Discovery
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiSuccess {FriendRequestModel} friendRequest FriendRequest model
+     *
+     * */
     @GET('/:userId/like')
     @Middleware(ensureAuthenticate)
     like(req: LikeDiscoveryRequest, res: express.Response, next: express.NextFunction) {
