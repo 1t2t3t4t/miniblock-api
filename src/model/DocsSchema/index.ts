@@ -220,3 +220,45 @@
     }
  *
  * */
+
+/**
+ * @api {GET} friendRequest Friend Request Schema
+ * @apiGroup Schema
+ * @apiExample friend request schema
+ user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+},
+ requestedUser: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    index: true,
+    ref: 'User'
+},
+ status: {
+    type: String,
+    enum: toEnumArray(FriendRequestStatus),
+    default: FriendRequestStatus.Pending
+}
+ *
+ * */
+
+/**
+ * @api {GET} chatRoom Chat Room Schema
+ * @apiGroup Schema
+ * @apiExample chat room schema
+ users: [
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
+ ],
+ chatRoomId: {
+    type: String,
+    required: true,
+    index: true
+}
+ *
+ * */
