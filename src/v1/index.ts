@@ -5,6 +5,7 @@ import Categories from './Categories'
 import Feed from './Feed'
 import Discovery from './Discovery'
 import FriendRequests from './Friend'
+import Chat from './Chat'
 
 const router = express.Router()
 
@@ -14,5 +15,6 @@ router.use('/categories', Categories)
 router.use('/feed', Feed)
 router.use('/discovery', Discovery)
 router.use('/friendRequests', FriendRequests)
+router.use('/chats', Chat)
 
 module.exports = router
