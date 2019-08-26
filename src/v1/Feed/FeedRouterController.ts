@@ -1,13 +1,8 @@
 import {GET, Middleware, RouterController} from "../../framework/annotation-restapi"
 import express from "express"
-import Post, {PostType} from '../../model/Post'
-import User from "../../model/User";
-import {Category} from "../../model/Categories";
+import Post from '../../model/Post'
 import FeedManager, {FeedSortType} from "../../common/FeedManager";
 import {authenticate, EnsureAuthRequest} from "../../middleware";
-import mongoose from "mongoose";
-import Comment, {CommentModel} from "../../model/Comment";
-import CommentDAO from "../../common/CommentDAO";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -136,12 +131,6 @@ export default class FeedRouterController {
         }).catch((e) => {
             res.status(500)
             next(e)
-        })
-    }
-
-    async wait() {
-        return new Promise((resolve, reject) => {
-            setTimeout(resolve, 100)
         })
     }
 

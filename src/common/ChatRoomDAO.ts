@@ -1,4 +1,4 @@
-import {UserRef} from "../model/User";
+import {UserModel, UserRef} from "../model/User";
 import {FirebaseDBModel} from "../model/Firebase";
 import ChatRoom, {ChatRoomModel} from "../model/ChatRoom";
 import FirebaseDatabase from "./FirebaseDatabase";
@@ -16,5 +16,9 @@ export default class ChatRoomDAO {
         } as ChatRoomModel)
 
         return chatRoom.save()
+    }
+
+    async get(user: UserModel): Promise<ChatRoomModel[]> {
+        return ChatRoom.find({ users: user._id })
     }
 }
