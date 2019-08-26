@@ -68,7 +68,7 @@ class AccountFacade {
     }
 
     async createFriendRequest(fromUser: UserModel,
-                        toUserId: string): Promise<FriendRequestModel> {
+                              toUserId: string): Promise<FriendRequestModel> {
         const request = new FriendRequest({
             user: fromUser,
             requestedUser: toUserId

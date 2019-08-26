@@ -275,7 +275,7 @@ describe('Discovery endpoint', () => {
         it('can like user', (done) => {
             const path = `/v1/discovery/${user._id.toHexString()}/like`
             manager.agent
-                .get(path)
+                .post(path)
                 .set(dbManager.authHeader)
                 .expect(200)
                 .expect((res) => {

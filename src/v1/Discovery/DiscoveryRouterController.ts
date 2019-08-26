@@ -1,4 +1,4 @@
-import {GET, Middleware, PUT, RouterController} from "../../framework/annotation-restapi";
+import {GET, Middleware, POST, PUT, RouterController} from "../../framework/annotation-restapi";
 import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import express from 'express'
 import {Gender} from "../../model/User";
@@ -109,7 +109,7 @@ export default class DiscoveryRouterController {
     }
 
     /**
-     * @api {GET} /v1/discovery/:userId/like Like user
+     * @api {POST} /v1/discovery/:userId/like Like user
      * @apiDescription Send friend request to user
      * @apiGroup Discovery
      * @apiPermission loggedIn
@@ -119,7 +119,7 @@ export default class DiscoveryRouterController {
      * @apiSuccess {FriendRequestModel} friendRequest FriendRequest model
      *
      * */
-    @GET('/:userId/like')
+    @POST('/:userId/like')
     @Middleware(ensureAuthenticate)
     like(req: LikeDiscoveryRequest, res: express.Response, next: express.NextFunction) {
         const user = req.user!

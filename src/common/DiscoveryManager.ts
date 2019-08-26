@@ -55,7 +55,9 @@ export default class DiscoveryManager {
             'userPrefInfo.showInDiscovery': true
         }
 
+        console.log(gender)
         if (!isNullOrUndefined(gender)) {
+            console.log(gender)
             query.gender = gender
         }
 
