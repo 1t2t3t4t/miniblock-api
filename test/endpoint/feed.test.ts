@@ -58,6 +58,16 @@ describe('Fetch all from feed with 1 category', () => {
     })
 
     const path = '/v1/feed/all'
+    it('error if invalid category', (done) => {
+        request(app)
+            .get(path + '?categoryId=loneliness')
+            .expect(400)
+            .expect((res: Response) => {
+                const message = res.body.body.message as string
+                assert.deepEqual(message, 'invalid categoryId (should be number)')
+            }).end(done)
+    })
+
     it('should get all feed', (done) => {
         request(app)
             .get(path)

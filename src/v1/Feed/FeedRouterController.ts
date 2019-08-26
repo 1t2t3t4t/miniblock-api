@@ -72,7 +72,7 @@ export default class FeedRouterController {
         if (categoryId && isNaN(Number(categoryId))) {
             console.log(categoryId, Number(categoryId))
             res.status(400)
-            res.send( new HTTPResponse.ErrorResponse('invalid categoryId (should be number)') )
+            res.send( new HTTPResponse.ErrorResponse('invalid categoryId (should be number)'))
             return
         }
 
