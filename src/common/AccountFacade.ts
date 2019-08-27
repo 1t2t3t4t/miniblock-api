@@ -1,6 +1,4 @@
 import User, {Gender, UserModel} from "../model/User"
-import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../model/FriendRequest";
-import ChatRoomDAO from "./ChatRoomDAO";
 import {isNullOrUndefined} from "util";
 import {CurrentFeeling} from "../model/CurrentFeeling";
 
@@ -24,8 +22,6 @@ interface UpdateProfileParams {
 }
 
 class AccountFacade {
-
-    private chatRoomDAO = new ChatRoomDAO()
 
     async register(email: string, displayName: string, uid: string): Promise<UserModel>  {
         let user = new User({ email, displayName, uid })
@@ -60,46 +56,6 @@ class AccountFacade {
         }
 
         return user.save()
-    }
-
-    async friendRequests(user: UserModel) {
-        const requests = await FriendRequest
-            .find({ requestedUser: user })
-            .populate('requestedUser')
-            .populate('user')
-        return requests
-    }
-
-    async createFriendRequest(fromUser: UserModel,
-                              toUserId: string): Promise<FriendRequestModel> {
-        const request = new FriendRequest({
-            user: fromUser,
-            requestedUser: toUserId
-        })
-
-        return request.save()
-    }
-
-    async friendRequestDecline(requestId: string) {
-        const request = await FriendRequest.findOne({ _id: requestId })
-        if (!request) throw new FriendRequestError.RequestNotFound()
-
-        request.status = FriendRequestStatus.Decline
-
-        return request.remove()
-    }
-
-    async friendRequestAccept(requestId: string) {
-        const request = await FriendRequest.findOne({ _id: requestId })
-        if (!request) throw new FriendRequestError.RequestNotFound()
-
-        request.status = FriendRequestStatus.Accept
-
-        const chatRoom = await this.chatRoomDAO.create([request.user, request.requestedUser])
-
-        await request.remove()
-
-        return chatRoom
     }
 }
 

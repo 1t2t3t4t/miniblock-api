@@ -5,6 +5,7 @@ import {Gender} from "../../model/User";
 import DiscoveryManager from "../../common/DiscoveryManager";
 import AccountFacade from "../../common/AccountFacade";
 import {CurrentFeeling} from "../../model/CurrentFeeling";
+import FriendRequestDAO from "../../common/FriendRequestDAO";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -35,7 +36,7 @@ interface LikeDiscoveryRequest extends EnsureAuthRequest {
 export default class DiscoveryRouterController {
 
     discoveryManager = new DiscoveryManager()
-    accountFacade = new AccountFacade()
+    friendRequestDAO = new FriendRequestDAO()
 
     /**
      * @api {PUT} /v1/discovery/currentLocation Update current location
@@ -125,7 +126,7 @@ export default class DiscoveryRouterController {
         const user = req.user!
         const userId = req.params.userId
 
-        this.accountFacade.createFriendRequest(user, userId)
+        this.friendRequestDAO.createFriendRequest(user, userId)
             .then((friendRequest) => {
             res.status(200)
             res.send(new HTTPResponse.Response({ friendRequest }))

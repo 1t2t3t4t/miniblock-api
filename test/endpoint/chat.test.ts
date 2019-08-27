@@ -3,6 +3,7 @@ import AccountFacade from "../../src/common/AccountFacade";
 import {UserModel} from "../../src/model/User";
 import {ChatRoomModel} from "../../src/model/ChatRoom";
 import assert from "assert";
+import FriendRequestDAO from "../../src/common/FriendRequestDAO";
 
 const DBManager = require('../DBManager')
 
@@ -12,7 +13,8 @@ describe('Chat endpoints', () => {
 
         const dbManager = new DBManager()
         const manager = new AppTestManager()
-        const facade = new AccountFacade()
+        const account = new AccountFacade()
+        const facade = new FriendRequestDAO()
         const path = '/v1/chats'
 
         let user: UserModel
@@ -20,7 +22,7 @@ describe('Chat endpoints', () => {
 
         before( async () => {
             await dbManager.start()
-            user = await facade.register('a@a.com', 'a', 'a')
+            user = await account.register('a@a.com', 'a', 'a')
             const friendRequest = await facade.createFriendRequest(user, dbManager.defaultUser._id.toString())
             chat = await facade.friendRequestAccept(friendRequest._id.toString())
         })

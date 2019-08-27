@@ -1,8 +1,8 @@
 import {GET, Middleware, PUT, RouterController} from "../../framework/annotation-restapi";
 import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import express from "express";
-import AccountFacade from "../../common/AccountFacade";
 import {FriendRequestStatus} from "../../model/FriendRequest";
+import FriendRequestDAO from "../../common/FriendRequestDAO";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -22,7 +22,7 @@ interface FriendRequestsActionRequest extends EnsureAuthRequest {
 @RouterController('/')
 export default class FriendRouterController {
 
-    accountFacade = new AccountFacade()
+    friendRequestDAO = new FriendRequestDAO()
 
     /**
      * @api {GET} /v1/friendRequests Get friend request list
@@ -40,7 +40,7 @@ export default class FriendRouterController {
     friendRequests(req: FriendRequestsRequest, res: express.Response, next: express.NextFunction) {
         const user = req.user!
 
-        this.accountFacade.friendRequests(user).then((requests) => {
+        this.friendRequestDAO.friendRequests(user).then((requests) => {
             res.send(new HTTPResponse.Response({ requests }))
         }).catch((e) => {
             res.status(500)
@@ -70,7 +70,7 @@ export default class FriendRouterController {
 
         switch (action) {
             case FriendRequestStatus.Accept:
-                this.accountFacade.friendRequestAccept(id).then((chatRoom) => {
+                this.friendRequestDAO.friendRequestAccept(id).then((chatRoom) => {
                     res.send(new HTTPResponse.Response({ chatRoom }))
                 }).catch((e) => {
                     res.status(500)
@@ -78,7 +78,7 @@ export default class FriendRouterController {
                 })
                 break
             case FriendRequestStatus.Decline:
-                this.accountFacade.friendRequestDecline(id).then(() => {
+                this.friendRequestDAO.friendRequestDecline(id).then(() => {
                     res.send(new HTTPResponse.Response({ message: "Declined user" }))
                 }).catch((e) => {
                     res.status(500)

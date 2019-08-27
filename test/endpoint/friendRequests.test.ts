@@ -8,6 +8,7 @@ import {CurrentFeeling} from "../../src/model/CurrentFeeling";
 import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
 import AccountFacade from "../../src/common/AccountFacade";
 import ChatRoom, {ChatRoomModel} from "../../src/model/ChatRoom";
+import FriendRequestDAO from "../../src/common/FriendRequestDAO";
 
 const DBManager = require('../DBManager')
 
@@ -22,10 +23,11 @@ describe('Friend Request endpoint', () => {
         const users: UserModel[] = []
 
         before( async () => {
-            const facade = new AccountFacade()
+            const facade = new FriendRequestDAO()
+            const account = new AccountFacade()
             await dbManager.start()
-            users.push(await facade.register('a@a.com', 'a', 'a'))
-            users.push(await facade.register('b@b.com', 'b', 'b'))
+            users.push(await account.register('a@a.com', 'a', 'a'))
+            users.push(await account.register('b@b.com', 'b', 'b'))
 
             for (let user of users) {
                 await facade.createFriendRequest(user, dbManager.defaultUser._id.toString())
@@ -57,7 +59,8 @@ describe('Friend Request endpoint', () => {
 
         const dbManager = new DBManager()
         const manager = new AppTestManager()
-        const facade = new AccountFacade()
+        const facade = new FriendRequestDAO()
+        const account = new AccountFacade()
         const path = '/v1/friendRequests'
 
         let user: UserModel
@@ -72,7 +75,7 @@ describe('Friend Request endpoint', () => {
         })
 
         it('correctly accept request', async () => {
-            user = await facade.register('a@a.com', 'a', 'a')
+            user = await account.register('a@a.com', 'a', 'a')
             friendRequest = await facade.createFriendRequest(user, dbManager.defaultUser._id.toString())
 
             await manager.agent
@@ -96,7 +99,7 @@ describe('Friend Request endpoint', () => {
         })
 
         it('correctly decline request', async () => {
-            user = await facade.register('a@a.com', 'a', 'a')
+            user = await account.register('a@a.com', 'a', 'a')
             friendRequest = await facade.createFriendRequest(user, dbManager.defaultUser._id.toString())
 
             await manager.agent
