@@ -29,7 +29,7 @@ describe('Chat endpoints', () => {
             dbManager.stop()
         })
 
-        it('correctly accept request', async () => {
+        it('correctly query chatRoom', async () => {
             return manager.agent
                 .get(path)
                 .set(dbManager.authHeader)
@@ -38,9 +38,10 @@ describe('Chat endpoints', () => {
                     const chatRooms = res.body.body.chatRooms as ChatRoomModel[]
                     assert.deepEqual(chatRooms.length, 1)
                     assert.deepEqual(chatRooms[0].users.length, 2)
-                    const users = chatRooms[0].users.map((user) => user.toString())
-                    assert(users.includes(dbManager.defaultUser._id.toString()), 'Contains user 1')
-                    assert(users.includes(user._id.toString()), 'Contains user 2')
+                    const users = res.body.body.chatRooms[0].users as UserModel[]
+                    const userIds = users.map((user) => user._id.toString())
+                    assert(userIds.includes(dbManager.defaultUser._id.toString()), 'Contains user 1')
+                    assert(userIds.includes(user._id.toString()), 'Contains user 2')
                 })
         })
     })

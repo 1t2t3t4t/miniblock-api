@@ -7,7 +7,7 @@ export default class ChatRoomDAO {
 
     firebaseDB = new FirebaseDatabase()
 
-    async create(users: UserRef[]) {
+    async create(users: UserRef[]): Promise<ChatRoomModel> {
         const fbChatRoom = await this.firebaseDB.createChatRoom()
 
         const chatRoom = new ChatRoom({
@@ -15,10 +15,11 @@ export default class ChatRoomDAO {
             chatRoomId: fbChatRoom.key
         } as ChatRoomModel)
 
-        return chatRoom.save()
+        await chatRoom.save()
+        return ChatRoom.populate(chatRoom, {path: 'users'})
     }
 
     async get(user: UserModel): Promise<ChatRoomModel[]> {
-        return ChatRoom.find({ users: user._id })
+        return ChatRoom.find({ users: user._id }).populate('users')
     }
 }

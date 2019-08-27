@@ -63,7 +63,10 @@ class AccountFacade {
     }
 
     async friendRequests(user: UserModel) {
-        const requests = await FriendRequest.find({ requestedUser: user })
+        const requests = await FriendRequest
+            .find({ requestedUser: user })
+            .populate('requestedUser')
+            .populate('user')
         return requests
     }
 

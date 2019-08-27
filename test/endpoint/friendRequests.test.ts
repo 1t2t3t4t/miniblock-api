@@ -43,11 +43,11 @@ describe('Friend Request endpoint', () => {
                 .expect(200)
                 .expect((res) => {
                     const requests = res.body.body.requests as FriendRequestModel[]
-                    assert.deepEqual(requests[0].user, users[0]._id.toString())
-                    assert.deepEqual(requests[0].requestedUser, dbManager.defaultUser._id.toString())
+                    assert.deepEqual((requests[0].user as UserModel)._id, users[0]._id.toString())
+                    assert.deepEqual((requests[0].requestedUser as UserModel)._id, dbManager.defaultUser._id.toString())
 
-                    assert.deepEqual(requests[1].user, users[1]._id.toString())
-                    assert.deepEqual(requests[1].requestedUser, dbManager.defaultUser._id.toString())
+                    assert.deepEqual((requests[1].user as UserModel)._id, users[1]._id.toString())
+                    assert.deepEqual((requests[1].requestedUser as UserModel)._id, dbManager.defaultUser._id.toString())
                 })
                 .end(done)
         })
@@ -75,7 +75,7 @@ describe('Friend Request endpoint', () => {
             user = await facade.register('a@a.com', 'a', 'a')
             friendRequest = await facade.createFriendRequest(user, dbManager.defaultUser._id.toString())
 
-            return manager.agent
+            await manager.agent
                 .put(path)
                 .set(dbManager.authHeader)
                 .send({
@@ -85,11 +85,14 @@ describe('Friend Request endpoint', () => {
                 .expect(200)
                 .expect((res) => {
                     const chatRoom = res.body.body.chatRoom as ChatRoomModel
-                    const users = chatRoom.users.map((user) => user.toString())
-                    assert(users.includes(user._id.toString()))
-                    assert(users.includes(dbManager.defaultUser._id.toString()))
+                    const users = res.body.body.chatRoom.users as UserModel[]
+                    const userIds = users.map((user) => user._id.toString())
+                    assert(userIds.includes(user._id.toString()))
+                    assert(userIds.includes(dbManager.defaultUser._id.toString()))
                     assert.notDeepEqual(chatRoom.chatRoomId, undefined)
                 })
+            const requests = await FriendRequest.find({ user: dbManager.defaultUser })
+            assert.deepEqual(requests.length, 0)
         })
 
         it('correctly decline request', async () => {
