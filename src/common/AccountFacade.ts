@@ -2,16 +2,6 @@ import User, {Gender, UserModel} from "../model/User"
 import {isNullOrUndefined} from "util";
 import {CurrentFeeling} from "../model/CurrentFeeling";
 
-export namespace FriendRequestError {
-    export class RequestNotFound extends Error {
-        message = 'There is no request for this user'
-    }
-
-    export class AlreadyAdded extends Error {
-        message = 'User already added'
-    }
-}
-
 interface UpdateProfileParams {
     displayName?: string,
     image?: string,

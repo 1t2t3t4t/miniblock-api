@@ -37,6 +37,6 @@ const FriendRequest = new mongoose.Schema({
 })
 
 FriendRequest.index({ user: 1, createdAt: -1 })
-FriendRequest.index({ user: 1, requestedUser: 1 })
+FriendRequest.index({ user: 1, requestedUser: 1 }, { unique: true , dropDups: true})
 
 export default mongoose.model<FriendRequestModel>('FriendRequest', FriendRequest)

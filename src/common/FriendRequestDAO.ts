@@ -1,8 +1,16 @@
 import {UserModel} from "../model/User";
 import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../model/FriendRequest";
-import {FriendRequestError} from "./AccountFacade";
 import ChatRoomDAO from "./ChatRoomDAO";
 
+export namespace FriendRequestError {
+    export class RequestNotFound extends Error {
+        message = 'There is no request for this user'
+    }
+
+    export class AlreadyAdded extends Error {
+        message = 'User already added'
+    }
+}
 export default class FriendRequestDAO {
 
     private chatRoomDAO = new ChatRoomDAO()
@@ -17,12 +25,12 @@ export default class FriendRequestDAO {
 
     async createFriendRequest(fromUser: UserModel,
                               toUserId: string): Promise<FriendRequestModel> {
-        const request = new FriendRequest({
+        const request = FriendRequest.create({
             user: fromUser,
             requestedUser: toUserId
         })
 
-        return request.save()
+        return request
     }
 
     async friendRequestDecline(requestId: string) {
