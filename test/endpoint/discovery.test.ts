@@ -5,7 +5,7 @@ import User, {Gender, UserModel} from "../../src/model/User";
 import DiscoveryManager from "../../src/common/DiscoveryManager";
 import {Category} from "../../src/model/Categories";
 import {CurrentFeeling} from "../../src/model/CurrentFeeling";
-import {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
+import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
 
 const DBManager = require('../DBManager')
 
@@ -266,15 +266,17 @@ describe('Discovery endpoint', () => {
                 }
             } as UserModel
             user = await new User(user).save()
+
+            await FriendRequest.ensureIndexes()
         })
 
         after(() => {
             dbManager.stop()
         })
 
-        it('can like user', (done) => {
+        it('can like user', async () => {
             const path = `/v1/discovery/${user._id.toHexString()}/like`
-            manager.agent
+            await manager.agent
                 .post(path)
                 .set(dbManager.authHeader)
                 .expect(200)
@@ -284,7 +286,18 @@ describe('Discovery endpoint', () => {
                     assert.deepEqual(friendRequest.requestedUser, user._id.toHexString())
                     assert.deepEqual((friendRequest.user as UserModel)._id, dbManager.defaultUser._id.toHexString())
                 })
-                .end(done)
+        })
+
+        it('cannot like dup request', async () => {
+            const path = `/v1/discovery/${user._id.toHexString()}/like`
+            await manager.agent
+                .post(path)
+                .set(dbManager.authHeader)
+                .expect(500)
+                .expect((res) => {
+                    const message = res.body.body.message as string
+                    assert(message.includes('duplicate key error dup key'), 'Get dup message')
+                })
         })
     })
 })
