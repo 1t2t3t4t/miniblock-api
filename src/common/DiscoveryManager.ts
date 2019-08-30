@@ -104,12 +104,19 @@ export default class DiscoveryManager {
 
         locationQuery.query = query
 
+        const filterOutAddedUsers = {
+            friendRequests: {
+                $size: 0
+            }
+        }
+
         const skip = page * limit
 
         return await User
             .aggregate()
             .near(locationQuery)
             .lookup(friendRequestLookup)
+            .match(filterOutAddedUsers)
             .skip(skip)
             .limit(limit)
     }
