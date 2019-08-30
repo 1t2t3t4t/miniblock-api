@@ -10,6 +10,16 @@ export namespace DiscoveryError {
     }
 }
 
+interface DiscoveryFilter {
+    currentFeeling: CurrentFeeling,
+    maxDistance?: number,
+    page: number,
+    limit: number,
+    gender?: Gender,
+    minAge?: number,
+    maxAge?: number
+}
+
 export default class DiscoveryManager {
 
     updateLocation(user: UserModel,
@@ -24,11 +34,8 @@ export default class DiscoveryManager {
     }
 
     async discovery(user: UserModel,
-                    currentFeeling: CurrentFeeling,
-                    maxDistance: number,
-                    page: number,
-                    limit: number,
-                    gender?: Gender,): Promise<UserModel[]> {
+                    filter: DiscoveryFilter): Promise<UserModel[]> {
+        const { currentFeeling, gender, limit, maxDistance, page, minAge, maxAge } = filter
         const currentLocation = user.discoveryInfo.currentLocation
         if (isNullOrUndefined(currentLocation)) throw new DiscoveryError.NullLocation()
 
@@ -55,10 +62,22 @@ export default class DiscoveryManager {
             'userPrefInfo.showInDiscovery': true
         }
 
-        console.log(gender)
         if (!isNullOrUndefined(gender)) {
-            console.log(gender)
             query.gender = gender
+        }
+
+        if (!isNullOrUndefined(minAge) || !isNullOrUndefined(maxAge)) {
+            console.log('Hello boi')
+            query.age = {}
+
+            if (!isNullOrUndefined(minAge)) {
+                query.age.$gte = minAge
+            }
+
+            if (!isNullOrUndefined(maxAge)) {
+                query.age.$lte = maxAge
+            }
+            console.log(query)
         }
 
         locationQuery.query = query

@@ -20,9 +20,11 @@ interface DiscoveryRequest extends EnsureAuthRequest {
     query: {
         gender?: Gender
         currentFeeling: CurrentFeeling
-        maxDistance: number
-        page: number
-        limit: number
+        maxDistance: string
+        page: string
+        limit: string
+        minAge: string
+        maxAge: string
     }
 }
 
@@ -88,10 +90,13 @@ export default class DiscoveryRouterController {
     @Middleware(ensureAuthenticate)
     discovery(req: DiscoveryRequest, res: express.Response, next: express.NextFunction) {
         const user = req.user!
-        const { gender, maxDistance } = req.query
+        const { gender } = req.query
         const currentFeeling = Number(req.query.currentFeeling)
         const page = Number(req.query.page) || 0
         const limit = Number(req.query.limit) || 10
+        const maxDistance = Number(req.query.maxDistance) || undefined
+        const minAge = Number(req.query.minAge) || undefined
+        const maxAge = Number(req.query.maxAge) || undefined
 
         if (isNaN(currentFeeling)) {
             res.status(400)
@@ -99,7 +104,7 @@ export default class DiscoveryRouterController {
             return
         }
 
-        this.discoveryManager.discovery(user, currentFeeling, maxDistance, page, limit, gender)
+        this.discoveryManager.discovery(user, { currentFeeling, maxDistance, page, limit, gender, minAge, maxAge })
             .then((users) => {
                 res.status(200)
                 res.send(new HTTPResponse.Response({ users }))
