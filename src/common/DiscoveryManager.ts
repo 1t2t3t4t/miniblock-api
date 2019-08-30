@@ -67,7 +67,6 @@ export default class DiscoveryManager {
         }
 
         if (!isNullOrUndefined(minAge) || !isNullOrUndefined(maxAge)) {
-            console.log('Hello boi')
             query.age = {}
 
             if (!isNullOrUndefined(minAge)) {
@@ -77,7 +76,30 @@ export default class DiscoveryManager {
             if (!isNullOrUndefined(maxAge)) {
                 query.age.$lte = maxAge
             }
-            console.log(query)
+        }
+
+        const friendRequestLookup = {
+            from: 'friendrequests',
+            let: {
+                requested: '$_id'
+            },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $and: [
+                                {
+                                    $eq: ["$user", user._id]
+                                },
+                                {
+                                    $eq: ["$requestedUser", "$$requested"]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            as: 'friendRequests'
         }
 
         locationQuery.query = query
@@ -87,6 +109,7 @@ export default class DiscoveryManager {
         return await User
             .aggregate()
             .near(locationQuery)
+            .lookup(friendRequestLookup)
             .skip(skip)
             .limit(limit)
     }
