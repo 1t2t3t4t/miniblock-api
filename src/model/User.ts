@@ -38,6 +38,7 @@ export interface UserModel extends mongoose.Document {
     email: string
     displayName?: string
     age: number
+    description: string
     displayImageInfo?: DisplayImageInfo
     userPrefInfo: UserPreferencesInfo
     gender: Gender
@@ -84,6 +85,11 @@ const User = new Schema({
     age: {
         type: Number,
         default: 0
+    },
+    description: {
+        type: String,
+        maxlength: 256,
+        default: ""
     },
     gender: {
         type: String,
