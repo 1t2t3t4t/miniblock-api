@@ -1,4 +1,4 @@
-import {GET, RouterController} from "../../framework/annotation-restapi";
+import {GET, Middleware, RouterController} from "../../framework/annotation-restapi";
 import Post, {PostModel, PostRef, PostType} from "../../model/Post";
 import Comment, {CommentModel, CommentRef} from "../../model/Comment";
 import User, {Gender, UserModel, UserRef} from "../../model/User";
@@ -13,6 +13,8 @@ import DiscoveryManager from "../../common/DiscoveryManager";
 import {randomEnum} from "../../utils/enum";
 import {isNullOrUndefined} from "util";
 import {CurrentFeeling} from "../../model/CurrentFeeling";
+import FriendRequestDAO from "../../common/FriendRequestDAO";
+import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 
 @RouterController('/helper')
 export default class HelperRouterController {
@@ -20,6 +22,7 @@ export default class HelperRouterController {
     commentDAO = new CommentDAO()
     accountFacade = new AccountFacade()
     discoveryManager = new DiscoveryManager()
+    friendRequestDAO = new FriendRequestDAO()
 
     @GET('/clean')
     async clean(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -76,6 +79,18 @@ export default class HelperRouterController {
         }
 
         return user
+    }
+
+    @GET('/beFriend/:id')
+    @Middleware(ensureAuthenticate)
+    async beFriend(req: EnsureAuthRequest, res: express.Response, next: express.NextFunction) {
+        const user = req.user!
+        const request = await this.friendRequestDAO.createFriendRequest(user, req.params.id)
+        const accept = await this.friendRequestDAO.friendRequestAccept(request._id.toString())
+
+        res.send({
+            accept
+        })
     }
 
     @GET('/stubPost')

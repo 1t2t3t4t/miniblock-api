@@ -6,6 +6,7 @@ import DiscoveryManager from "../../src/common/DiscoveryManager";
 import {Category} from "../../src/model/Categories";
 import {CurrentFeeling} from "../../src/model/CurrentFeeling";
 import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
+import FriendRequestDAO from "../../src/common/FriendRequestDAO";
 
 const DBManager = require('../DBManager')
 
@@ -337,5 +338,76 @@ describe('Discovery endpoint', () => {
                     assert(message.includes('duplicate key error dup key'), 'Get dup message')
                 })
         })
+    })
+
+    describe('Complex discovery query', () => {
+
+        const dbManager = new DBManager()
+        const manager = new AppTestManager()
+        const friendRequestDAO = new FriendRequestDAO()
+        const path = '/v1/discovery'
+
+        let users: UserModel[] = []
+
+        before( async () => {
+            await dbManager.start()
+            // liked user
+            users.push({
+                uid: "2",
+                email: "a@a.com",
+                displayName: "2",
+                age: 20,
+                gender: Gender.MALE,
+                currentFeeling: [CurrentFeeling.Relationships],
+                discoveryInfo: {
+                    currentLocation: {
+                        coordinates: [69, 45]
+                    },
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
+                }
+            } as UserModel)
+            // already friend
+            users.push({
+                uid: "3",
+                email: "a@b.com",
+                age: 60,
+                displayName: "3",
+                gender: Gender.MALE,
+                currentFeeling: [CurrentFeeling.Loneliness, CurrentFeeling.Relationships],
+                discoveryInfo: {
+                    currentLocation: {
+                        coordinates: [69.5, 45.5]
+                    }
+                },
+                userPrefInfo: {
+                    showInDiscovery: true
+                }
+            } as UserModel)
+            users = await User.insertMany(users)
+            const requestA = await friendRequestDAO.createFriendRequest(dbManager.defaultUser, users[0]._id.toString())
+            const requestB = await friendRequestDAO.createFriendRequest(dbManager.defaultUser, users[1]._id.toString())
+            await friendRequestDAO.friendRequestAccept(requestB._id.toString())
+        })
+
+        after(() => {
+            dbManager.stop()
+        })
+
+        it('get no users for liked and already friend users', async () => {
+            const dis = new DiscoveryManager()
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
+            await User.ensureIndexes()
+            await manager.agent
+                .get(path + '?currentFeeling=' + Category.Relationships)
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const u: UserModel[] = res.body.body.users
+                    assert.deepEqual(u.length, 0)
+                })
+        })
+
     })
 })
