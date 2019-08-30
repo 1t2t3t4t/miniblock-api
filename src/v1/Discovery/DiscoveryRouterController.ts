@@ -5,6 +5,7 @@ import {Gender} from "../../model/User";
 import DiscoveryManager from "../../common/DiscoveryManager";
 import AccountFacade from "../../common/AccountFacade";
 import {CurrentFeeling} from "../../model/CurrentFeeling";
+import FriendRequestDAO from "../../common/FriendRequestDAO";
 
 const HTTPResponse = require('../../model/HTTPResponse');
 
@@ -19,9 +20,11 @@ interface DiscoveryRequest extends EnsureAuthRequest {
     query: {
         gender?: Gender
         currentFeeling: CurrentFeeling
-        maxDistance: number
-        page: number
-        limit: number
+        maxDistance: string
+        page: string
+        limit: string
+        minAge: string
+        maxAge: string
     }
 }
 
@@ -35,7 +38,7 @@ interface LikeDiscoveryRequest extends EnsureAuthRequest {
 export default class DiscoveryRouterController {
 
     discoveryManager = new DiscoveryManager()
-    accountFacade = new AccountFacade()
+    friendRequestDAO = new FriendRequestDAO()
 
     /**
      * @api {PUT} /v1/discovery/currentLocation Update current location
@@ -87,10 +90,13 @@ export default class DiscoveryRouterController {
     @Middleware(ensureAuthenticate)
     discovery(req: DiscoveryRequest, res: express.Response, next: express.NextFunction) {
         const user = req.user!
-        const { gender, maxDistance } = req.query
+        const { gender } = req.query
         const currentFeeling = Number(req.query.currentFeeling)
         const page = Number(req.query.page) || 0
         const limit = Number(req.query.limit) || 10
+        const maxDistance = Number(req.query.maxDistance) || undefined
+        const minAge = Number(req.query.minAge) || undefined
+        const maxAge = Number(req.query.maxAge) || undefined
 
         if (isNaN(currentFeeling)) {
             res.status(400)
@@ -98,7 +104,7 @@ export default class DiscoveryRouterController {
             return
         }
 
-        this.discoveryManager.discovery(user, currentFeeling, maxDistance, page, limit, gender)
+        this.discoveryManager.discovery(user, { currentFeeling, maxDistance, page, limit, gender, minAge, maxAge })
             .then((users) => {
                 res.status(200)
                 res.send(new HTTPResponse.Response({ users }))
@@ -125,7 +131,7 @@ export default class DiscoveryRouterController {
         const user = req.user!
         const userId = req.params.userId
 
-        this.accountFacade.createFriendRequest(user, userId)
+        this.friendRequestDAO.createFriendRequest(user, userId)
             .then((friendRequest) => {
             res.status(200)
             res.send(new HTTPResponse.Response({ friendRequest }))

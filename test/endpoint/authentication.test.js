@@ -11,7 +11,7 @@ describe('POST v1/account/register', () => {
 
     before((next) => {
         dbManager.start().then(() => {
-                next()
+            next()
         }).catch((e) => {
             console.log(e)
         })
