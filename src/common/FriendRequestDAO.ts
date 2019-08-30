@@ -25,6 +25,7 @@ export default class FriendRequestDAO {
 
     async createFriendRequest(fromUser: UserModel,
                               toUserId: string): Promise<FriendRequestModel> {
+        console.log(fromUser, toUserId)
         const request = FriendRequest.create({
             user: fromUser,
             requestedUser: toUserId

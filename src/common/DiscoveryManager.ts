@@ -102,10 +102,37 @@ export default class DiscoveryManager {
             as: 'friendRequests'
         }
 
+        const chatRoomLookup = {
+            from: 'chatrooms',
+            let: {
+                requested: '$_id'
+            },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $and: [
+                                {
+                                    $in: [user._id, "$users"]
+                                },
+                                {
+                                    $in: ["$$requested", "$users"]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            as: 'chatRooms'
+        }
+
         locationQuery.query = query
 
         const filterOutAddedUsers = {
             friendRequests: {
+                $size: 0
+            },
+            chatRooms: {
                 $size: 0
             }
         }
@@ -116,6 +143,7 @@ export default class DiscoveryManager {
             .aggregate()
             .near(locationQuery)
             .lookup(friendRequestLookup)
+            .lookup(chatRoomLookup)
             .match(filterOutAddedUsers)
             .skip(skip)
             .limit(limit)
