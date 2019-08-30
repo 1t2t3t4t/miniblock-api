@@ -77,6 +77,7 @@ describe('Discovery endpoint', () => {
                 uid: "2",
                 email: "a@a.com",
                 displayName: "2",
+                age: 20,
                 gender: Gender.MALE,
                 currentFeeling: [CurrentFeeling.Relationships],
                 discoveryInfo: {
@@ -91,6 +92,7 @@ describe('Discovery endpoint', () => {
             users.push({
                 uid: "3",
                 email: "a@b.com",
+                age: 60,
                 displayName: "3",
                 gender: Gender.MALE,
                 currentFeeling: [CurrentFeeling.Loneliness, CurrentFeeling.Relationships],
@@ -107,6 +109,7 @@ describe('Discovery endpoint', () => {
                 uid: "4",
                 email: "a@c.com",
                 displayName: "4",
+                age: 20,
                 gender: Gender.FEMALE,
                 currentFeeling: [CurrentFeeling.Loneliness],
                 discoveryInfo: {
@@ -123,6 +126,7 @@ describe('Discovery endpoint', () => {
                 uid: "5",
                 email: "b@c.com",
                 displayName: "5",
+                age: 20,
                 gender: Gender.OTHER,
                 currentFeeling: [CurrentFeeling.Relationships],
                 userPrefInfo: {
@@ -134,6 +138,7 @@ describe('Discovery endpoint', () => {
                 uid: "6",
                 email: "a@def.com",
                 displayName: '6',
+                age: 20,
                 gender: Gender.FEMALE,
                 currentFeeling: [CurrentFeeling.Loneliness],
                 userPrefInfo: {
@@ -145,6 +150,7 @@ describe('Discovery endpoint', () => {
                 uid: "7",
                 email: "b@cefs.com",
                 displayName: "7",
+                age: 20,
                 gender: Gender.OTHER,
                 currentFeeling: [CurrentFeeling.Relationships],
                 discoveryInfo: {
@@ -237,6 +243,38 @@ describe('Discovery endpoint', () => {
                     assert(u[0].currentFeeling.includes(CurrentFeeling.Loneliness))
                     assert.deepEqual(u[0].gender, Gender.FEMALE)
                     assert.deepEqual(u[0].uid, "4")
+                })
+        })
+
+        it('get users with minAge', async () => {
+            const dis = new DiscoveryManager()
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
+            await User.ensureIndexes()
+            await manager.agent
+                .get(path + '?currentFeeling=' + Category.Relationships + '&minAge=50')
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const u: UserModel[] = res.body.body.users
+                    assert.deepEqual(u.length, 1)
+                    assert(u[0].currentFeeling.includes(CurrentFeeling.Relationships))
+                    assert.deepEqual(u[0].uid, "3")
+                })
+        })
+
+        it('get users with maxAge', async () => {
+            const dis = new DiscoveryManager()
+            await dis.updateLocation(dbManager.defaultUser, 0, 0)
+            await User.ensureIndexes()
+            await manager.agent
+                .get(path + '?currentFeeling=' + Category.Relationships + '&maxAge=24')
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const u: UserModel[] = res.body.body.users
+                    assert.deepEqual(u.length, 1)
+                    assert(u[0].currentFeeling.includes(CurrentFeeling.Relationships))
+                    assert.deepEqual(u[0].uid, "2")
                 })
         })
     })
