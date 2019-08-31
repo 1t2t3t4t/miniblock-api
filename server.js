@@ -25,7 +25,9 @@ admin.initializeApp({
 	databaseURL: "https://lovesick-react.firebaseio.com"
 })
 
-app.use(Analytics.shared.logTimeMiddleware.bind(Analytics.shared))
+if (env != "test") {
+	app.use(Analytics.shared.logTimeMiddleware.bind(Analytics.shared))
+}
 
 app.use(bodyParser.json())
 app.use((req, res, next) => {
