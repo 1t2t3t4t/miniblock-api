@@ -15,6 +15,8 @@ import {isNullOrUndefined} from "util";
 import {CurrentFeeling} from "../../model/CurrentFeeling";
 import FriendRequestDAO from "../../common/FriendRequestDAO";
 import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
+import randomName from "../../utils/nameGenerator";
+import randomValue from "../../utils/randomizer";
 
 @RouterController('/helper')
 export default class HelperRouterController {
@@ -46,6 +48,7 @@ export default class HelperRouterController {
         } else {
             const length = Number(req.query.length)
             for(let i=0;i<length;i++) {
+                console.log("stubbing", i)
                 users.push(await this.addUser())
             }
         }
@@ -58,7 +61,7 @@ export default class HelperRouterController {
     private async addUser(): Promise<UserModel> {
         const mockLocation = Math.random() <= 0.5
         const email = stringGenerator(10) + '@gmail.com'
-        const displayName = stringGenerator(10) + ' mockedLocation: ' + mockLocation
+        const displayName = 'mocked ' + randomName()
         const uid = stringGenerator(10)
         const user = await this.accountFacade.register(email, displayName, uid)
         const age = Math.ceil(Math.random() * 10) + 18
@@ -69,7 +72,11 @@ export default class HelperRouterController {
             currentFeeling.pop()
         }
 
-        await this.accountFacade.updateProfile(user, { currentFeeling, gender, age })
+        const imageArray = ["posts/images/bb28fb10-cc17-11e9-bf6c-1389d03944c5.png"]
+
+        let image = Math.random() <= 0.8 ? randomValue(imageArray) : undefined
+
+        await this.accountFacade.updateProfile(user, { currentFeeling, gender, age, image })
         if (mockLocation) {
             await this.accountFacade.updateProfile(user, { showInDiscovery: true })
             // 13.75398, 100.50144 is Bangkok Lat and Long
