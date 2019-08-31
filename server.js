@@ -1,5 +1,7 @@
 import {register} from './src/framework/annotation-restapi'
 import HelperRouterController from "./src/v1/Helper";
+import TestRouterController from './src/framework/annotation-restapi/test-endpoint'
+import Analytics from "./src/analytics/Analytics"
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -21,7 +23,11 @@ const serviceAccount = require("./lovesick-react-firebase-adminsdk-vndcv-1c91db8
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 	databaseURL: "https://lovesick-react.firebaseio.com"
-});
+})
+
+if (env != "test") {
+	app.use(Analytics.shared.logTimeMiddleware.bind(Analytics.shared))
+}
 
 app.use(bodyParser.json())
 app.use((req, res, next) => {
@@ -36,8 +42,6 @@ app.use((req, res, next) => {
 if (env != 'production') {
 	register(app, HelperRouterController)
 }
-
-import TestRouterController from './src/framework/annotation-restapi/test-endpoint'
 
 if (env == 'test') {
 	console.log('REGISTER TEST ROUTE')
