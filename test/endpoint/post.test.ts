@@ -203,8 +203,12 @@ describe('Edit post', () => {
                 const body: any = res.body!
                 assert.notDeepEqual(body.body.post, undefined)
                 const post: PostModel = body.body!.post
-                assert.deepEqual(post.authInfo, undefined)
-                assert.deepEqual(post.likeInfo.isLiked, undefined)
+
+                assert.deepEqual(post.authInfo!.canDelete, true)
+                assert.deepEqual(post.authInfo!.canEdit, true)
+                assert.deepEqual(post.authInfo!.canSeeProfile, true)
+                assert.deepEqual(post.likeInfo.isLiked, false)
+
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, title)
                 assert.deepEqual(post.content.text, newText)

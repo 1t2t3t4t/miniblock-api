@@ -52,6 +52,8 @@ export default class PostDAO {
             post.categoryId = categoryId
         }
 
+        post.setInteractor(interactor)
+
         return post.save()
     }
 

@@ -14,7 +14,7 @@ export default class Analytics {
         res.on("finish", () => {
             const elapsedHrTime = process.hrtime(startHrTime)
             const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6
-            const path = req.path
+            const path = req.originalUrl
             console.log("%s : %fms", path, elapsedTimeInMs)
             this.recordResponseTime(path, elapsedTimeInMs)
         })
