@@ -8,6 +8,7 @@ enum MessageType {
 }
 
 export interface MessageInfo {
+    chatRoom: mongoose.Types.ObjectId
     type: MessageType
     content: string
 }
@@ -17,6 +18,11 @@ export interface MessageModel extends Document {
 }
 
 const Message = new Schema({
+    chatRoom: {
+        type: Schema.Types.ObjectId,
+        ref: 'ChatRoom',
+        required: true
+    },
     messageInfo: {
         type: {
             type: String,
