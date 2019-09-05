@@ -42,6 +42,21 @@ export default class ChatRouterController {
             })
     }
 
+    /**
+     * @api {POST} /v1/chats/message Post message to chat
+     * @apiDescription Post new message to chat
+     * @apiGroup Chat
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiParam {String} chatRoomId Id of chatRoom
+     * @apiParam {String} type Type of message (currently only have text)
+     * @apiParam {String} content Content of the message
+     *
+     * @apiSuccess {ChatRoom} chatRoom ChatRoom model with latestMessageInfo
+     *
+     * */
     @POST('/message')
     @Middleware(ensureAuthenticate)
     postMessage(req: PostChatMessage, res: express.Response, next: express.NextFunction) {

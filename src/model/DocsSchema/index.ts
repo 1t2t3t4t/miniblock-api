@@ -250,15 +250,46 @@
  * @apiGroup Schema
  * @apiExample chat room schema
  users: [
-    {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }
+ {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
  ],
  chatRoomId: {
-    type: String,
-    required: true,
-    index: true
-}
+        type: String,
+        required: true,
+        index: true
+    },
+ latestMessageInfo: {
+        type: MessageSchema
+ }
+ *
+ * */
+
+/**
+ * @api {GET} message Message Schema
+ * @apiGroup Schema
+ * @apiExample message schema
+ chatRoom: {
+        type: Schema.Types.ObjectId,
+        ref: 'ChatRoom',
+        required: true
+    },
+ messageInfo: {
+        sender: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        type: {
+            type: String,
+            required: true,
+            enum: toEnumArray<string>(MessageType)
+        },
+        content: {
+            type: String,
+            required: true
+        }
+    }
  *
  * */
