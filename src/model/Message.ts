@@ -4,7 +4,7 @@ import {UserRef} from "./User";
 
 const Schema = mongoose.Schema
 
-enum MessageType {
+export enum MessageType {
     TEXT = 'text'
 }
 
@@ -45,4 +45,5 @@ const Message = new Schema({
     timestamps: true
 })
 
+export const MessageSchema = Message
 export default mongoose.model<MessageModel>("Message", Message)

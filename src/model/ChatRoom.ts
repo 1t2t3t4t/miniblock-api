@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
-import Message from "./Message";
+import {MessageModel, MessageSchema} from "./Message";
 
 export interface ChatRoomModel extends mongoose.Document {
     users: mongoose.Types.ObjectId[],
-    chatRoomId: string
+    chatRoomId: string,
+    latestMessageInfo: MessageModel
 }
 
 const ChatRoom = new mongoose.Schema({
@@ -19,7 +20,7 @@ const ChatRoom = new mongoose.Schema({
         index: true
     },
     latestMessageInfo: {
-        type: Message
+        type: MessageSchema
     }
 })
 
