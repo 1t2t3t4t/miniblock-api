@@ -1,5 +1,6 @@
 import mongoose, {Document} from 'mongoose'
 import {toEnumArray} from "../utils/enum";
+import {UserRef} from "./User";
 
 const Schema = mongoose.Schema
 
@@ -8,12 +9,13 @@ enum MessageType {
 }
 
 export interface MessageInfo {
-    chatRoom: mongoose.Types.ObjectId
+    sender: UserRef
     type: MessageType
     content: string
 }
 
 export interface MessageModel extends Document {
+    chatRoom: mongoose.Types.ObjectId
     messageInfo: MessageInfo
 }
 
@@ -24,10 +26,15 @@ const Message = new Schema({
         required: true
     },
     messageInfo: {
+        sender: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
         type: {
             type: String,
             required: true,
-            enum: toEnumArray(MessageType)
+            enum: toEnumArray<string>(MessageType)
         },
         content: {
             type: String,
