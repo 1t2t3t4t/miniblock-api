@@ -26,4 +26,6 @@ const ChatRoom = new mongoose.Schema({
 
 ChatRoom.index({ users: 1 })
 
+ChatRoom.index({ users: 1, 'latestMessageInfo.createdAt': -1 })
+
 export default mongoose.model<ChatRoomModel>('ChatRoom', ChatRoom)
