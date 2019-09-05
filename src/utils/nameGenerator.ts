@@ -17,5 +17,3 @@ const names = [
 export default function randomName() {
     return randomValue(names) + ' ' + randomValue(names) + ' ' + stringGenerator(3)
 }
-
-console.log(randomName())

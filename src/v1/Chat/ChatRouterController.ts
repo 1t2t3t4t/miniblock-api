@@ -47,8 +47,8 @@ export default class ChatRouterController {
     postMessage(req: PostChatMessage, res: express.Response, next: express.NextFunction) {
         const user = req.user!
         this.chatRoomDAO.postMessage(user, req.body.chatRoomId, req.body)
-            .then((message) => {
-                res.status(200).send(new HTTPResponse.Response({ message }))
+            .then((chatRoom) => {
+                res.status(200).send(new HTTPResponse.Response({ chatRoom }))
             }).catch((e) => {
             res.status(500)
             next(e)

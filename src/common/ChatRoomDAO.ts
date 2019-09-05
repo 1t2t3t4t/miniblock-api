@@ -39,7 +39,7 @@ export default class ChatRoomDAO {
         return ChatRoom.find({ users: user._id }).populate('users')
     }
 
-    async postMessage(user: UserModel, chatRoomId: string, messageParams: MessageParams): Promise<MessageModel> {
+    async postMessage(user: UserModel, chatRoomId: string, messageParams: MessageParams): Promise<ChatRoomModel> {
         const chatRoom = await ChatRoom.findOne({ _id: chatRoomId })
         if (!chatRoom) throw new ChatRoomError.ChatRoomNotFound()
         if (!await this.isInChatRoom(user, chatRoom)) throw new ChatRoomError.NotInChatRoom()
@@ -55,9 +55,8 @@ export default class ChatRoomDAO {
 
         message = await message.save()
         chatRoom.latestMessageInfo = message
-        await chatRoom.save()
 
-        return message
+        return await chatRoom.save()
     }
 
     private async isInChatRoom(user: UserModel, chatRoom: ChatRoomModel): Promise<boolean> {
