@@ -1,10 +1,18 @@
-import {GET, Middleware, RouterController} from "../../framework/annotation-restapi";
-import {ensureAuthenticate} from "../../middleware";
-import {FeedQueryRequest} from "../Feed/FeedRouterController";
+import {GET, Middleware, POST, RouterController} from "../../framework/annotation-restapi";
+import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
 import express from 'express'
 import ChatRoomDAO from "../../common/ChatRoomDAO";
+import {MessageInfo, MessageType} from "../../model/Message";
 
 const HTTPResponse = require('../../model/HTTPResponse');
+
+interface PostChatMessage extends EnsureAuthRequest {
+    body: {
+        chatRoomId: string
+        type: MessageType
+        content: string
+    }
+}
 
 @RouterController('/')
 export default class ChatRouterController {
@@ -24,7 +32,7 @@ export default class ChatRouterController {
      * */
     @GET('/')
     @Middleware(ensureAuthenticate)
-    all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
+    all(req: EnsureAuthRequest, res: express.Response, next: express.NextFunction) {
         this.chatRoomDAO.get(req.user!)
             .then((chatRooms) => {
                 res.status(200).send(new HTTPResponse.Response({ chatRooms }))
@@ -33,4 +41,33 @@ export default class ChatRouterController {
                 next(e)
             })
     }
+
+    /**
+     * @api {POST} /v1/chats/message Post message to chat
+     * @apiDescription Post new message to chat
+     * @apiGroup Chat
+     * @apiPermission loggedIn
+     *
+     * @apiHeader {String} Authorization Token string from Firebase
+     *
+     * @apiParam {String} chatRoomId Id of chatRoom
+     * @apiParam {String} type Type of message (currently only have text)
+     * @apiParam {String} content Content of the message
+     *
+     * @apiSuccess {ChatRoom} chatRoom ChatRoom model with latestMessageInfo
+     *
+     * */
+    @POST('/message')
+    @Middleware(ensureAuthenticate)
+    postMessage(req: PostChatMessage, res: express.Response, next: express.NextFunction) {
+        const user = req.user!
+        this.chatRoomDAO.postMessage(user, req.body.chatRoomId, req.body)
+            .then((chatRoom) => {
+                res.status(200).send(new HTTPResponse.Response({ chatRoom }))
+            }).catch((e) => {
+                res.status(500)
+                next(e)
+        })
+    }
+
 }
