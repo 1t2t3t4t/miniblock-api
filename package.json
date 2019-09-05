@@ -9,6 +9,7 @@
     "build": "rm -rf build && tsc",
     "staging": "ENV=staging ts-node server",
     "test": "ENV=test nyc --reporter=text mocha --retries 3 --timeout 10000 --require ts-node/register --exit ./test/**/*.test.{js,ts}",
+    "mocha": "ENV=test mocha --timeout 10000 --require ts-node/register --exit",
     "postinstall": "link-module-alias",
     "gen-doc": "apidoc -i src/ -o docs/ && open docs/index.html",
     "tsc": "tsc"

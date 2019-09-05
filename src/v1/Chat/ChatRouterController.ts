@@ -50,8 +50,8 @@ export default class ChatRouterController {
             .then((chatRoom) => {
                 res.status(200).send(new HTTPResponse.Response({ chatRoom }))
             }).catch((e) => {
-            res.status(500)
-            next(e)
+                res.status(500)
+                next(e)
         })
     }
 

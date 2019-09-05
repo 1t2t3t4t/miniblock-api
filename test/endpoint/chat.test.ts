@@ -5,7 +5,7 @@ import ChatRoom, {ChatRoomModel} from "../../src/model/ChatRoom";
 import assert from "assert";
 import FriendRequestDAO from "../../src/common/FriendRequestDAO";
 import {ObjectID} from "bson";
-import {ChatRoomError} from "../../src/common/ChatRoomDAO";
+import ChatRoomDAO, {ChatRoomError} from "../../src/common/ChatRoomDAO";
 import Message, {MessageModel, MessageType} from "../../src/model/Message";
 
 const DBManager = require('../DBManager')
@@ -17,17 +17,21 @@ describe('Chat endpoints', () => {
         const dbManager = new DBManager()
         const manager = new AppTestManager()
         const account = new AccountFacade()
-        const facade = new FriendRequestDAO()
+        const chatRoomDAO = new ChatRoomDAO()
         const path = '/v1/chats'
 
         let user: UserModel
         let chat: ChatRoomModel
 
+        let userB: UserModel
+        let chatB: ChatRoomModel
+
         before( async () => {
             await dbManager.start()
             user = await account.register('a@a.com', 'a', 'a')
-            const friendRequest = await facade.createFriendRequest(user, dbManager.defaultUser._id.toString())
-            chat = await facade.friendRequestAccept(friendRequest._id.toString())
+            chat = await chatRoomDAO.create([user, dbManager.defaultUser])
+            userB = await account.register('b@b.com', 'b', 'b')
+            chatB = await chatRoomDAO.create([userB, dbManager.defaultUser])
         })
 
         after(() => {
@@ -41,12 +45,47 @@ describe('Chat endpoints', () => {
                 .expect(200)
                 .expect((res) => {
                     const chatRooms = res.body.body.chatRooms as ChatRoomModel[]
-                    assert.deepEqual(chatRooms.length, 1)
+                    assert.deepEqual(chatRooms.length, 2)
+                    assert.deepEqual(chatRooms[0]._id, chat._id.toString())
+                    assert.deepEqual(chatRooms[1]._id, chatB._id.toString())
                     assert.deepEqual(chatRooms[0].users.length, 2)
                     const users = res.body.body.chatRooms[0].users as UserModel[]
                     const userIds = users.map((user) => user._id.toString())
                     assert(userIds.includes(dbManager.defaultUser._id.toString()), 'Contains user 1')
                     assert(userIds.includes(user._id.toString()), 'Contains user 2')
+                })
+        })
+
+        it('sort chatRoom by latestMessage', async () => {
+            const messageParams = {
+                content: 'content',
+                type: MessageType.TEXT
+            }
+
+            await manager.agent
+                .get(path)
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const chatRooms = res.body.body.chatRooms as ChatRoomModel[]
+                    assert.deepEqual(chatRooms.length, 2)
+                    assert.deepEqual(chatRooms[0]._id, chat._id.toString())
+                    assert.deepEqual(chatRooms[1]._id, chatB._id.toString())
+                })
+
+            await chatRoomDAO.postMessage(dbManager.defaultUser, chatB._id.toString(), messageParams)
+
+            await manager.agent
+                .get(path)
+                .set(dbManager.authHeader)
+                .expect(200)
+                .expect((res) => {
+                    const chatRooms = res.body.body.chatRooms as ChatRoomModel[]
+                    assert.deepEqual(chatRooms.length, 2)
+                    assert.deepEqual(chatRooms[0]._id, chatB._id.toString())
+                    assert.deepEqual(chatRooms[0].latestMessageInfo.messageInfo.type, MessageType.TEXT)
+                    assert.deepEqual(chatRooms[0].latestMessageInfo.messageInfo.content, 'content')
+                    assert.deepEqual(chatRooms[1]._id, chat._id.toString())
                 })
         })
     })
@@ -56,7 +95,7 @@ describe('Chat endpoints', () => {
         const dbManager = new DBManager()
         const manager = new AppTestManager()
         const account = new AccountFacade()
-        const facade = new FriendRequestDAO()
+        const chatRoomDAO = new ChatRoomDAO()
         const path = '/v1/chats/message'
 
         let user: UserModel
@@ -65,8 +104,7 @@ describe('Chat endpoints', () => {
         before( async () => {
             await dbManager.start()
             user = await account.register('a@a.com', 'a', 'a')
-            const friendRequest = await facade.createFriendRequest(user, dbManager.defaultUser._id.toString())
-            chat = await facade.friendRequestAccept(friendRequest._id.toString())
+            chat = await chatRoomDAO.create([user, dbManager.defaultUser])
         })
 
         after(() => {

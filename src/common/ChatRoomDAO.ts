@@ -36,7 +36,9 @@ export default class ChatRoomDAO {
     }
 
     async get(user: UserModel): Promise<ChatRoomModel[]> {
-        return ChatRoom.find({ users: user._id }).populate('users')
+        return ChatRoom.find({ users: user._id })
+            .populate('users')
+            .sort({ 'latestMessageInfo.createdAt': 'desc' })
     }
 
     async postMessage(user: UserModel, chatRoomId: string, messageParams: MessageParams): Promise<ChatRoomModel> {
