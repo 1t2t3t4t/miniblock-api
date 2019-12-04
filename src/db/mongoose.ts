@@ -20,6 +20,8 @@ switch (env) {
         break;
 }
 
+console.log(mongoURI)
+
 mongoose.connect(mongoURI, {
     useUnifiedTopology: true,
     useCreateIndex: true,
