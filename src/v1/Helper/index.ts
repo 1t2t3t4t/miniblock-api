@@ -9,7 +9,6 @@ import AuthenticationFacade from '../../common/AccountFacade';
 import CommentDAO from "../../common/CommentDAO";
 import AccountFacade from "../../common/AccountFacade";
 import stringGenerator from "../../utils/stringGenerator";
-import DiscoveryManager from "../../common/DiscoveryManager";
 import {randomEnum} from "../../utils/enum";
 import {isNullOrUndefined} from "util";
 import {CurrentFeeling} from "../../model/CurrentFeeling";
@@ -23,7 +22,6 @@ export default class HelperRouterController {
 
     commentDAO = new CommentDAO()
     accountFacade = new AccountFacade()
-    discoveryManager = new DiscoveryManager()
     friendRequestDAO = new FriendRequestDAO()
 
     @GET('/clean')
@@ -59,7 +57,6 @@ export default class HelperRouterController {
     }
 
     private async addUser(): Promise<UserModel> {
-        const mockLocation = Math.random() <= 0.5
         const email = stringGenerator(10) + '@gmail.com'
         const displayName = 'mocked ' + randomName()
         const uid = stringGenerator(10)
@@ -77,13 +74,6 @@ export default class HelperRouterController {
         let image = Math.random() <= 0.8 ? randomValue(imageArray) : undefined
 
         await this.accountFacade.updateProfile(user, { currentFeeling, gender, age, image })
-        if (mockLocation) {
-            await this.accountFacade.updateProfile(user, { showInDiscovery: true })
-            // 13.75398, 100.50144 is Bangkok Lat and Long
-            const latitude = 13.75398 + Math.random()
-            const longitude = 100.50144 + Math.random()
-            await this.discoveryManager.updateLocation(user, latitude, longitude)
-        }
 
         return user
     }

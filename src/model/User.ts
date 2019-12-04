@@ -2,11 +2,9 @@ import mongoose, {Model} from 'mongoose'
 import {isNullOrUndefined} from "util";
 import {toEnumArray} from "../utils/enum";
 import {Category} from "./Categories";
-import Location, {LocationInfo} from "./Location";
 import {anonymousDisplayName} from "../utils/userHelper";
 import {CurrentFeeling} from "./CurrentFeeling";
 import FriendRequest, {FriendRequestModel} from "./FriendRequest";
-import ChatRoom from "./ChatRoom";
 
 const Schema = mongoose.Schema
 
@@ -20,14 +18,6 @@ export interface DisplayImageInfo {
     image: string
 }
 
-export interface UserPreferencesInfo {
-    showInDiscovery: boolean
-}
-
-export interface DiscoveryInfo {
-    currentLocation?: LocationInfo
-}
-
 export interface AnonymousInfo {
     displayName: string
 }
@@ -39,12 +29,10 @@ export interface UserModel extends mongoose.Document {
     displayName?: string
     age: number
     description: string
-    displayImageInfo?: DisplayImageInfo
-    userPrefInfo: UserPreferencesInfo
+    displayImageInfo?: DisplayImageInfo 
     gender: Gender
     currentFeeling: CurrentFeeling[]
-    discoveryInfo: DiscoveryInfo,
-    anonymousInfo: AnonymousInfo,
+    anonymousInfo: AnonymousInfo
     isFriend?: boolean
 
     setInteractor: (interactor: UserModel) => Promise<boolean>
@@ -102,18 +90,6 @@ const User = new Schema({
             enum: toEnumArray(CurrentFeeling)
         }
     ],
-    discoveryInfo: {
-        currentLocation: {
-            type: Location,
-            default: null
-        }
-    },
-    userPrefInfo: {
-        showInDiscovery: {
-            type: Boolean,
-            default: false
-        }
-    },
     anonymousInfo: {
         displayName: {
             type: String
@@ -131,9 +107,6 @@ User.pre('save', function (this: UserModel)  {
     }
 })
 
-User.index({ currentFeeling: 1, 'userPrefInfo.showInDiscovery': 1, 'discoveryInfo.currentLocation': '2dsphere' },
-    { name: "discovery_index" })
-
 User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>, uid: string) {
     if (!uid) throw Error('uid is missing')
 
@@ -141,10 +114,9 @@ User.statics.findByUID = async function(this: Model<UserModel, UserModelHelper>,
 }
 
 User.methods.setInteractor = async function(this: UserModel, interactor: UserModel) {
-    const isFriendRequest = await !isNullOrUndefined(FriendRequest.find({ user: interactor, requestedUser: this }))
-    const isFriend = await !isNullOrUndefined(ChatRoom.findOne({ users: [this, interactor] }))
+    const isFriendRequest = !isNullOrUndefined(await FriendRequest.find({ user: interactor, requestedUser: this }))
 
-    this.isFriend = isFriend || isFriendRequest
+    this.isFriend = isFriendRequest
 }
 
 export function isUserModel(user: UserRef): user is UserModel {

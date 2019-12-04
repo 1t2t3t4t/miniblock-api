@@ -21,6 +21,7 @@ class DBManager {
     async start() {
         this.uri = await this.server.getConnectionString()
         this.connection = await mongooseDB.connect(this.uri, {
+            useUnifiedTopology: true,
             useCreateIndex: true,
             useNewUrlParser: true
         })

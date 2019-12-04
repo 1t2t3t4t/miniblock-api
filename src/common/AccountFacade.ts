@@ -7,7 +7,6 @@ interface UpdateProfileParams {
     image?: string,
     age?: number,
     description?: string,
-    showInDiscovery?: boolean,
     gender?: Gender,
     currentFeeling?: CurrentFeeling[]
 }
@@ -20,7 +19,7 @@ class AccountFacade {
     }
     
     async updateProfile(user: UserModel, params: UpdateProfileParams): Promise<UserModel> {
-        const { displayName, image, age, showInDiscovery, gender, currentFeeling, description } = params
+        const { displayName, image, age, gender, currentFeeling, description } = params
 
         if (displayName) {
             user.displayName = displayName
@@ -37,11 +36,7 @@ class AccountFacade {
         if (image) {
             user.displayImageInfo = { image }
         }
-
-        if (!isNullOrUndefined(showInDiscovery)) {
-            user.userPrefInfo.showInDiscovery = showInDiscovery
-        }
-
+        
         if (gender) {
             user.gender = gender
         }

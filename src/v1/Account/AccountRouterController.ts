@@ -91,7 +91,6 @@ export default class AccountRouterController {
      * @apiParam {String} [gender] User gender
      * @apiParam {Int} [age] User age
      * @apiParam {[Int]} [currentFeeling] Array user current feeling
-     * @apiParam {Boolean} [showInDiscovery] User's desire to be shown in discovery mode
      *
      * @apiSuccess {User} user User model
      *

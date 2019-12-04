@@ -57,27 +57,11 @@
             enum: toEnumArray(CurrentFeeling)
         }
  ],
- discoveryInfo: {
-        currentLocation: {
-            type: Location,
-            default: null
-        }
-    },
- userPrefInfo: {
-        showInDiscovery: {
-            type: Boolean,
-            default: true
-        }
-    },
  anonymousInfo: {
         displayName: {
             type: String
         }
     }
- distance: {
-    type: Number
-    note: "only available in discovery mode in km unit"
- }
  *
  * */
 

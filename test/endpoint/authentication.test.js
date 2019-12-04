@@ -34,7 +34,6 @@ describe('POST v1/account/register', () => {
             .expect((res) => {
                 assert(res.body.body !== undefined)
                 assert(res.body.body.user !== undefined)
-                assert(res.body.body.user.discoveryInfo.currentLocation === null)
                 assert.deepEqual(res.body.body.user.anonymousInfo.displayName, 'txxxr')
             })
             .end(done)

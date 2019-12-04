@@ -1,6 +1,5 @@
 import {UserModel} from "../model/User";
 import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../model/FriendRequest";
-import ChatRoomDAO from "./ChatRoomDAO";
 
 export namespace FriendRequestError {
     export class RequestNotFound extends Error {
@@ -11,9 +10,7 @@ export namespace FriendRequestError {
         message = 'User already added'
     }
 }
-export default class FriendRequestDAO {
-
-    private chatRoomDAO = new ChatRoomDAO()
+export default class FriendRequestDAO { 
 
     async friendRequests(user: UserModel) {
         const requests = await FriendRequest
@@ -48,11 +45,9 @@ export default class FriendRequestDAO {
 
         request.status = FriendRequestStatus.Accept
 
-        const chatRoom = await this.chatRoomDAO.create([request.user, request.requestedUser])
-
         await request.remove()
 
-        return chatRoom
+        return request
     }
 
 }

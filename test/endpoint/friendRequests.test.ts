@@ -1,13 +1,10 @@
 import AppTestManager from "../AppTestManager";
 import assert from 'assert'
-import {LocationInfo} from "../../src/model/Location";
 import User, {Gender, UserModel} from "../../src/model/User";
-import DiscoveryManager from "../../src/common/DiscoveryManager";
 import {Category} from "../../src/model/Categories";
 import {CurrentFeeling} from "../../src/model/CurrentFeeling";
 import FriendRequest, {FriendRequestModel, FriendRequestStatus} from "../../src/model/FriendRequest";
 import AccountFacade from "../../src/common/AccountFacade";
-import ChatRoom, {ChatRoomModel} from "../../src/model/ChatRoom";
 import FriendRequestDAO from "../../src/common/FriendRequestDAO";
 
 const DBManager = require('../DBManager')
@@ -86,14 +83,6 @@ describe('Friend Request endpoint', () => {
                     action: FriendRequestStatus.Accept
                 })
                 .expect(200)
-                .expect((res) => {
-                    const chatRoom = res.body.body.chatRoom as ChatRoomModel
-                    const users = res.body.body.chatRoom.users as UserModel[]
-                    const userIds = users.map((user) => user._id.toString())
-                    assert(userIds.includes(user._id.toString()))
-                    assert(userIds.includes(dbManager.defaultUser._id.toString()))
-                    assert.notDeepEqual(chatRoom.chatRoomId, undefined)
-                })
             const requests = await FriendRequest.find({ user: dbManager.defaultUser })
             assert.deepEqual(requests.length, 0)
         })
