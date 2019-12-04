@@ -34,7 +34,6 @@ const Comment = new mongoose.Schema({
         ref: 'Post',
         required: true,
         validate: {
-            isAsync: true,
             validator: validatePost,
             msg: 'PostId {VALUE} does not exist'
         }

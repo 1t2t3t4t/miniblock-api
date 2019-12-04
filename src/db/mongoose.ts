@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { mongo } from 'mongoose'
 const url = require('./MongoURL')
 
 const env = process.env.ENV || "development"
@@ -20,8 +20,8 @@ switch (env) {
         break;
 }
 
-
 mongoose.connect(mongoURI, {
+    useUnifiedTopology: true,
     useCreateIndex: true,
     useNewUrlParser: true
 }).then(() => {
