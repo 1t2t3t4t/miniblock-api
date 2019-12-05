@@ -18,11 +18,11 @@ const port = process.env.PORT || 3000
 
 let app = express()
 
-const serviceAccount = require("./lovesick-react-firebase-adminsdk-vndcv-1c91db8e2f.json");
+const serviceAccount = require("./mini-block-firebase-adminsdk-hearq-8812b8f42b.json")
 
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
-	databaseURL: "https://lovesick-react.firebaseio.com"
+	databaseURL: "https://mini-block.firebaseio.com"
 })
 
 if (env != "test") {
