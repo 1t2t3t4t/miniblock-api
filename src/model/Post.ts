@@ -76,7 +76,8 @@ const Post = new Schema({
     type: {
         type: String,
         enum: toEnumArray(PostType),
-        required: true
+        required: true,
+        default: PostType.TEXT
     },
     content: {
         detail1: {

@@ -362,6 +362,45 @@ describe('Create post', () => {
             .end(done)
     })
 
+    it('can create post if valid with defauly type', (done) => {
+        const path = '/v1/post'
+        request(app)
+            .post(path)
+            .send({
+                category: Category.Depression,
+                content: {
+                    detail1: `text number`
+                },
+                title: `title`
+            })
+            .set(validHeaderToken)
+            .expect(200)
+            .expect((res: Response) => {
+                assert.notDeepEqual(res.body, undefined)
+                const body: any = res.body!
+                assert.notDeepEqual(body.body.post, undefined)
+
+                const post: PostModel = body.body!.post
+
+                assert.deepEqual(post.likeInfo.count, 0)
+                assert.deepEqual(post.title, 'title')
+                assert.deepEqual(post.content.detail1, 'text number')
+                assert.deepEqual(post.commentInfo.count, 0)
+                assert.deepEqual(post.category, Category.Depression)
+                assert.deepEqual(post.type, PostType.TEXT)
+
+                const creator = post.creator as UserModel
+                assert.deepEqual(creator.displayName, dbManager.defaultUser.displayName)
+                assert.deepEqual(creator.anonymousInfo.displayName, dbManager.defaultUser.anonymousInfo.displayName)
+
+                assert.deepEqual(post.authInfo!.canDelete, true)
+                assert.deepEqual(post.authInfo!.canEdit, true)
+                assert.deepEqual(post.authInfo!.canSeeProfile, true)
+                assert.deepEqual(post.likeInfo.isLiked, false)
+            })
+            .end(done)
+    })
+
     it('cannot create post if no detail1', (done) => {
         const path = '/v1/post'
         request(app)
