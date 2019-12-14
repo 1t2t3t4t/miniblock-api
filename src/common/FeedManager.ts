@@ -21,7 +21,7 @@ export default class FeedManager {
     }
 
     async getAll(limit?: number,
-                 afterId?: string,
+                 page?: number,
                  category?: string,
                  sortType?: FeedSortType,
                  interactor?: UserModel): Promise<PostModel[]> {
@@ -30,10 +30,10 @@ export default class FeedManager {
         let posts: PostModel[] = []
         switch (sortType) {
             case FeedSortType.New:
-                posts = await this.allNew(limit, afterId, category)
+                posts = await this.allNew(limit, page, category)
                 break
             case FeedSortType.Top:
-                posts = await this.allTop(limit, afterId, category)
+                posts = await this.allTop(limit, page, category)
                 break
         }
 
@@ -46,7 +46,7 @@ export default class FeedManager {
     }
 
     async allNew(limit?: number,
-                 afterId?: string,
+                 page?: number,
                  category?: string): Promise<PostModel[]> {
         const query = {} as PostModel
 
@@ -54,7 +54,7 @@ export default class FeedManager {
             query.category = category
         }
 
-        const documentQuery = this.queryPaginate(query, afterId, limit)
+        const documentQuery = this.queryPaginate(query, page, limit)
 
         documentQuery.sort({ createdAt: 'desc' })
 
@@ -62,7 +62,7 @@ export default class FeedManager {
     }
 
     async allTop(limit?: number,
-                 afterId?: string,
+                 page?: number,
                  category?: string): Promise<PostModel[]> {
         const query = {} as any | PostModel
 
@@ -70,25 +70,17 @@ export default class FeedManager {
             query.category = category
         }
 
-        if (afterId) {
-            query._id = { $ne: afterId }
-
-            const post = await Post.findOne({ _id: afterId })
-            if (post) {
-                query['likeInfo.count'] = {$lt: post.likeInfo.count}
-            }
-             else {
-                throw Error('Cannot find post with afterId:' + afterId)
-            }
-        }
-
+        const skip = ((page || 1) - 1) * (limit || 20)
+        
         const documentQuery = Post.find(query)
+        .sort({ "likeInfo.count": "desc" })
+        .skip(skip)
 
         if (limit) {
             documentQuery.limit(Number(limit))
         }
 
-        documentQuery.sort({ 'likeInfo.count': 'desc' })
+        documentQuery.sort({ 'createdAt': 'desc' })
 
         const posts = await documentQuery
             .populate('creator')
@@ -98,13 +90,13 @@ export default class FeedManager {
 
     async search(keyword: string,
                  limit?: number,
-                 afterId?: string,
+                 page?: number,
                  interactor?: UserModel): Promise<PostModel[]> {
         const query = {} as PostSearchModel
 
         query.title = new RegExp(`.*${keyword}.*`,'i')
 
-        const documentQuery = this.queryPaginate(query, afterId, limit)
+        const documentQuery = this.queryPaginate(query, page, limit)
         const posts = await documentQuery
             .sort({ createdAt: 'desc' })
             .populate('creator')
@@ -118,18 +110,12 @@ export default class FeedManager {
     }
 
     protected queryPaginate(query: any | PostModel,
-                            afterId?: string,
+                            page?: number,
                             limit?: number): DocumentQuery<PostModel[], PostModel> {
-        if (afterId) {
-            query._id = { $lt: afterId }
-        }
+        const skip = ((page || 1) - 1) * (limit || 20)
+        const documentQuery = Post.find(query).skip(skip)
 
-        const documentQuery = Post.find(query)
-
-        if (limit) {
-            documentQuery.limit(Number(limit))
-        }
-
+        documentQuery.limit(Number(limit))
         return documentQuery
     }
 }

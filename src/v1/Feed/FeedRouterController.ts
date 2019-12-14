@@ -9,7 +9,7 @@ const HTTPResponse = require('../../model/HTTPResponse');
 export interface FeedQueryRequest extends EnsureAuthRequest {
     query: {
         limit?: number,
-        afterId?: string,
+        page?: string,
         category?: string,
         sortType: FeedSortType
     }
@@ -18,7 +18,7 @@ export interface FeedQueryRequest extends EnsureAuthRequest {
 export interface FeedSearchQueryRequest extends EnsureAuthRequest {
     query: {
         limit?: number,
-        afterId?: string,
+        page?: string,
         keyword: string
     }
 }
@@ -68,9 +68,9 @@ export default class FeedRouterController {
     @GET('/all')
     @Middleware(authenticate)
     all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
-        const { sortType, limit, afterId, category } = req.query
+        const { sortType, limit, page, category } = req.query
         
-        this.feedManager.getAll(limit, afterId, category, sortType, req.user)
+        this.feedManager.getAll(limit, Number(page), category, sortType, req.user)
             .then((posts) => {
                 res.status(200).send(new HTTPResponse.Response({ posts }))
             }).catch((e) => {
@@ -115,9 +115,9 @@ export default class FeedRouterController {
     @GET('/search')
     @Middleware(authenticate)
     async search(req: FeedSearchQueryRequest, res: express.Response, next: express.NextFunction) {
-        const { limit, afterId, keyword } = req.query
+        const { limit, page, keyword } = req.query
 
-        this.feedManager.search(keyword, limit, afterId, req.user)
+        this.feedManager.search(keyword, limit, Number(page), req.user)
             .then((posts) => {
             res.status(200).send(new HTTPResponse.Response({ posts }))
         }).catch((e) => {

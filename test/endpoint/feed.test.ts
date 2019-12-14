@@ -5,6 +5,7 @@ import {Response} from 'superagent'
 import mongoose from 'mongoose'
 import PostDAO from "../../src/common/PostDAO";
 import AccountFacade from "../../src/common/AccountFacade";
+import FeedManager from '../../src/common/FeedManager'
 
 const assert = require('assert')
 const request = require('supertest')
@@ -96,10 +97,9 @@ describe('Fetch all from feed with 1 category', () => {
             }).end(done)
     })
 
-    it('should get 10 posts after 10th post', (done) => {
-        const tenId = posts.find((post, index) => index == 15)!._id
+    it('should get 10 posts page 2', (done) => {
         request(app)
-            .get(path + `?limit=10&afterId=${tenId}`)
+            .get(path + `?limit=10&page=2`)
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
@@ -110,10 +110,9 @@ describe('Fetch all from feed with 1 category', () => {
             }).end(done)
     })
 
-    it('should get 5 posts after 20th post', (done) => {
-        const twenId = posts.find((post, index) => index == 5)!._id
+    it('should get 5 posts page 3', (done) => {
         request(app)
-            .get(path + `?limit=10&afterId=${twenId}`)
+            .get(path + `?limit=10&page=3`)
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
@@ -200,22 +199,15 @@ describe('Fetch all from feed with mixed category', () => {
             }).end(done)
     })
 
-    it('should get 10 posts with specific category after 10th', (done) => {
+    it('should get 10 posts with specific category page 2', (done) => {
         const category = Category.Depression
-        const afterId = posts
-            .filter((post) => post.category == category)
-            .find((post, idx) => idx == 15)!._id
         request(app)
-            .get(path + '?limit=10&category=' + category + '&afterId=' + afterId)
+            .get(path + '?limit=10&category=' + category + '&page=2')
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 10)
-                const expectId = posts
-                    .filter((post) => post.category == category)
-                    .find((post, idx) => idx == 14)!._id.toString()
-                assert.deepEqual(expectId, resPosts[0]._id)
                 resPosts.forEach((post) => {
                     assert.deepEqual(post.category, category)
                 })
@@ -308,12 +300,9 @@ describe('Seach post', () => {
             }).end(done)
     })
 
-    it('should get all post that matches keyword with limit and afterId', (done) => {
-        const thirdPost = posts
-            .filter((post) => post.title.includes(keyword))
-            .find((post, idx) => idx == 2)!._id
+    it('should get all post that matches keyword with limit page 2', (done) => {
         request(app)
-            .get(path + '?keyword=' + keyword + '&limit=3&afterId=' + thirdPost)
+            .get(path + '?keyword=' + keyword + '&limit=3&page=2')
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
@@ -500,20 +489,14 @@ describe('Fetch top from feed with mixed category', () => {
             }).end(done)
     })
 
-    it('should get 10 posts after 10th', (done) => {
-        const category = Category.Depression
-        const after = posts
-            .sort((a, b) => b.likeInfo.count! - a.likeInfo.count!)
-            .find((post, idx) => idx == 15)!
+    it('should get 10 posts page 2', (done) => {
         request(app)
-            .get(path + '&limit=10&afterId=' + after._id)
+            .get(path + '&limit=10&page=2')
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 10)
-                assert.deepEqual(resPosts.find((post) => post.title == after.title), undefined)
-                assert(resPosts[0].likeInfo.count! <= after.likeInfo.count!, 'should start with lower or equal likes')
                 assert(isOrderedDesc(resPosts), 'should ordered count by desc')
             }).end(done)
     })
@@ -534,21 +517,15 @@ describe('Fetch top from feed with mixed category', () => {
             }).end(done)
     })
 
-    it('should get 10 posts with specific category after 10th', (done) => {
+    it('should get 10 posts with specific category page 2', (done) => {
         const category = Category.Depression
-        const after = posts
-            .filter((post) => post.category == category)
-            .sort((a, b) => b.likeInfo.count! - a.likeInfo.count!)
-            .find((post, idx) => idx == 8)!
         request(app)
-            .get(path + '&limit=10&category=' + category + '&afterId=' + after._id)
+            .get(path + '&limit=10&category=' + category + '&page=2')
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 10)
-                assert.deepEqual(resPosts.find((post) => post.title == after.title), undefined)
-                assert(resPosts[0].likeInfo.count! <= after.likeInfo.count!, 'should start with lower or equal likes')
                 resPosts.forEach((post) => {
                     assert.deepEqual(post.category, category)
                 })
