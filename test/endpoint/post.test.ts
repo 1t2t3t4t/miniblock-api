@@ -25,7 +25,7 @@ describe('Get post', () => {
     before((next) => {
         dbManager.start().then(() => {
             return new PostDAO().createPost(dbManager.defaultUser,
-                { text: text},
+                { detail1: text},
                 type,
                 title,
                 category)
@@ -58,9 +58,9 @@ describe('Get post', () => {
                 assert.deepEqual(post.likeInfo.isLiked, undefined)
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, title)
-                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.content.detail1, text)
                 assert.deepEqual(post.commentInfo.count, 0)
-                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.category, category)
                 assert.deepEqual(post.type, type)
             })
             .end(done)
@@ -85,9 +85,9 @@ describe('Get post', () => {
 
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, title)
-                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.content.detail1, text)
                 assert.deepEqual(post.commentInfo.count, 0)
-                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.category, category)
                 assert.deepEqual(post.type, type)
 
                 const creator = post.creator as UserModel
@@ -102,7 +102,7 @@ describe('Get post', () => {
             "BosS",
             "3")
         const othersPost = await new PostDAO().createPost(newUser,
-            { text: text},
+            { detail1: text},
             type,
             title,
             category)
@@ -125,9 +125,9 @@ describe('Get post', () => {
 
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, title)
-                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.content.detail1, text)
                 assert.deepEqual(post.commentInfo.count, 0)
-                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.category, category)
                 assert.deepEqual(post.type, type)
 
                 const creator = post.creator as UserModel
@@ -167,7 +167,7 @@ describe('Edit post', () => {
     before((next) => {
         dbManager.start().then(() => {
             return new PostDAO().createPost(dbManager.defaultUser,
-                { text: text},
+                { detail1: text},
                 type,
                 title,
                 category)
@@ -194,7 +194,7 @@ describe('Edit post', () => {
             .set(validHeaderToken)
             .send({
                 content: {
-                    text: newText
+                    detail1: newText
                 }
             })
             .expect(200)
@@ -211,9 +211,9 @@ describe('Edit post', () => {
 
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, title)
-                assert.deepEqual(post.content.text, newText)
+                assert.deepEqual(post.content.detail1, newText)
                 assert.deepEqual(post.commentInfo.count, 0)
-                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.category, category)
                 assert.deepEqual(post.type, type)
                 assert.notDeepEqual((post.creator as UserModel)._id, undefined)
             })
@@ -254,7 +254,7 @@ describe('Delete post', () => {
     before((next) => {
         dbManager.start().then(() => {
             return new PostDAO().createPost(dbManager.defaultUser,
-                { text: text},
+                { detail1: text},
                 type,
                 title,
                 category)
@@ -321,16 +321,16 @@ describe('Create post', () => {
     })
 
     const validHeaderToken = { 'authorization': 'Bearer admin'}
-
+    
     it('can create post if valid', (done) => {
         const path = '/v1/post'
         request(app)
             .post(path)
             .send({
                 type: PostType.TEXT,
-                categoryId: Category.Depression,
+                category: Category.Depression,
                 content: {
-                    text: `text number`
+                    detail1: `text number`
                 },
                 title: `title`
             })
@@ -345,9 +345,9 @@ describe('Create post', () => {
 
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, 'title')
-                assert.deepEqual(post.content.text, 'text number')
+                assert.deepEqual(post.content.detail1, 'text number')
                 assert.deepEqual(post.commentInfo.count, 0)
-                assert.deepEqual(post.categoryId, Category.Depression)
+                assert.deepEqual(post.category, Category.Depression)
                 assert.deepEqual(post.type, PostType.TEXT)
 
                 const creator = post.creator as UserModel
@@ -359,6 +359,23 @@ describe('Create post', () => {
                 assert.deepEqual(post.authInfo!.canSeeProfile, true)
                 assert.deepEqual(post.likeInfo.isLiked, false)
             })
+            .end(done)
+    })
+
+    it('cannot create post if no detail1', (done) => {
+        const path = '/v1/post'
+        request(app)
+            .post(path)
+            .send({
+                type: PostType.TEXT,
+                category: Category.Depression,
+                content: {
+                    detail2: `text number`
+                },
+                title: `title`
+            })
+            .set(validHeaderToken)
+            .expect(500)
             .end(done)
     })
 
@@ -381,13 +398,10 @@ describe('Create post', () => {
             .post(path)
             .send({
                 type: PostType.IMAGE,
-                categoryId: Category.Depression,
+                category: Category.Depression,
                 content: {
-                    imageInfo: {
-                        image: "imageurl",
-                        width: 600,
-                        height: 800
-                    }
+                    detail1: "Hi",
+                    imgUrl1: "some url"
                 },
                 creator: dbManager.defaultUser._id,
                 title: `title`
@@ -398,43 +412,10 @@ describe('Create post', () => {
                 assert.notDeepEqual(res.body, undefined)
                 const body: any = res.body!
                 assert.notDeepEqual(body.body.post, undefined)
-                assert.notDeepEqual(body.body.post.content.imageInfo, undefined)
-                assert.notDeepEqual(body.body.post.content.imageInfo.image, undefined)
-                assert.notDeepEqual(body.body.post.content.imageInfo.width, undefined)
-                assert.notDeepEqual(body.body.post.content.imageInfo.height, undefined)
+                assert.deepEqual(body.body.post.content.imgUrl1, "some url")
             })
             .end(done)
     })
-
-    it('can create image post even if no width and height', (done) => {
-        const path = '/v1/post'
-        request(app)
-            .post(path)
-            .send({
-                type: PostType.IMAGE,
-                categoryId: Category.Depression,
-                content: {
-                    imageInfo: {
-                        image: "imageurl"
-                    }
-                },
-                creator: dbManager.defaultUser._id,
-                title: `title`
-            })
-            .set(validHeaderToken)
-            .expect(200)
-            .expect((res: Response) => {
-                assert.notDeepEqual(res.body, undefined)
-                const body: any = res.body!
-                assert.notDeepEqual(body.body.post, undefined)
-                assert.notDeepEqual(body.body.post.content.imageInfo, undefined)
-                assert.notDeepEqual(body.body.post.content.imageInfo.image, undefined)
-                assert.deepEqual(body.body.post.content.imageInfo.width, undefined)
-                assert.deepEqual(body.body.post.content.imageInfo.height, undefined)
-            })
-            .end(done)
-    })
-
 })
 
 describe('Interact with post', () => {

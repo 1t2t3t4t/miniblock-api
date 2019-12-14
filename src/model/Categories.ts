@@ -12,10 +12,10 @@ export class CategoryModel {
 }
 
 export enum Category {
-    Loneliness = 1,
-    SocialProblems,
-    Relationships,
-    Depression
+    Loneliness = "Loneliness",
+    SocialProblems = "SocialProblems",
+    Relationships = "Relationships",
+    Depression = "Depression"
 }
 
 const isNumeric = (obj: any) => {

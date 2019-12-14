@@ -73,12 +73,12 @@
         type: String,
         required: true,
     },
- categoryId: {
+ category: {
         type: Number,
         required: true,
         validate: {
             validator: categoryValidator,
-            msg: 'we dont have categoryId {VALUE}.'
+            msg: 'we dont have category {VALUE}.'
         },
         index: true
     },

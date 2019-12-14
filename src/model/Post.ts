@@ -1,9 +1,9 @@
-import mongoose, {Types} from 'mongoose'
-import User, {Gender, isUserModel, UserModel, UserRef} from './User'
-import categories, {Category} from './Categories'
-import {isNullOrUndefined, isString} from "util";
-import {CommentModel, CommentRef} from './Comment'
-import {toEnumArray} from "../utils/enum";
+import mongoose, { Types } from 'mongoose'
+import User, { Gender, isUserModel, UserModel, UserRef } from './User'
+import categories, { Category } from './Categories'
+import { isNullOrUndefined, isString } from "util";
+import { CommentModel, CommentRef } from './Comment'
+import { toEnumArray } from "../utils/enum";
 
 const Schema = mongoose.Schema
 
@@ -14,30 +14,19 @@ export enum PostType {
 }
 
 export type PostContentInfo = {
-    link?: string,
-    text?: string,
-    imageInfo?: {
-        image: string,
-        width?: number,
-        height?: number
-    }
+    detail1: string;
+    detail2?: string;
+    detail3?: string;
+    detail4?: string;
+    imgUrl1?: string;
+    imgUrl2?: string;
+    imgUrl3?: string;
+    imgUrl4?: string;
 }
 
 export enum Reaction {
     like = 'like',
     none = 'none'
-}
-
-const contentValidator = function (this: PostModel, content: PostContentInfo): boolean {
-    switch (this.type) {
-        case PostType.IMAGE:
-            return !isNullOrUndefined(content.imageInfo) && !isNullOrUndefined(content.imageInfo.image)
-        case PostType.TEXT:
-            return !isNullOrUndefined(content.text)
-        case PostType.LINK:
-            return !isNullOrUndefined(content.link)
-    }
-    return false
 }
 
 export function isPostModel(post: PostRef): post is PostModel {
@@ -54,7 +43,7 @@ export interface PostModel extends mongoose.Document {
     post: any;
     _id: mongoose.Types.ObjectId
     title: string
-    categoryId: number
+    category: string
     type: PostType
     content: PostContentInfo
     creator: UserRef
@@ -79,9 +68,8 @@ const Post = new Schema({
         type: String,
         required: true,
     },
-    categoryId: {
-        type: Number,
-        enum: toEnumArray(Category),
+    category: {
+        type: String,
         required: true,
         index: true
     },
@@ -91,31 +79,31 @@ const Post = new Schema({
         required: true
     },
     content: {
-        type: {
-            text: {
-                type: String
-            },
-            link: {
-                type: String
-            },
-            imageInfo: {
-                image: {
-                    required: true,
-                    type: String
-                },
-                width: {
-                    type: Number
-                },
-                height: {
-                    type: Number
-                }
-            }
+        detail1: {
+            type: String,
+            required: true
         },
-        required: true,
-        validate: {
-            validator: contentValidator,
-            msg: 'content does not conform to type'
-        }
+        detail2: {
+            type: String
+        },
+        detail3: {
+            type: String
+        },
+        detail4: {
+            type: String
+        },
+        imgUrl1: {
+            type: String
+        },
+        imgUrl2: {
+            type: String
+        },
+        imgUrl3: {
+            type: String
+        },
+        imgUrl4: {
+            type: String
+        },
     },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
@@ -161,14 +149,14 @@ Post.virtual('authInfo.canDelete')
 Post.virtual('authInfo.canEdit')
 Post.virtual('authInfo.canSeeProfile')
 
-Post.index({  categoryId: 1, _id: -1,'likeInfo.count': -1 })
-Post.index({  _id: -1,'likeInfo.count': -1 })
+Post.index({ category: 1, _id: -1, 'likeInfo.count': -1 })
+Post.index({ _id: -1, 'likeInfo.count': -1 })
 
-Post.index({  createdAt: -1, _id: -1 })
-Post.index({  categoryId: 1, createdAt: -1 , _id: -1 })
+Post.index({ createdAt: -1, _id: -1 })
+Post.index({ category: 1, createdAt: -1, _id: -1 })
 Post.index({ title: 1, createdAt: -1, _id: -1 })
 
-Post.pre('save', function(this: PostModel) {
+Post.pre('save', function (this: PostModel) {
     if (this.isModified('likeInfo') || this.isNew) {
         this.likeInfo.count = this.likeInfo.like.length
     }
@@ -178,7 +166,7 @@ Post.pre('save', function(this: PostModel) {
     }
 })
 
-Post.methods.setInteractor = function(this: PostModel, interactor: UserRef) {
+Post.methods.setInteractor = function (this: PostModel, interactor: UserRef) {
     const interactorId = isUserModel(interactor) ? interactor._id : interactor
 
     this.likeInfo.isLiked = !isNullOrUndefined(this.likeInfo.like.find((liker) => {
@@ -192,7 +180,7 @@ Post.methods.setInteractor = function(this: PostModel, interactor: UserRef) {
     this.authInfo!.canSeeProfile = authInfo.canSeeProfile
 }
 
-Post.methods.checkAuth = function(this: PostModel, interactor: UserRef): AuthInfo {
+Post.methods.checkAuth = function (this: PostModel, interactor: UserRef): AuthInfo {
     const interactorId = isUserModel(interactor) ? interactor._id : interactor
     const creatorId = (isUserModel(this.creator) ? this.creator._id : this.creator) as mongoose.Types.ObjectId
     return {
@@ -209,7 +197,7 @@ export class PostReactionError extends Error {
 
 }
 
-Post.methods.setReaction = function(this: PostModel, interactor: UserModel, reaction: Reaction) {
+Post.methods.setReaction = function (this: PostModel, interactor: UserModel, reaction: Reaction) {
     this.setInteractor(interactor)
 
     switch (reaction) {

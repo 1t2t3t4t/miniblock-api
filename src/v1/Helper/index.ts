@@ -114,16 +114,16 @@ export default class HelperRouterController {
 
             const cat = [Category.Loneliness, Category.Depression, Category.Relationships, Category.SocialProblems]
 
-            const categoryId = Math.ceil(Math.random() * cat.length)
+            const category = Math.ceil(Math.random() * cat.length)
 
             const post = new Post({
                 creator,
                 content: {
-                    text: "test " + i
+                    detail1: "test " + i
                 },
                 type: PostType.TEXT,
-                title: "title " + i + "cat " + categoryId,
-                categoryId,
+                title: "title " + i + "cat " + category,
+                category,
                 likeInfo: {
                     like: likers
                 }

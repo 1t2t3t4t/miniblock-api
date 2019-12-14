@@ -22,7 +22,7 @@ export default class FeedManager {
 
     async getAll(limit?: number,
                  afterId?: string,
-                 categoryId?: Category,
+                 category?: string,
                  sortType?: FeedSortType,
                  interactor?: UserModel): Promise<PostModel[]> {
         sortType = sortType || FeedSortType.New
@@ -30,10 +30,10 @@ export default class FeedManager {
         let posts: PostModel[] = []
         switch (sortType) {
             case FeedSortType.New:
-                posts = await this.allNew(limit, afterId, categoryId)
+                posts = await this.allNew(limit, afterId, category)
                 break
             case FeedSortType.Top:
-                posts = await this.allTop(limit, afterId, categoryId)
+                posts = await this.allTop(limit, afterId, category)
                 break
         }
 
@@ -47,11 +47,11 @@ export default class FeedManager {
 
     async allNew(limit?: number,
                  afterId?: string,
-                 categoryId?: Category): Promise<PostModel[]> {
+                 category?: string): Promise<PostModel[]> {
         const query = {} as PostModel
 
-        if (categoryId) {
-            query.categoryId = Number(categoryId)
+        if (category) {
+            query.category = category
         }
 
         const documentQuery = this.queryPaginate(query, afterId, limit)
@@ -63,11 +63,11 @@ export default class FeedManager {
 
     async allTop(limit?: number,
                  afterId?: string,
-                 categoryId?: Category): Promise<PostModel[]> {
+                 category?: string): Promise<PostModel[]> {
         const query = {} as any | PostModel
 
-        if (categoryId) {
-            query.categoryId = Number(categoryId)
+        if (category) {
+            query.category = category
         }
 
         if (afterId) {

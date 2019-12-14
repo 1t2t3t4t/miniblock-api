@@ -31,7 +31,7 @@ export default class PostDAO {
                    content?: PostContentInfo,
                    type?: PostType,
                    title?: string,
-                   categoryId?: Category): Promise<PostModel> {
+                   category?: string): Promise<PostModel> {
         const post = await Post.findById(postId).populate('creator')
         if (!post) throw new PostNotFoundError()
         if (!post.checkAuth(interactor).canEdit) throw new InvalidAuthError()
@@ -48,8 +48,8 @@ export default class PostDAO {
             post.title = title
         }
 
-        if (categoryId) {
-            post.categoryId = categoryId
+        if (category) {
+            post.category = category
         }
 
         post.setInteractor(interactor)
@@ -61,13 +61,13 @@ export default class PostDAO {
                      content: PostContentInfo,
                      type: PostType,
                      title: string,
-                     categoryId: Category): Promise<PostModel> {
+                     category: string): Promise<PostModel> {
         const post = new Post({
             creator,
             content,
             type,
             title,
-            categoryId
+            category
         })
 
         post.setInteractor(creator)

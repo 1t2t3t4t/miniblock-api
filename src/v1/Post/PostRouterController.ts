@@ -19,7 +19,7 @@ interface PostRequest extends EnsureAuthRequest {
     body: {
         content: PostContentInfo,
         title: string,
-        categoryId: number,
+        category: string,
         type: PostType
     }
 }
@@ -31,7 +31,7 @@ interface EditPostRequest extends EnsureAuthRequest {
     body: {
         content?: PostContentInfo,
         title?: string,
-        categoryId?: number,
+        category?: string,
         type?: PostType
     }
 }
@@ -71,7 +71,7 @@ export default class PostRouterController {
      *     },
      *     title: String,
      *     type: Enum ("link" | "text" | "image")
-     *     categoryId: Int
+     *     category: Int
      * }
      *
      * @apiSuccess {Post} post Post model
@@ -81,9 +81,9 @@ export default class PostRouterController {
     @Middleware(ensureAuthenticate)
     post(req: PostRequest, res: express.Response, next: express.NextFunction) {
         const creator = req.user!
-        const { content, title, type, categoryId } = req.body
+        const { content, title, type, category } = req.body
 
-        this.postDAO.createPost(creator, content, type, title, categoryId).then((post) => {
+        this.postDAO.createPost(creator, content, type, title, category).then((post) => {
             res.status(200).send(new HTTPResponse.Response({ post }))
         }).catch((e) => {
             res.status(500)
@@ -127,7 +127,7 @@ export default class PostRouterController {
      * @apiParam {ContentInfo} [content] New content
      * @apiParam {String} [title] New title
      * @apiParam {String} [type] New type has to be corresponding with content
-     * @apiParam {Int} [categoryId] New category
+     * @apiParam {Int} [category] New category
      *
      * @apiParamExample
      * body: {
@@ -136,7 +136,7 @@ export default class PostRouterController {
      *     },
      *     title: String,
      *     type: Enum ("link" | "text" | "image")
-     *     categoryId: Int
+     *     category: Int
      * }
      *
      * @apiSuccess {Post} post Post model
@@ -147,10 +147,10 @@ export default class PostRouterController {
     async editPost(req: EditPostRequest, res: express.Response, next: express.NextFunction) {
         const interactor = req.user!
         const postId = req.params.postId
-        const { content, title, categoryId, type } = req.body
+        const { content, title, category, type } = req.body
 
         try {
-            const post = await this.postDAO.editPost(interactor, postId, content, type, title, categoryId)
+            const post = await this.postDAO.editPost(interactor, postId, content, type, title, category)
             res.status(200).send(new HTTPResponse.Response({ post }))
         } catch (e) {
             res.status(500)

@@ -7,13 +7,14 @@ export default class PostFactory {
     static build(creator: UserRef,
                  title: string = 'default title',
                  type: PostType = PostType.TEXT,
-                 categoryId: Category = Category.Loneliness,
+                 category: Category = Category.Loneliness,
                  text: string = 'default text'): PostModel {
         return {
             type,
-            categoryId,
+            category,
             content: {
-                text
+                detail1: "Detail 1",
+                imgUrl1: "img"
             },
             creator,
             title

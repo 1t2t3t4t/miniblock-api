@@ -10,7 +10,7 @@ export interface FeedQueryRequest extends EnsureAuthRequest {
     query: {
         limit?: number,
         afterId?: string,
-        categoryId?: string,
+        category?: string,
         sortType: FeedSortType
     }
 }
@@ -37,11 +37,11 @@ export default class FeedRouterController {
      *
      * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
      * @apiParam {int} [limit] Set limit of fetching
-     * @apiParam {int} [categoryId] Set to filter for specific categoryId
+     * @apiParam {int} [category] Set to filter for specific category
      * @apiParam {SortType} [sortType] Set sort type of feed whether by 'new' or 'top'
      *
      * @apiParamExample Querystring example
-     * v1/feed/all?afterId=[ID]&limit=10&categoryId=1&sortType=new
+     * v1/feed/all?afterId=[ID]&limit=10&category=1&sortType=new
      *
      * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example
@@ -59,7 +59,7 @@ export default class FeedRouterController {
      *         }
      *         type: String
      *         title: String
-     *         categoryId: Int
+     *         category: Int
      *         createdAt: Date
      *         updatedAt: Date
      *     }
@@ -68,16 +68,8 @@ export default class FeedRouterController {
     @GET('/all')
     @Middleware(authenticate)
     all(req: FeedQueryRequest, res: express.Response, next: express.NextFunction) {
-        const { sortType, limit, afterId, categoryId } = req.query
-        if (categoryId && isNaN(Number(categoryId))) {
-            console.log(categoryId, Number(categoryId))
-            res.status(400)
-            res.send( new HTTPResponse.ErrorResponse('invalid categoryId (should be number)'))
-            return
-        }
-
-        const category = Number(categoryId)
-
+        const { sortType, limit, afterId, category } = req.query
+        
         this.feedManager.getAll(limit, afterId, category, sortType, req.user)
             .then((posts) => {
                 res.status(200).send(new HTTPResponse.Response({ posts }))
@@ -114,7 +106,7 @@ export default class FeedRouterController {
      *         }
      *         type: String
      *         title: String
-     *         categoryId: Int
+     *         category: Int
      *         createdAt: Date
      *         updatedAt: Date
      *     }

@@ -20,18 +20,18 @@ describe('Fetch all from feed with 1 category', () => {
             for(let i=1;i<=25;i++) {
                 let modelLoneliness = {
                     type: PostType.TEXT,
-                    categoryId: Category.Loneliness,
+                    category: Category.Loneliness,
                     content: {
-                        text: `text number ${i}`
+                        detail1: `text number ${i}`
                     },
                     creator: creator,
                     title: `${i}`
                 } as PostModel
                 let modelDepression = {
                     type: PostType.TEXT,
-                    categoryId: Category.Depression,
+                    category: Category.Depression,
                     content: {
-                        text: `text number ${i}`
+                        detail1: `text number ${i}`
                     },
                     creator: creator,
                     title: `${i}`
@@ -58,15 +58,6 @@ describe('Fetch all from feed with 1 category', () => {
     })
 
     const path = '/v1/feed/all'
-    it('error if invalid category', (done) => {
-        request(app)
-            .get(path + '?categoryId=loneliness')
-            .expect(400)
-            .expect((res: Response) => {
-                const message = res.body.body.message as string
-                assert.deepEqual(message, 'invalid categoryId (should be number)')
-            }).end(done)
-    })
 
     it('should get all feed', (done) => {
         request(app)
@@ -82,9 +73,9 @@ describe('Fetch all from feed with 1 category', () => {
 
                     assert.deepEqual(post.likeInfo.count, 0)
                     assert.notDeepEqual(post.title, undefined)
-                    assert.notDeepEqual(post.content.text, undefined)
+                    assert.notDeepEqual(post.content.detail1, undefined)
                     assert.deepEqual(post.commentInfo.count, 0)
-                    assert.notDeepEqual(post.categoryId, undefined)
+                    assert.notDeepEqual(post.category, undefined)
                     assert.notDeepEqual(post.type, undefined)
 
                     const creator = post.creator as UserModel
@@ -142,18 +133,18 @@ describe('Fetch all from feed with mixed category', () => {
             for(let i=1;i<=25;i++) {
                 let modelLoneliness = {
                     type: PostType.TEXT,
-                    categoryId: Category.Loneliness,
+                    category: Category.Loneliness,
                     content: {
-                        text: `text number ${i}`
+                        detail1: `text number ${i}`
                     },
                     creator: creator,
                     title: `${i}`
                 } as PostModel
                 let modelDepression = {
                     type: PostType.TEXT,
-                    categoryId: Category.Depression,
+                    category: Category.Depression,
                     content: {
-                        text: `text number ${i}`
+                        detail1: `text number ${i}`
                     },
                     creator: creator,
                     title: `${i}`
@@ -194,39 +185,39 @@ describe('Fetch all from feed with mixed category', () => {
             }).end(done)
     })
 
-    it('should get 10 posts with specific categoryId', (done) => {
-        const categoryId = Category.Depression
+    it('should get 10 posts with specific category', (done) => {
+        const category = Category.Depression
         request(app)
-            .get(path + '?limit=10&categoryId=' + categoryId)
+            .get(path + '?limit=10&category=' + category)
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 10)
                 resPosts.forEach((post) => {
-                    assert.deepEqual(post.categoryId, categoryId)
+                    assert.deepEqual(post.category, category)
                 })
             }).end(done)
     })
 
-    it('should get 10 posts with specific categoryId after 10th', (done) => {
-        const categoryId = Category.Depression
+    it('should get 10 posts with specific category after 10th', (done) => {
+        const category = Category.Depression
         const afterId = posts
-            .filter((post) => post.categoryId == categoryId)
+            .filter((post) => post.category == category)
             .find((post, idx) => idx == 15)!._id
         request(app)
-            .get(path + '?limit=10&categoryId=' + categoryId + '&afterId=' + afterId)
+            .get(path + '?limit=10&category=' + category + '&afterId=' + afterId)
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 10)
                 const expectId = posts
-                    .filter((post) => post.categoryId == categoryId)
+                    .filter((post) => post.category == category)
                     .find((post, idx) => idx == 14)!._id.toString()
                 assert.deepEqual(expectId, resPosts[0]._id)
                 resPosts.forEach((post) => {
-                    assert.deepEqual(post.categoryId, categoryId)
+                    assert.deepEqual(post.category, category)
                 })
             }).end(done)
     })
@@ -244,9 +235,9 @@ describe('Seach post', () => {
         const makePost = (title: string, creator: UserRef): PostModel => {
             return {
                 type: PostType.TEXT,
-                categoryId: Category.Loneliness,
+                category: Category.Loneliness,
                 content: {
-                    text: `text`
+                    detail1: `text`
                 },
                 title: title,
                 creator: creator,
@@ -347,9 +338,9 @@ describe('Like info in feed', () => {
         const stubPost = async (creator: UserRef) => {
             let likedPostModel = {
                 type: PostType.TEXT,
-                categoryId: Category.Loneliness,
+                category: Category.Loneliness,
                 content: {
-                    text: `text`
+                    detail1: `text`
                 },
                 creator: creator,
                 title: `like`,
@@ -362,9 +353,9 @@ describe('Like info in feed', () => {
 
             let notLikedPostModel = {
                 type: PostType.TEXT,
-                categoryId: Category.Loneliness,
+                category: Category.Loneliness,
                 content: {
-                    text: `text`
+                    detail1: `text`
                 },
                 creator: creator,
                 title: `not like`
@@ -424,9 +415,9 @@ describe('Fetch top from feed with mixed category', () => {
                 }
                 let modelLoneliness = {
                     type: PostType.TEXT,
-                    categoryId: Category.Loneliness,
+                    category: Category.Loneliness,
                     content: {
-                        text: `text number ${i}`
+                        detail1: `text number ${i}`
                     },
                     creator: creator,
                     title: `${i} catA`,
@@ -441,9 +432,9 @@ describe('Fetch top from feed with mixed category', () => {
                 }
                 let modelDepression = {
                     type: PostType.TEXT,
-                    categoryId: Category.Depression,
+                    category: Category.Depression,
                     content: {
-                        text: `text number ${i}`
+                        detail1: `text number ${i}`
                     },
                     creator: creator,
                     title: `${i} catB`,
@@ -510,7 +501,7 @@ describe('Fetch top from feed with mixed category', () => {
     })
 
     it('should get 10 posts after 10th', (done) => {
-        const categoryId = Category.Depression
+        const category = Category.Depression
         const after = posts
             .sort((a, b) => b.likeInfo.count! - a.likeInfo.count!)
             .find((post, idx) => idx == 15)!
@@ -527,30 +518,30 @@ describe('Fetch top from feed with mixed category', () => {
             }).end(done)
     })
 
-    it('should get 10 posts with specific categoryId', (done) => {
-        const categoryId = Category.Depression
+    it('should get 10 posts with specific category', (done) => {
+        const category = Category.Depression
         request(app)
-            .get(path + '&limit=10&categoryId=' + categoryId)
+            .get(path + '&limit=10&category=' + category)
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
                 const resPosts: Array<PostModel> = res.body.body.posts
                 assert.deepEqual(resPosts.length, 10)
                 resPosts.forEach((post) => {
-                    assert.deepEqual(post.categoryId, categoryId)
+                    assert.deepEqual(post.category, category)
                 })
                 assert(isOrderedDesc(resPosts), 'should ordered count by desc')
             }).end(done)
     })
 
-    it('should get 10 posts with specific categoryId after 10th', (done) => {
-        const categoryId = Category.Depression
+    it('should get 10 posts with specific category after 10th', (done) => {
+        const category = Category.Depression
         const after = posts
-            .filter((post) => post.categoryId == categoryId)
+            .filter((post) => post.category == category)
             .sort((a, b) => b.likeInfo.count! - a.likeInfo.count!)
             .find((post, idx) => idx == 8)!
         request(app)
-            .get(path + '&limit=10&categoryId=' + categoryId + '&afterId=' + after._id)
+            .get(path + '&limit=10&category=' + category + '&afterId=' + after._id)
             .expect(200)
             .expect((res: Response) => {
                 assert.notDeepEqual(res.body.body.posts, undefined)
@@ -559,7 +550,7 @@ describe('Fetch top from feed with mixed category', () => {
                 assert.deepEqual(resPosts.find((post) => post.title == after.title), undefined)
                 assert(resPosts[0].likeInfo.count! <= after.likeInfo.count!, 'should start with lower or equal likes')
                 resPosts.forEach((post) => {
-                    assert.deepEqual(post.categoryId, categoryId)
+                    assert.deepEqual(post.category, category)
                 })
                 assert(isOrderedDesc(resPosts), 'should ordered count by desc')
             }).end(done)
@@ -581,7 +572,7 @@ describe('Post in feed', () => {
     before((next) => {
         dbManager.start().then(() => {
             return new PostDAO().createPost(dbManager.defaultUser,
-                { text: text},
+                { detail1: text},
                 type,
                 title,
                 category)
@@ -619,9 +610,9 @@ describe('Post in feed', () => {
 
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, title)
-                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.content.detail1, text)
                 assert.deepEqual(post.commentInfo.count, 0)
-                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.category, category)
                 assert.deepEqual(post.type, type)
 
                 const creator = post.creator as UserModel
@@ -636,7 +627,7 @@ describe('Post in feed', () => {
             "BosS",
             "3")
         const othersPost = await new PostDAO().createPost(newUser,
-            { text: text},
+            { detail1: text},
             type,
             title,
             category)
@@ -658,9 +649,9 @@ describe('Post in feed', () => {
 
                 assert.deepEqual(post.likeInfo.count, 0)
                 assert.deepEqual(post.title, title)
-                assert.deepEqual(post.content.text, text)
+                assert.deepEqual(post.content.detail1, text)
                 assert.deepEqual(post.commentInfo.count, 0)
-                assert.deepEqual(post.categoryId, category)
+                assert.deepEqual(post.category, category)
                 assert.deepEqual(post.type, type)
 
                 const creator = post.creator as UserModel
