@@ -35,13 +35,13 @@ export default class FeedRouterController {
      *
      * @apiHeader {String} [Authorization] Token string from Firebase to set like status
      *
-     * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
+     * @apiParam {int} [page] Page of the pagination
      * @apiParam {int} [limit] Set limit of fetching
      * @apiParam {int} [category] Set to filter for specific category
      * @apiParam {SortType} [sortType] Set sort type of feed whether by 'new' or 'top'
      *
      * @apiParamExample Querystring example
-     * v1/feed/all?afterId=[ID]&limit=10&category=1&sortType=new
+     * v1/feed/all?page=[ID]&limit=10&category=1&sortType=new
      *
      * @apiSuccess {[Post]} posts Array of post
      * @apiSuccessExample example
@@ -87,7 +87,7 @@ export default class FeedRouterController {
      * @apiHeader {String} [Authorization] Token string from Firebase to set like status
      *
      * @apiParam {string} keyword Keyword used for searching the posts
-     * @apiParam {string} [afterId] Add query to fetch feed that is after the input id
+     * @apiParam {int} [page] Page of the pagination
      * @apiParam {int} [limit] Set limit of fetching
      *
      * @apiSuccess {[Post]} posts Array of post

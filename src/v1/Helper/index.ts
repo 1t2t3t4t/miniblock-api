@@ -92,14 +92,22 @@ export default class HelperRouterController {
 
     @GET('/stubPost')
     async stubPost(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const creator = await User.findByUID('1')
+
+        if (isNullOrUndefined(creator)) {
+            console.log("User is null")
+            res.status(200).send('User is null')
+            return
+        }
+
+        console.log('Found user', creator._id, creator.displayName)
+
         let date = Date.now()
 
         await Post.deleteMany({})
         await Comment.deleteMany({})
 
         console.log('Clear all...')
-
-        const creator = await User.findByUID('1')
 
         for(let i=0;i<20;i++) {
             console.log('at', i)
@@ -112,8 +120,8 @@ export default class HelperRouterController {
 
             console.log('Stub likes', likeCount)
 
-            const cat = [Category.Loneliness, Category.Depression, Category.Relationships, Category.SocialProblems]
-
+            const cat = ['Technology', 'Finance', 'Industrial', 'Sport', 'Food']
+            
             const category = Math.ceil(Math.random() * cat.length)
 
             const post = new Post({
@@ -131,26 +139,26 @@ export default class HelperRouterController {
 
             const p = await post.save()
 
-            console.log('Stub post')
+            // console.log('Stub post')
 
-            const comments =  this.addComment(p, creator)
+            // const comments =  this.addComment(p, creator)
 
-            let sc: CommentModel[] = []
+            // let sc: CommentModel[] = []
 
-            for (let c of comments) {
-                if (Math.random() <= 0.5) {
-                    sc.push(...this.addSubComment(p, creator, c))
-                } else {
-                    console.log('Skip sub comments', c._id.toString())
-                }
-            }
+            // for (let c of comments) {
+            //     if (Math.random() <= 0.5) {
+            //         sc.push(...this.addSubComment(p, creator, c))
+            //     } else {
+            //         console.log('Skip sub comments', c._id.toString())
+            //     }
+            // }
 
-            console.log('Create comments')
-            await Comment.create(comments)
-            console.log('Create subcomments')
-            await Comment.create(sc)
-            console.log('update post')
-            await p.save()
+            // console.log('Create comments')
+            // await Comment.create(comments)
+            // console.log('Create subcomments')
+            // await Comment.create(sc)
+            // console.log('update post')
+            // await p.save()
         }
 
         console.log('Completed with time', Date.now() - date, 'ms.')
