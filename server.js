@@ -1,4 +1,6 @@
-import {register} from './src/framework/annotation-restapi'
+import {
+	register
+} from './src/framework/annotation-restapi'
 import HelperRouterController from "./src/v1/Helper";
 import TestRouterController from './src/framework/annotation-restapi/test-endpoint'
 import Analytics from "./src/analytics/Analytics"
@@ -12,7 +14,9 @@ const v1 = require('./src/v1')
 
 const env = process.env.ENV
 
-const { ErrorResponse } = require('./src/model/HTTPResponse')
+const {
+	ErrorResponse
+} = require('./src/model/HTTPResponse')
 
 const port = process.env.PORT || 3000
 
@@ -31,11 +35,11 @@ if (env != "test") {
 
 app.use(bodyParser.json())
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-    res.setHeader('Access-Control-Allow-Headers', '*')
-    res.setHeader('Access-Control-Allow-Credentials', "true")
-    next()
+	res.setHeader('Access-Control-Allow-Origin', '*')
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+	res.setHeader('Access-Control-Allow-Headers', '*')
+	res.setHeader('Access-Control-Allow-Credentials', "true")
+	next()
 })
 
 app.use((req, res, next) => {
@@ -64,9 +68,38 @@ app.use(function (err, req, res, next) {
 		console.log(err)
 	}
 	const error = new ErrorResponse(err.message)
-  	res.send(error)
+	res.send(error)
 })
 
 module.exports = app.listen(port, () => {
-    console.log('Server started on port', port)
+	app._router.stack.forEach(print.bind(null, []))
+	console.log('Server started on port', port)
 })
+
+function print(path, layer) {
+	if (layer.route) {
+		layer.route.stack.forEach(print.bind(null, path.concat(split(layer.route.path))))
+	} else if (layer.name === 'router' && layer.handle.stack) {
+		layer.handle.stack.forEach(print.bind(null, path.concat(split(layer.regexp))))
+	} else if (layer.method) {
+		console.log('%s \t\t /%s',
+		layer.method.toUpperCase(),
+		path.concat(split(layer.regexp)).filter(Boolean).join('/'))
+	}
+}
+
+function split(thing) {
+	if (typeof thing === 'string') {
+		return thing.split('/')
+	} else if (thing.fast_slash) {
+		return ''
+	} else {
+		var match = thing.toString()
+			.replace('\\/?', '')
+			.replace('(?=\\/|$)', '$')
+			.match(/^\/\^((?:\\[.*+?^${}()|[\]\\\/]|[^.*+?^${}()|[\]\\\/])*)\$\//)
+		return match ?
+			match[1].replace(/\\(.)/g, '$1').split('/') :
+			'<complex:' + thing.toString() + '>'
+	}
+}
