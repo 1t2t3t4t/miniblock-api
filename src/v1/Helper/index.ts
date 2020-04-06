@@ -1,21 +1,19 @@
-import {GET, Middleware, RouterController} from "../../framework/annotation-restapi";
-import Post, {PostModel, PostRef, PostType} from "../../model/Post";
-import Comment, {CommentModel, CommentRef} from "../../model/Comment";
-import User, {Gender, UserModel, UserRef} from "../../model/User";
-import mongoose from "mongoose";
 import express from 'express'
-import {Category} from "../../model/Categories";
-import AuthenticationFacade from '../../common/AccountFacade';
-import CommentDAO from "../../common/CommentDAO";
-import AccountFacade from "../../common/AccountFacade";
-import stringGenerator from "../../utils/stringGenerator";
-import {randomEnum} from "../../utils/enum";
-import {isNullOrUndefined} from "util";
-import {CurrentFeeling} from "../../model/CurrentFeeling";
-import FriendRequestDAO from "../../common/FriendRequestDAO";
-import {ensureAuthenticate, EnsureAuthRequest} from "../../middleware";
-import randomName from "../../utils/nameGenerator";
-import randomValue from "../../utils/randomizer";
+import mongoose from "mongoose"
+import { isNullOrUndefined } from "util"
+import { default as AccountFacade, default as AuthenticationFacade } from '../../common/AccountFacade'
+import CommentDAO from "../../common/CommentDAO"
+import FriendRequestDAO from "../../common/FriendRequestDAO"
+import { GET, Middleware, RouterController } from "../../framework/annotation-restapi"
+import { ensureAuthenticate, EnsureAuthRequest } from "../../middleware"
+import Comment, { CommentModel } from "../../model/Comment"
+import { CurrentFeeling } from "../../model/CurrentFeeling"
+import Post, { PostModel, PostType } from "../../model/Post"
+import User, { Gender, UserModel, UserRef } from "../../model/User"
+import { randomEnum } from "../../utils/enum"
+import randomName from "../../utils/nameGenerator"
+import randomValue from "../../utils/randomizer"
+import stringGenerator from "../../utils/stringGenerator"
 
 @RouterController('/helper')
 export default class HelperRouterController {
@@ -139,26 +137,26 @@ export default class HelperRouterController {
 
             const p = await post.save()
 
-            // console.log('Stub post')
+            console.log('Stub post')
 
-            // const comments =  this.addComment(p, creator)
+            const comments =  this.addComment(p, creator)
 
-            // let sc: CommentModel[] = []
+            let sc: CommentModel[] = []
 
-            // for (let c of comments) {
-            //     if (Math.random() <= 0.5) {
-            //         sc.push(...this.addSubComment(p, creator, c))
-            //     } else {
-            //         console.log('Skip sub comments', c._id.toString())
-            //     }
-            // }
+            for (let c of comments) {
+                if (Math.random() <= 0.5) {
+                    sc.push(...this.addSubComment(p, creator, c))
+                } else {
+                    console.log('Skip sub comments', c._id.toString())
+                }
+            }
 
-            // console.log('Create comments')
-            // await Comment.create(comments)
-            // console.log('Create subcomments')
-            // await Comment.create(sc)
-            // console.log('update post')
-            // await p.save()
+            console.log('Create comments')
+            await Comment.create(comments)
+            console.log('Create subcomments')
+            await Comment.create(sc)
+            console.log('update post')
+            await p.save()
         }
 
         console.log('Completed with time', Date.now() - date, 'ms.')

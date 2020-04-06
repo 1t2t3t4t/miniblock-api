@@ -1,6 +1,5 @@
-import Post, {isPostModel, PostContentInfo, PostModel, PostRef, PostType} from "../model/Post";
-import {isUserModel, UserRef} from "../model/User";
-import {Category} from "../model/Categories";
+import Post, { PostContentInfo, PostModel, PostType } from "../model/Post"
+import { UserRef } from "../model/User"
 
 export class PostNotFoundError extends Error {
     message = 'Post does not exist'
@@ -14,7 +13,9 @@ export default class PostDAO {
 
     async getPost(postId: string,
                   interactor?: UserRef): Promise<PostModel> {
-        const post = await Post.findById(postId).populate('creator')
+        const post = await Post.findById(postId)
+            .populate('creator')
+            .populate('commentInfo.comments')
         if (!post) {
             throw new PostNotFoundError()
         }
