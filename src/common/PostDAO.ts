@@ -15,7 +15,10 @@ export default class PostDAO {
                   interactor?: UserRef): Promise<PostModel> {
         const post = await Post.findById(postId)
             .populate('creator')
-            .populate('commentInfo.comments')
+            .populate({
+                path: 'commentInfo.comments',
+                populate: 'creator'
+            })
         if (!post) {
             throw new PostNotFoundError()
         }
